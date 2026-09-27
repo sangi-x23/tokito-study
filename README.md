@@ -15,6 +15,9 @@ El contexto completo del proyecto está en [`CLAUDE.md`](./CLAUDE.md).
 ```bash
 pnpm install
 pnpm build          # compila shared, api y web en orden topológico
+
+# Variables de entorno de la API (el .env está en .gitignore)
+cp apps/api/.env.example apps/api/.env
 ```
 
 ## Comandos
