@@ -64,6 +64,7 @@ Vercel: dos proyectos desde este repo, con Root Directory `apps/api` y `apps/web
 - `Topic`: taxonomía jerárquica (tema → subtema) mediante `parentId`. Ejemplo: "Fechas y calendario" contiene "Días de la semana", "Días del mes" y "Meses". **La navegación de la app es por temas, no por clases.**
 - `StudyItem`: el átomo del sistema (palabra, kanji, punto gramatical o frase). Existe **una sola vez** aunque aparezca en varias clases: clave `[type, japanese]`.
 - `ItemTopic`: relación N:N entre ítem y tema. Un ítem puede vivir en varios temas a la vez: 日 pertenece tanto a "Fechas y calendario" como a un tema de categoría `KANJI` para practicarlo. `isPrimary` marca el tema canónico (breadcrumbs y listados planos) y `position` ordena dentro del tema.
+- `KanjiDetail`: datos de práctica de un kanji (1:1 con el `StudyItem` de tipo `KANJI`). Lecturas `onyomi` y `kunyomi` como arreglos, más `strokeCount` y `jlptLevel` opcionales. Tabla aparte y no columnas nulables en `StudyItem`, para que la tabla del átomo no se llene de campos que solo aplican a un tipo.
 - `ItemOccurrence`: en qué clases apareció cada ítem.
 - `ImageAsset`: caché de imágenes ya procesadas, por hash SHA-256 del contenido, con el texto extraído. Las imágenes **no se almacenan**.
 - `IngestionRun`: registro de cada corrida; una corrida en `RUNNING` funciona como candado.
@@ -71,6 +72,8 @@ Vercel: dos proyectos desde este repo, con Root Directory `apps/api` y `apps/web
 Invariantes:
 - **IDs estables:** la ingesta siempre hace *upsert* por clave natural. Nunca borrar y recrear ítems o temas.
 - **Todo ítem tiene al menos un tema.** El schema no lo exige (la relación es N:N); lo garantiza la ingesta. Un ítem sin temas es un bug, no un estado válido.
+- **`KanjiDetail` solo cuelga de ítems `KANJI`.** Tampoco lo exige el schema; es responsabilidad de la ingesta.
+- **Qué palabras usan un kanji no se guarda:** se deriva con `japanese LIKE '%<kanji>%'` sobre los ítems de tipo `WORD`. A la escala de un curso eso es trivial para Postgres, y una tabla de enlace habría que mantenerla sincronizada cada vez que entra una palabra nueva.
 - Las features futuras agregan tablas o módulos propios que **leen** `StudyItem`; no modifican las tablas de contenido.
 
 ## Ingesta
@@ -87,10 +90,12 @@ Invariantes:
 
 ### LlmProvider
 Interfaz independiente del proveedor, con implementación inicial en Gemini. Métodos previstos:
-- `extractStudyItems(parts)` → ítems con una etiqueta libre de tema sugerido.
+- `extractStudyItems(parts)` → ítems con una etiqueta libre de tema sugerido. Para los ítems de tipo `KANJI` devuelve además `onyomi`, `kunyomi`, `strokeCount` y `jlptLevel`.
 - `buildTaxonomy(labelsWithExamples)` → árbol de temas y mapeo etiqueta → slug de tema.
 - `assignToTopics(items, catalog)` → reutiliza temas existentes del catálogo o propone nuevos con su tema padre.
 Siempre con salida JSON estructurada y validada con zod. Si la validación falla, la corrida se marca `FAILED` y no se escribe nada.
+
+Las lecturas de un kanji son **las que enseñó el curso**, no el juego completo del diccionario: la app estudia el material de clase. `strokeCount` y `jlptLevel`, en cambio, son datos de referencia que el modelo puede alucinar; por eso son opcionales y es válido dejarlos en `null` antes que escribir un dato inventado.
 
 ### Bootstrap (lectura inicial, script local)
 `pnpm ingest:bootstrap`, corre en la máquina local contra Neon (sin el límite de 300 s de Vercel). Tres fases:
@@ -103,7 +108,7 @@ Siempre con salida JSON estructurada y validada con zod. Si la validación falla
 - Toma el candado (`IngestionRun`), detecta pestañas nuevas o con `contentHash` distinto, extrae, asigna con el catálogo de temas actual, hace upsert y cierra la corrida.
 
 ## Features futuras (no implementar aún)
-Tarjetas de estudio, vocabulario, quizzes, práctica de dictado. Todas son **por sesión**: se arma la sesión (por tema o por clase), se estudia y el estado vive en memoria (Context o store en el layout raíz de Next.js). Repetición dentro de la sesión estilo Leitner, sin repaso entre días. Aviso `beforeunload` si hay una sesión en curso.
+Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de kanji (lee `KanjiDetail`, no necesita tablas nuevas). Todas son **por sesión**: se arma la sesión (por tema o por clase), se estudia y el estado vive en memoria (Context o store en el layout raíz de Next.js). Repetición dentro de la sesión estilo Leitner, sin repaso entre días. Aviso `beforeunload` si hay una sesión en curso.
 
 ## Roadmap
 

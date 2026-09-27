@@ -76,10 +76,13 @@ model StudyItem {
   id          String           @id @default(cuid())
   type        ItemType
   japanese    String
+  // Furigana de palabras y frases. Null en los kanji: sus lecturas viven
+  // en KanjiDetail, porque un kanji tiene varias y hay que poder preguntarlas por separado.
   reading     String?
   meaning     String
   example     String?
   topics      ItemTopic[]
+  kanji       KanjiDetail?
   occurrences ItemOccurrence[]
 
   @@unique([type, japanese])
@@ -103,6 +106,21 @@ model ItemTopic {
 
   @@id([itemId, topicId])
   @@index([topicId])
+}
+
+// Datos de un kanji para la sección de práctica. Existe solo para los
+// StudyItem con type = KANJI; lo garantiza la ingesta, no el schema.
+//
+// Las lecturas son las que enseñó el curso, no el juego completo del
+// diccionario: la app estudia el material de clase. Si algún día hace falta
+// el set completo, entra como una fuente aparte sin tocar esta tabla.
+model KanjiDetail {
+  itemId      String    @id
+  item        StudyItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  onyomi      String[] // lecturas on, en katakana: ニチ, ジツ
+  kunyomi     String[] // lecturas kun, en hiragana: ひ, か
+  strokeCount Int?
+  jlptLevel   Int? // 5 = N5 ... 1 = N1
 }
 
 // En qué clases apareció cada ítem
