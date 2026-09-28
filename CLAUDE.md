@@ -124,6 +124,7 @@ Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de k
 ## Variables de entorno (`apps/api/.env`, nunca en el repo)
 
 ```
+PORT=                  # opcional, por defecto 3001
 DATABASE_URL=          # Neon pooled (-pooler)
 DIRECT_URL=            # Neon directa, para migraciones
 GOOGLE_CLIENT_ID=
@@ -134,6 +135,14 @@ GEMINI_API_KEY=
 GEMINI_MODEL=          # modelo Flash disponible en el free tier
 CRON_SECRET=
 ```
+
+### Validación
+
+`apps/api/src/config/env.ts` valida el entorno con zod **al importarse**: un valor ausente o mal formado mata el proceso al arrancar, no a mitad de una petición. Sin librería extra (`envalid`, `@t3-oss/env-*`): zod ya es dependencia del proyecto y Node 24 carga el `.env` de forma nativa con `process.loadEnvFile`, que además **nunca pisa una variable ya presente en el entorno**, así que en Vercel mandan siempre los valores de la plataforma. El mismo módulo sirve para el bootstrap de la Fase 4, que corre fuera de Nest.
+
+**Cada variable entra al esquema en la fase que empieza a leerla.** Exigir una que todavía nadie usa solo consigue que la app no arranque. Hoy el esquema cubre `PORT`, `DATABASE_URL` y `DIRECT_URL`.
+
+`DATABASE_URL` y `DIRECT_URL` se diferencian solo en el `-pooler` del host, así que el esquema comprueba cuál es cuál. Intercambiarlas es fácil y rompería las migraciones con un error opaco de PgBouncer.
 
 ## Convenciones
 - Código e identificadores en inglés; comentarios y documentación en español.
