@@ -18,7 +18,7 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **Base de datos:** PostgreSQL en **Neon**, con **Prisma 7**.
 - **Frontend:** Next.js (App Router) + Tailwind, desplegado en Vercel.
 - **LLM:** Gemini (SDK `@google/genai`), modelo Flash del nivel gratuito, configurable por `GEMINI_MODEL`.
-- **Fuente:** Google Docs API (`googleapis`), scope `documents.readonly`, OAuth con refresh token del usuario.
+- **Fuente:** Google Docs API (`googleapis`), scope `documents.readonly`, autenticada con una **cuenta de servicio**.
 - **Validación:** `zod` para toda respuesta del LLM y todo input externo.
 
 ### Versiones fijadas (decisiones de la Fase 0)
@@ -39,6 +39,9 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 ### Decisiones de la Fase 2
 
 - **Cada componente valida sus propias variables.** `parseEnvWith(schema)` en `config/env.ts` es el helper; `google-docs` declara las suyas en `google-docs.env.ts` y las valida al construir el cliente, no al importar el módulo. Así la API pública arranca sin credenciales de Google, que solo necesita la ingesta.
+- **Cuenta de servicio, no OAuth de usuario.** El documento del curso es accesible por enlace, así que la app no necesita actuar en nombre de nadie. Decisivo: un refresh token de una app en estado "Testing" **caduca a los 7 días** y dejaría el cron semanal sin credencial; la clave de una cuenta de servicio no caduca. Si el documento deja de ser accesible por enlace, hay que compartírselo al correo de la cuenta de servicio.
+- **La clave va en una sola variable y en base64.** La clave privada trae saltos de línea reales; repartida en varias variables con `
+` escapados se rompe al copiarla entre el `.env` y el panel de Vercel.
 - **`includeTabsContent: true` es obligatorio.** Sin él `documents.get` devuelve solo la primera pestaña y el resto de las clases se pierde en silencio.
 - **Las tablas se aplanan a filas con `|` entre columnas.** Un diario de japonés mete el vocabulario en tablas y perder esa estructura confundiría al LLM.
 - **Las reglas de `strip-personal-data.ts` son provisionales.** Se escribieron sin ver el documento real: quitan la línea completa si trae un enlace de videollamada, un correo o una etiqueta tipo `Participantes:`. Hay que calibrarlas con `docs:print`. No hay forma fiable de detectar un nombre suelto sin etiqueta delante.
@@ -144,10 +147,8 @@ Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de k
 PORT=                  # opcional, por defecto 3001
 DATABASE_URL=          # Neon pooled (-pooler)
 DIRECT_URL=            # Neon directa, para migraciones
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
-GOOGLE_REFRESH_TOKEN=
-GOOGLE_DOC_ID=
+GOOGLE_SERVICE_ACCOUNT_KEY=  # JSON de la cuenta de servicio, en base64
+GOOGLE_DOC_ID=               # ID o URL del documento
 GEMINI_API_KEY=
 GEMINI_MODEL=          # modelo Flash disponible en el free tier
 CRON_SECRET=
