@@ -28,6 +28,14 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **Prisma `~7.10.0`** cuando llegue la Fase 1. El tag `latest` del paquete `prisma` apunta hoy a un release candidate de la 8; el estable de `@prisma/client` sigue en 7.10.
 - **`@tokito/shared` compila a `dist/`** con `tsc` (CommonJS + `.d.ts`) en vez de exponer el código fuente, para que Nest y Next lo consuman igual. `pnpm -r build` respeta el orden topológico, así que `shared` se construye primero.
 
+### Decisiones de la Fase 1
+
+- **`moduleFormat = "cjs"` en el generador.** Por defecto `prisma-client` emite ESM (usa `import.meta`) y Node revienta al cargarlo desde nuestro build CommonJS: *exports is not defined in ES module scope*.
+- **`prisma.config.ts` lee `process.env.DIRECT_URL` directo, sin zod.** Usa `loadEnvFile()` pero no el módulo validado, porque `prisma generate` corre en `postinstall` y tiene que funcionar en un clon recién hecho, antes de que exista el `.env`. Por eso la carga del archivo vive en `config/load-env-file.ts`, separada de la validación.
+- **`PrismaService` no llama a `$connect()` al arrancar.** Prisma conecta en la primera consulta. Conectar al inicializar despertaría la base en cada arranque en frío, incluso para peticiones que no la tocan como `/health`, y el free tier de Neon cobra por horas de cómputo.
+- **Adaptador por WebSocket (`PrismaNeon`), no HTTP.** La variante HTTP es más ligera pero no soporta transacciones interactivas, y la ingesta las necesita.
+- **`onlyBuiltDependencies` en `pnpm-workspace.yaml`.** pnpm 10+ bloquea los scripts de postinstall y Prisma los necesita.
+
 ## Estructura
 
 ```
@@ -68,6 +76,7 @@ Vercel: dos proyectos desde este repo, con Root Directory `apps/api` y `apps/web
 - `ItemOccurrence`: en qué clases apareció cada ítem.
 - `ImageAsset`: caché de imágenes ya procesadas, por hash SHA-256 del contenido, con el texto extraído. Las imágenes **no se almacenan**.
 - `IngestionRun`: registro de cada corrida; una corrida en `RUNNING` funciona como candado.
+  El candado lo garantiza la base, no el código: un **índice único parcial** (`IngestionRun_one_running`) escrito a mano en la migración inicial, porque Prisma no sabe expresarlos en el schema. Un segundo `INSERT` en `RUNNING` falla con `23505`. Comprobado que `prisma migrate dev` no intenta borrarlo: genera una migración vacía.
 
 Invariantes:
 - **IDs estables:** la ingesta siempre hace *upsert* por clave natural. Nunca borrar y recrear ítems o temas.
@@ -113,7 +122,7 @@ Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de k
 ## Roadmap
 
 - [x] **Fase 0:** esqueleto del monorepo (pnpm workspaces, `apps/api` Nest, `apps/web` Next, `packages/shared`).
-- [ ] **Fase 1:** Prisma + Neon: schema, `prisma.config.ts`, migración inicial, `PrismaService` con adaptador Neon, `GET /topics` de prueba.
+- [x] **Fase 1:** Prisma + Neon: schema, `prisma.config.ts`, migración inicial, `PrismaService` con adaptador Neon, `GET /topics` de prueba.
 - [ ] **Fase 2:** módulo `google-docs`: autenticación, lectura de pestañas, parseo a partes ordenadas (texto + imágenes), descarte del encabezado. Script de prueba que imprima las secciones.
 - [ ] **Fase 3:** módulo `llm`: interfaz `LlmProvider`, implementación Gemini multimodal, throttle, reintentos y validación zod.
 - [ ] **Fase 4:** bootstrap local en tres fases.
