@@ -36,6 +36,14 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **Adaptador por WebSocket (`PrismaNeon`), no HTTP.** La variante HTTP es más ligera pero no soporta transacciones interactivas, y la ingesta las necesita.
 - **`onlyBuiltDependencies` en `pnpm-workspace.yaml`.** pnpm 10+ bloquea los scripts de postinstall y Prisma los necesita.
 
+### Decisiones de la Fase 2
+
+- **Cada componente valida sus propias variables.** `parseEnvWith(schema)` en `config/env.ts` es el helper; `google-docs` declara las suyas en `google-docs.env.ts` y las valida al construir el cliente, no al importar el módulo. Así la API pública arranca sin credenciales de Google, que solo necesita la ingesta.
+- **`includeTabsContent: true` es obligatorio.** Sin él `documents.get` devuelve solo la primera pestaña y el resto de las clases se pierde en silencio.
+- **Las tablas se aplanan a filas con `|` entre columnas.** Un diario de japonés mete el vocabulario en tablas y perder esa estructura confundiría al LLM.
+- **Las reglas de `strip-personal-data.ts` son provisionales.** Se escribieron sin ver el documento real: quitan la línea completa si trae un enlace de videollamada, un correo o una etiqueta tipo `Participantes:`. Hay que calibrarlas con `docs:print`. No hay forma fiable de detectar un nombre suelto sin etiqueta delante.
+- **Tests con el runner de Node (`node:test`), sin dependencias.** `pnpm --filter @tokito/api test` compila a `dist-test/` y corre los `*.spec.ts`. El parser es una función pura sobre la respuesta de la API, así que se prueba con datos de mentira y sin red.
+
 ## Estructura
 
 ```
@@ -50,7 +58,7 @@ apps/
       llm/        interfaz LlmProvider + implementación Gemini
       ingestion/  ingesta semanal (endpoint cron) y lógica compartida con el bootstrap
       content/    lectura de temas e ítems (API pública)
-    scripts/      bootstrap local (lectura inicial)
+      scripts/    scripts sueltos (print-sections, bootstrap) compilados con el resto
   web/            Next.js
 packages/
   shared/         tipos y DTOs compartidos (@tokito/shared)
@@ -123,7 +131,7 @@ Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de k
 
 - [x] **Fase 0:** esqueleto del monorepo (pnpm workspaces, `apps/api` Nest, `apps/web` Next, `packages/shared`).
 - [x] **Fase 1:** Prisma + Neon: schema, `prisma.config.ts`, migración inicial, `PrismaService` con adaptador Neon, `GET /topics` de prueba.
-- [ ] **Fase 2:** módulo `google-docs`: autenticación, lectura de pestañas, parseo a partes ordenadas (texto + imágenes), descarte del encabezado. Script de prueba que imprima las secciones.
+- [x] **Fase 2:** módulo `google-docs`: autenticación, lectura de pestañas, parseo a partes ordenadas (texto + imágenes), descarte del encabezado. Script de prueba que imprima las secciones. **Pendiente:** calibrar el descarte de datos personales contra el documento real, que necesita las credenciales de OAuth.
 - [ ] **Fase 3:** módulo `llm`: interfaz `LlmProvider`, implementación Gemini multimodal, throttle, reintentos y validación zod.
 - [ ] **Fase 4:** bootstrap local en tres fases.
 - [ ] **Fase 5:** ingesta semanal: endpoint, candado, Vercel Cron, `CRON_SECRET`.
