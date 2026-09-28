@@ -1,15 +1,7 @@
-import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { z } from 'zod';
+import { loadEnvFile } from './load-env-file';
 
-// En local las variables viven en apps/api/.env; en Vercel las inyecta la
-// plataforma y el archivo no existe, por eso la carga es opcional.
-// `loadEnvFile` nunca pisa una variable ya presente en el entorno, así que
-// en Vercel siempre mandan los valores de la plataforma.
-const envFilePath = resolve(process.cwd(), '.env');
-if (existsSync(envFilePath)) {
-  process.loadEnvFile(envFilePath);
-}
+loadEnvFile();
 
 const postgresUrl = z.url({ protocol: /^postgres(ql)?$/ });
 

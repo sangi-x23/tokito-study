@@ -1,6 +1,10 @@
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
+  // La API compila a CommonJS. Sin esto el generador emite ESM (usa
+  // import.meta) y Node revienta al cargar el cliente con "exports is not
+  // defined in ES module scope".
+  moduleFormat = "cjs"
 }
 
 datasource db {

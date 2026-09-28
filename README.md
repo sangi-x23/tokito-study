@@ -28,8 +28,12 @@ cp apps/api/.env.example apps/api/.env
 | `pnpm dev:web`   | Next.js en dev (`http://localhost:3000`)          |
 | `pnpm build`     | Construye todos los paquetes                      |
 | `pnpm typecheck` | Verifica tipos en todos los paquetes              |
+| `pnpm --filter @tokito/api db:migrate` | Crea y aplica una migración (usa `DIRECT_URL`) |
+| `pnpm --filter @tokito/api db:studio`  | Abre Prisma Studio sobre la base               |
 
 `GET /health` responde `{ "status": "ok" }` y sirve como prueba de humo del despliegue.
+
+`GET /topics` lee de la base y devuelve los temas; con la tabla vacía responde `[]`.
 
 > `pnpm dev:web` necesita que `@tokito/shared` esté construido al menos una vez
 > (`pnpm build`), porque los apps consumen su `dist/`.
