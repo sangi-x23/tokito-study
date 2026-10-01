@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import type { docs_v1 } from 'googleapis';
-import { parseDocument } from './document-parser';
+import { parseDocument } from '../helpers/document-parser';
 
 function paragraph(...elements: docs_v1.Schema$ParagraphElement[]): docs_v1.Schema$StructuralElement {
   return { paragraph: { elements } };

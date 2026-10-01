@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { loadGoogleEnv } from './google-docs.env';
+import { loadGoogleEnv } from '../config/google-docs.env';
 
 const KEY_JSON = {
   client_email: 'tokito@ejemplo.iam.gserviceaccount.com',

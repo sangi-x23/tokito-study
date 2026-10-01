@@ -1,5 +1,4 @@
-import { GoogleDocsService } from '../google-docs/google-docs.service';
-import type { ParsedSection } from '../google-docs/document-part';
+import { GoogleDocsService, type ParsedSection } from '../google-docs';
 
 /**
  * Imprime las secciones del documento del curso para inspeccionarlas a ojo.

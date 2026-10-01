@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { stripPersonalData } from './strip-personal-data';
+import { stripPersonalData } from '../helpers/strip-personal-data';
 
 describe('stripPersonalData', () => {
   it('quita la línea con el enlace de Meet', () => {

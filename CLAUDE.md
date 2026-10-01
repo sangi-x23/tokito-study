@@ -58,6 +58,10 @@ apps/
       health/     GET /health, prueba de humo del despliegue
       prisma/     PrismaService (adaptador Neon)
       google-docs/  lectura del documento y parseo a secciones
+        config/     variables de entorno y cliente autenticado de googleapis
+        types/      tipos públicos del módulo (DocumentPart, ParsedSection…)
+        helpers/    funciones puras (parser, descarte de datos personales)
+        tests/      *.spec.ts del módulo
       llm/        interfaz LlmProvider + implementación Gemini
       ingestion/  ingesta semanal (endpoint cron) y lógica compartida con el bootstrap
       content/    lectura de temas e ítems (API pública)

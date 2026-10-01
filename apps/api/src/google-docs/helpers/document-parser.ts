@@ -1,5 +1,5 @@
 import type { docs_v1 } from 'googleapis';
-import type { DocumentPart, ParsedDocument, ParsedSection } from './document-part';
+import type { DocumentPart, ParsedDocument, ParsedSection } from '../types/document-part';
 import { stripPersonalData } from './strip-personal-data';
 
 type InlineObjects = Record<string, docs_v1.Schema$InlineObject>;
