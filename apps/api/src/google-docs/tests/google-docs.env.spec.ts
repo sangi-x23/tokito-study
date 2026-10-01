@@ -52,6 +52,17 @@ describe('loadGoogleEnv', () => {
     );
   });
 
+  it('sin GOOGLE_DOC_SKIP_TABS no salta ninguna pestaña', () => {
+    assert.deepEqual(loadGoogleEnv(envWith({ GOOGLE_DOC_SKIP_TABS: '' })).GOOGLE_DOC_SKIP_TABS, []);
+  });
+
+  it('separa GOOGLE_DOC_SKIP_TABS por comas e ignora los espacios', () => {
+    assert.deepEqual(
+      loadGoogleEnv(envWith({ GOOGLE_DOC_SKIP_TABS: ' t.0 , t.abc,' })).GOOGLE_DOC_SKIP_TABS,
+      ['t.0', 't.abc'],
+    );
+  });
+
   it('rechaza algo que no parece un ID de documento', () => {
     assert.throws(
       () => loadGoogleEnv(envWith({ GOOGLE_DOC_ID: 'corto' })),

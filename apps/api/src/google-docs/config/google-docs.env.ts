@@ -45,6 +45,20 @@ const googleEnvSchema = z.object({
     .refine((id) => /^[\w-]{20,}$/.test(id), {
       message: 'no parece un ID de Google Doc ni una URL que lo contenga',
     }),
+
+  /**
+   * Pestañas que no son clases, separadas por coma (ej. `t.0`). Se leen para
+   * sacar de ellas los nombres a descartar, pero no se devuelven como secciones.
+   */
+  GOOGLE_DOC_SKIP_TABS: z
+    .string()
+    .default('')
+    .transform((value) =>
+      value
+        .split(',')
+        .map((tabId) => tabId.trim())
+        .filter((tabId) => tabId.length > 0),
+    ),
 });
 
 export type GoogleEnv = z.infer<typeof googleEnvSchema>;

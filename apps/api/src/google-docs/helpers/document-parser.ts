@@ -1,6 +1,6 @@
 import type { docs_v1 } from 'googleapis';
 import type { DocumentPart, ParsedDocument, ParsedSection } from '../types/document-part';
-import { stripPersonalData } from './strip-personal-data';
+import { collectPersonalNames, stripPersonalData, type PersonalNames } from './strip-personal-data';
 
 type InlineObjects = Record<string, docs_v1.Schema$InlineObject>;
 
@@ -42,19 +42,35 @@ class PartsBuilder {
     return this.parts;
   }
 
+  // El texto se guarda crudo: el descarte de datos personales necesita haber
+  // visto el documento entero, así que se aplica después en `cleanParts`.
   private flush(): void {
-    const text = stripPersonalData(this.buffer)
+    if (this.buffer.trim().length > 0) {
+      this.parts.push({ kind: 'text', text: this.buffer });
+    }
+
+    this.buffer = '';
+  }
+}
+
+type TextPart = Extract<DocumentPart, { kind: 'text' }>;
+
+const isText = (part: DocumentPart): part is TextPart => part.kind === 'text';
+
+function cleanParts(parts: readonly DocumentPart[], names: PersonalNames): DocumentPart[] {
+  return parts.flatMap((part): DocumentPart[] => {
+    if (!isText(part)) {
+      return [part];
+    }
+
+    const text = stripPersonalData(part.text, names)
       // Quitar líneas deja huecos; más de un renglón en blanco no aporta nada.
       .replace(/\n{3,}/g, '\n\n')
       .replace(/[ \t]+\n/g, '\n')
       .trim();
 
-    if (text.length > 0) {
-      this.parts.push({ kind: 'text', text });
-    }
-
-    this.buffer = '';
-  }
+    return text.length > 0 ? [{ kind: 'text', text }] : [];
+  });
 }
 
 function walkParagraph(
@@ -149,39 +165,63 @@ function flattenTabs(tabs: docs_v1.Schema$Tab[]): docs_v1.Schema$Tab[] {
   return flat;
 }
 
+export interface ParseOptions {
+  /** Pestañas que no son clases (temario, notas…) y no se devuelven. */
+  readonly skipTabIds?: readonly string[];
+}
+
 /**
  * Convierte la respuesta de `documents.get` en secciones listas para procesar.
+ *
+ * Va en dos pasadas: primero lee todas las pestañas, incluidas las que se
+ * saltan, para juntar los nombres de compañeros y profesores; después descarta
+ * de cada sección las líneas con datos personales. Una pestaña saltada sirve
+ * así de fuente de nombres (la lista de la clase) sin llegar nunca a la salida.
  *
  * Función pura: no toca la red ni la base, así que se puede probar con datos
  * de mentira.
  */
-export function parseDocument(document: docs_v1.Schema$Document): ParsedDocument {
-  const sections: ParsedSection[] = [];
+export function parseDocument(
+  document: docs_v1.Schema$Document,
+  options: ParseOptions = {},
+): ParsedDocument {
+  const skip = new Set(options.skipTabIds ?? []);
 
-  flattenTabs(document.tabs ?? []).forEach((tab, position) => {
+  const tabs = flattenTabs(document.tabs ?? []).flatMap((tab, position) => {
     const tabId = tab.tabProperties?.tabId;
     const documentTab = tab.documentTab;
 
     // Sin tabId no hay clave natural estable con la que hacer upsert.
     if (!tabId || !documentTab) {
-      return;
+      return [];
     }
 
     const builder = new PartsBuilder();
     walkContent(documentTab.body?.content ?? [], documentTab.inlineObjects ?? {}, builder);
-    const parts = builder.build();
 
-    sections.push({
-      tabId,
-      title: tab.tabProperties?.title?.trim() ?? '',
-      position,
-      parts,
-      rawText: parts
-        .filter((part): part is Extract<DocumentPart, { kind: 'text' }> => part.kind === 'text')
-        .map((part) => part.text)
-        .join('\n\n'),
-    });
+    return [{ tabId, title: tab.tabProperties?.title?.trim() ?? '', position, parts: builder.build() }];
   });
+
+  const names = collectPersonalNames(
+    tabs.flatMap((tab) => tab.parts.filter(isText).map((part) => part.text)).join('\n'),
+  );
+
+  const sections = tabs
+    .filter((tab) => !skip.has(tab.tabId))
+    .map((tab): ParsedSection => {
+      const parts = cleanParts(tab.parts, names);
+
+      return {
+        tabId: tab.tabId,
+        title: tab.title,
+        position: tab.position,
+        parts,
+        rawText: parts
+          .filter(isText)
+          .map((part) => part.text)
+          .join('\n\n'),
+      };
+    });
 
   return {
     documentId: document.documentId ?? '',

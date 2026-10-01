@@ -17,7 +17,8 @@ export class GoogleDocsService {
    * primera pestaña y el resto de las clases se pierde en silencio.
    */
   async fetchDocument(documentId?: string): Promise<ParsedDocument> {
-    const id = documentId ?? loadGoogleEnv().GOOGLE_DOC_ID;
+    const env = loadGoogleEnv();
+    const id = documentId ?? env.GOOGLE_DOC_ID;
 
     this.logger.log(`Leyendo el documento ${id}`);
 
@@ -26,7 +27,7 @@ export class GoogleDocsService {
       includeTabsContent: true,
     });
 
-    const parsed = parseDocument(response.data);
+    const parsed = parseDocument(response.data, { skipTabIds: env.GOOGLE_DOC_SKIP_TABS });
 
     this.logger.log(
       `${parsed.sections.length} pestañas leídas de "${parsed.title}" (revisión ${parsed.revisionId ?? 'desconocida'})`,

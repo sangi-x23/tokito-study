@@ -141,6 +141,40 @@ describe('parseDocument', () => {
     assert.equal(parsed.sections[0]?.rawText, 'Clase 1\nVocabulario');
   });
 
+  it('salta las pestañas pedidas pero usa sus nombres para limpiar las demás', () => {
+    const parsed = parseDocument(
+      doc([
+        tab('t.0', 'Introducción', [paragraph(text('アナ：Ana\n'))], { index: 0 }),
+        tab('t.1', 'Clase 1', [paragraph(text('出席者：Ana\nわたしは　アナです。\nねこ：gato\n'))], {
+          index: 1,
+        }),
+      ]),
+      { skipTabIds: ['t.0'] },
+    );
+
+    assert.deepEqual(
+      parsed.sections.map((section) => section.tabId),
+      ['t.1'],
+    );
+    assert.equal(parsed.sections[0]?.position, 1);
+    assert.equal(parsed.sections[0]?.rawText, 'ねこ：gato');
+  });
+
+  it('descarta una parte de texto que se queda vacía al limpiarla', () => {
+    const parsed = parseDocument(
+      doc([
+        tab('t1', 'Clase 1', [paragraph(text('出席者：Ana\n'), image('img-1'), text('ねこ\n'))], {
+          inlineObjects: { 'img-1': inlineObject('https://example.com/a.png') },
+        }),
+      ]),
+    );
+
+    assert.deepEqual(
+      parsed.sections[0]?.parts.map((part) => part.kind),
+      ['image', 'text'],
+    );
+  });
+
   it('conserva los metadatos del documento', () => {
     const parsed = parseDocument(doc([]));
 
