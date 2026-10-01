@@ -28,6 +28,8 @@ cp apps/api/.env.example apps/api/.env
 | `pnpm dev:web`   | Next.js en dev (`http://localhost:3000`)          |
 | `pnpm build`     | Construye todos los paquetes                      |
 | `pnpm typecheck` | Verifica tipos en todos los paquetes              |
+| `pnpm --filter @tokito/api test`       | Corre los tests con el runner de Node          |
+| `pnpm --filter @tokito/api docs:print` | Imprime las secciones del Google Doc           |
 | `pnpm --filter @tokito/api db:migrate` | Crea y aplica una migración (usa `DIRECT_URL`) |
 | `pnpm --filter @tokito/api db:studio`  | Abre Prisma Studio sobre la base               |
 
