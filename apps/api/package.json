@@ -12,9 +12,11 @@
     "db:deploy": "prisma migrate deploy",
     "db:studio": "prisma studio",
     "test": "tsc -p tsconfig.json --outDir dist-test && node --test \"dist-test/**/*.spec.js\"",
-    "docs:print": "node dist/scripts/print-sections.js"
+    "docs:print": "node dist/scripts/print-sections.js",
+    "llm:try": "node dist/scripts/try-extraction.js"
   },
   "dependencies": {
+    "@google/genai": "2.24.0",
     "@neondatabase/serverless": "^1.1.0",
     "@nestjs/common": "^12.1.0",
     "@nestjs/core": "^12.1.0",
