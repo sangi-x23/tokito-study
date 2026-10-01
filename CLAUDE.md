@@ -61,6 +61,19 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **Latencia observada:** una pestaña sin imágenes tarda unos 30 s; con 4 imágenes, entre 70 y 115 s. `buildTaxonomy` tarda entre 20 y 110 s. Cabe en los 300 s de Vercel para una pestaña por corrida, pero no da para varias pestañas con reintentos en la misma función. A tenerlo en cuenta en la Fase 5.
 - **La taxonomía no es determinista.** Dos corridas con las mismas etiquetas dieron 17 y 34 temas. Es una razón más para la revisión manual del bootstrap (Fase 4).
 
+### Decisiones de la Fase 4
+
+- **`contentHash` = SHA-256 del texto y de los hashes de las imágenes, en orden.** Cambiar una imagen cuenta como cambio aunque el texto siga igual. Se hashea el contenido descargado, no la `contentUri`, que es temporal y cambia en cada lectura. Por eso calcular la huella obliga a descargar las imágenes, incluso de las pestañas que no cambiaron.
+- **`imageId` = hash de la imagen.** Así el texto que devuelve el LLM se casa directo con la entrada de `ImageAsset`. Una imagen repetida en la misma pestaña se manda una sola vez. Las que ya están en caché se sustituyen por su texto. Las nuevas se reducen a 1024 px de ancho y se mandan en JPEG de calidad 85.
+- **`extract` solo lee la base.** Consulta `ImageAsset` para reutilizar textos, pero toda escritura espera a `import`, después de la revisión. Las imágenes nuevas se guardan en caché recién al importar.
+- **Fusión de ítems entre pestañas por `[type, japanese]`**, con `japanese` normalizado (NFC y sin espacios en los extremos). Significado, ejemplo y lecturas salen de la primera clase donde apareció. Los temas son la unión de los de todas sus etiquetas, y el primario es el de la primera.
+- **Todo kanji va también a un tema de categoría `KANJI`.** Se usa el primero de la taxonomía y, si no hay ninguno, se crea `kanji`.
+- **Escritura por lotes, no fila por fila.** Neon responde en unos 70 ms por consulta, y un upsert por fila serían miles de consultas y varios minutos. `writePlan` lee lo que existe, crea lo nuevo con `createMany`/`createManyAndReturn` y actualiza solo lo que cambió. Es la misma función que usará la ingesta semanal.
+- **Lo único que se borra son enlaces `ItemTopic` obsoletos** de los ítems importados. Si la taxonomía revisada mueve un ítem de tema, deja de aparecer en el anterior. Ítems y temas nunca se borran.
+- **El candado libera corridas abandonadas.** Una corrida que lleva más de 30 minutos en `RUNNING` se marca `FAILED` antes de tomar el candado. Sin eso, un proceso que muere sin cerrar bloquearía para siempre el cron.
+- **`classDate` sale del título** (`7/10 …`). El año es el de la corrida, o el anterior si la fecha quedaría en el futuro.
+- **La cuota diaria del nivel gratuito es pequeña.** El 2026-10-01 se agotó la de `gemini-3.5-flash` tras unas 20 llamadas, contando las pruebas y los reintentos ante 503. El bootstrap completo necesita unas 12 llamadas si ninguna falla, así que conviene correrlo con la cuota del día intacta. Como es reanudable, si se corta se sigue al día siguiente. Con mucha demanda, `GEMINI_MAX_RETRIES=8` aguanta picos de 503 de unos 3 minutos.
+
 ## Estructura
 
 ```
@@ -85,6 +98,10 @@ apps/
         providers/  GeminiProvider
         tests/      *.spec.ts del módulo
       ingestion/  ingesta semanal (endpoint cron) y lógica compartida con el bootstrap
+        types/      plan de importación (SectionExtraction, ImportPlan…)
+        helpers/    huella de contenido, imágenes, plan, escritura por lotes, candado
+        bootstrap/  las tres fases del bootstrap y sus archivos locales en .bootstrap/
+        tests/      *.spec.ts del módulo
       content/    lectura de temas e ítems (API pública)
       scripts/    scripts sueltos (print-sections, bootstrap) compilados con el resto
   web/            Next.js
@@ -145,10 +162,10 @@ El prompt de `extractStudyItems` debe pedir explícitamente que **no se extraiga
 Las lecturas de un kanji son **las que enseñó el curso**, no el juego completo del diccionario: la app estudia el material de clase. `strokeCount` y `jlptLevel`, en cambio, son datos de referencia que el modelo puede alucinar; por eso son opcionales y es válido dejarlos en `null` antes que escribir un dato inventado.
 
 ### Bootstrap (lectura inicial, script local)
-`pnpm ingest:bootstrap`, corre en la máquina local contra Neon (sin el límite de 300 s de Vercel). Tres fases:
-1. **Extracción por pestaña:** ítems con etiqueta sugerida → archivos JSON locales. Reanudable.
-2. **Taxonomía:** una llamada solo texto con las etiquetas y ejemplos → árbol de temas + mapeo etiqueta → tema.
-3. **Revisión e importación:** el autor revisa el JSON de la taxonomía y luego se importa a la base de datos.
+`pnpm --filter @tokito/api ingest:bootstrap <fase>`, corre en la máquina local contra Neon (sin el límite de 300 s de Vercel). Tres fases, cada una un subcomando:
+1. **`extract`:** ítems con etiqueta sugerida → `apps/api/.bootstrap/extractions/<tabId>.json`. Es reanudable: salta las pestañas cuya huella no cambió (`--force` las rehace) y borra los archivos de pestañas que ya no están.
+2. **`taxonomy`:** una llamada solo texto con las etiquetas y hasta 5 ejemplos de cada una → `.bootstrap/taxonomy.json`, más el árbol impreso para revisarlo. No pisa una taxonomía existente sin `--force`.
+3. **Revisión e `import`:** el autor edita `taxonomy.json` a mano. `import` lo revalida con las mismas reglas que la respuesta del LLM, arma el plan y lo escribe en una transacción con el candado tomado. `--dry-run` solo cuenta lo que escribiría.
 
 ### Ingesta semanal (Vercel Cron)
 - Endpoint protegido por `CRON_SECRET`, un día después de la clase (horario en UTC; Colombia = UTC-5).
@@ -163,7 +180,7 @@ Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de k
 - [x] **Fase 1:** Prisma + Neon: schema, `prisma.config.ts`, migración inicial, `PrismaService` con adaptador Neon, `GET /topics` de prueba.
 - [x] **Fase 2:** módulo `google-docs`: autenticación, lectura de pestañas, parseo a partes ordenadas (texto + imágenes), descarte de datos personales calibrado contra el documento real y exclusión de pestañas que no son clases. Script de prueba que imprime las secciones.
 - [x] **Fase 3:** módulo `llm`: interfaz `LlmProvider` con sus tres métodos, implementación Gemini multimodal, throttle, reintentos y validación zod. Script `llm:try` para calibrar la extracción contra una pestaña real.
-- [ ] **Fase 4:** bootstrap local en tres fases.
+- [ ] **Fase 4:** bootstrap local en tres fases: `ingest:bootstrap extract`, `taxonomy` e `import` (con `--dry-run`). Código listo y probado contra Neon. **Pendiente:** correr el bootstrap real, que se cortó el 2026-10-01 por la cuota diaria de Gemini.
 - [ ] **Fase 5:** ingesta semanal: endpoint, candado, Vercel Cron, `CRON_SECRET`.
 - [ ] **Fase 6:** API de lectura: árbol de temas, detalle de tema con ítems y clases donde aparecieron.
 - [ ] **Fase 7:** frontend: navegación por temas y vista de ítems.
