@@ -49,6 +49,18 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **`GOOGLE_DOC_SKIP_TABS` excluye pestañas que no son clases.** La `t.0` trae el temario, la lista de la clase y las notas del parcial, que tienen el mismo formato que el vocabulario y no se pueden filtrar con reglas. Una pestaña excluida se lee como fuente de nombres, pero nunca se devuelve como sección. Las demás conservan su `position` original.
 - **Tests con el runner de Node (`node:test`), sin dependencias.** `pnpm --filter @tokito/api test` compila a `dist-test/` y corre los `*.spec.ts`. El parser es una función pura sobre la respuesta de la API, así que se prueba con datos de mentira y sin red.
 
+### Decisiones de la Fase 3
+
+- **`GEMINI_MODEL=gemini-3.5-flash`.** Se eligió listando los modelos con la clave el 2026-10-01 y probando cada uno. `gemini-3.8-flash` aparece en el listado pero devolvía 503 de forma sistemática; `gemini-3.5-flash` responde y acepta `responseJsonSchema`.
+- **`@google/genai` fijado en 2.24.0, no en la 2.25.0.** La 2.25.0 tenía un día de publicada y no pasaba el `minimumReleaseAge` de pnpm; se prefirió no excluirla de esa protección. `allowBuilds` queda en `false` para `@google/genai` (su script es un `echo`) y `protobufjs` (solo comprueba versiones).
+- **zod es la única fuente de verdad del formato.** `z.toJSONSchema()` genera el `responseJsonSchema` que se manda a Gemini, y la respuesta se valida con el mismo esquema. Las reglas que no se ven en la estructura (`KanjiDetail` solo en ítems `KANJI`, cada imagen con su texto, cada etiqueta con su tema, árbol de dos niveles sin ciclos, todo ítem con tema) van en funciones `check*` aparte. Los textos no vacíos van como `refine` y no como `.min(1)`, para que el JSON Schema se quede en lo básico.
+- **Los reintentos son nuestros, no del SDK.** Sin `retryOptions` el SDK no reintenta. Un 429 puede ser por la cuota por minuto, que se reintenta respetando el `RetryInfo`, o por la diaria (`quotaId` con `PerDay`), que lanza `LlmQuotaExhaustedError` de inmediato, porque no se recupera hasta medianoche, hora del Pacífico. Los 5xx y los fallos de red se reintentan con backoff exponencial y jitter. Un error de validación no se reintenta.
+- **Throttle en memoria del proceso** (`GEMINI_MIN_INTERVAL_MS`, por defecto 7 s). Basta porque la ingesta nunca corre en paralelo: el candado de `IngestionRun` lo garantiza.
+- **El proveedor es perezoso.** La clave y el modelo se validan en la primera llamada, así que la API pública arranca sin credenciales de Gemini. Quien consume el módulo inyecta `LLM_PROVIDER`, no `GeminiProvider`.
+- **El módulo `llm` recibe las imágenes ya descargadas.** Descargarlas, reducirlas con `sharp` y consultar `ImageAsset` es trabajo de la ingesta. Cada imagen va precedida de una marca `[imagen <id>]` para que el modelo devuelva su texto en `imageTexts`.
+- **Latencia observada:** una pestaña sin imágenes tarda unos 30 s; con 4 imágenes, entre 70 y 115 s. `buildTaxonomy` tarda entre 20 y 110 s. Cabe en los 300 s de Vercel para una pestaña por corrida, pero no da para varias pestañas con reintentos en la misma función. A tenerlo en cuenta en la Fase 5.
+- **La taxonomía no es determinista.** Dos corridas con las mismas etiquetas dieron 17 y 34 temas. Es una razón más para la revisión manual del bootstrap (Fase 4).
+
 ## Estructura
 
 ```
@@ -65,6 +77,13 @@ apps/
         helpers/    funciones puras (parser, descarte de datos personales)
         tests/      *.spec.ts del módulo
       llm/        interfaz LlmProvider + implementación Gemini
+        config/     variables de entorno de Gemini
+        types/      contratos de la interfaz (LlmPart, Extraction, Taxonomy…)
+        schemas/    esquemas zod de cada respuesta y sus reglas check*
+        prompts/    instrucciones de cada método
+        helpers/    throttle, reintentos, parseo de la salida estructurada
+        providers/  GeminiProvider
+        tests/      *.spec.ts del módulo
       ingestion/  ingesta semanal (endpoint cron) y lógica compartida con el bootstrap
       content/    lectura de temas e ítems (API pública)
       scripts/    scripts sueltos (print-sections, bootstrap) compilados con el resto
@@ -143,7 +162,7 @@ Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de k
 - [x] **Fase 0:** esqueleto del monorepo (pnpm workspaces, `apps/api` Nest, `apps/web` Next, `packages/shared`).
 - [x] **Fase 1:** Prisma + Neon: schema, `prisma.config.ts`, migración inicial, `PrismaService` con adaptador Neon, `GET /topics` de prueba.
 - [x] **Fase 2:** módulo `google-docs`: autenticación, lectura de pestañas, parseo a partes ordenadas (texto + imágenes), descarte de datos personales calibrado contra el documento real y exclusión de pestañas que no son clases. Script de prueba que imprime las secciones.
-- [ ] **Fase 3:** módulo `llm`: interfaz `LlmProvider`, implementación Gemini multimodal, throttle, reintentos y validación zod.
+- [x] **Fase 3:** módulo `llm`: interfaz `LlmProvider` con sus tres métodos, implementación Gemini multimodal, throttle, reintentos y validación zod. Script `llm:try` para calibrar la extracción contra una pestaña real.
 - [ ] **Fase 4:** bootstrap local en tres fases.
 - [ ] **Fase 5:** ingesta semanal: endpoint, candado, Vercel Cron, `CRON_SECRET`.
 - [ ] **Fase 6:** API de lectura: árbol de temas, detalle de tema con ítems y clases donde aparecieron.
@@ -159,7 +178,9 @@ GOOGLE_SERVICE_ACCOUNT_KEY=  # JSON de la cuenta de servicio, en base64
 GOOGLE_DOC_ID=               # ID o URL del documento
 GOOGLE_DOC_SKIP_TABS=        # opcional, tabId separados por coma (hoy t.0)
 GEMINI_API_KEY=
-GEMINI_MODEL=          # modelo Flash disponible en el free tier
+GEMINI_MODEL=          # modelo Flash disponible en el free tier (hoy gemini-3.5-flash)
+GEMINI_MIN_INTERVAL_MS=  # opcional, por defecto 7000
+GEMINI_MAX_RETRIES=      # opcional, por defecto 4
 CRON_SECRET=
 ```
 

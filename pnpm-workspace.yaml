@@ -3,8 +3,10 @@ packages:
   - packages/*
 
 allowBuilds:
+  '@google/genai': false
   '@prisma/engines': set this to true or false
   prisma: set this to true or false
+  protobufjs: false
 
 # pnpm bloquea los scripts de postinstall por defecto. Prisma los necesita
 # para descargar sus motores, así que se autorizan explícitamente.
