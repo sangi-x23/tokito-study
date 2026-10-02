@@ -52,6 +52,11 @@ describe('classifyGeminiError', () => {
     });
   });
 
+  it('el timeout de la petición es reintentable', () => {
+    const error = new DOMException('This operation was aborted', 'AbortError');
+    assert.deepEqual(classifyGeminiError(error), { kind: 'retryable', retryAfterMs: null });
+  });
+
   it('tolera un mensaje que no es JSON', () => {
     const error = new ApiError({ status: 503, message: 'Service Unavailable' });
     assert.deepEqual(classifyGeminiError(error), { kind: 'retryable', retryAfterMs: null });
