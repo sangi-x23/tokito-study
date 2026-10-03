@@ -45,7 +45,13 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **`includeTabsContent: true` es obligatorio.** Sin él `documents.get` devuelve solo la primera pestaña y el resto de las clases se pierde en silencio.
 - **Las tablas se aplanan a filas con `|` entre columnas.** Un diario de japonés mete el vocabulario en tablas y perder esa estructura confundiría al LLM.
 - **El descarte de datos personales está calibrado contra el documento real** y trabaja por líneas: quita la línea completa. Caen los enlaces y la etiqueta de videollamada, los correos, la asistencia (`出席者：` / `欠席者：`, con `：` de ancho completo), las menciones a profesores (`〈kana〉せんせい`) y los compañeros con `くん` o `ちゃん`. Se pierde alguna frase de ejemplo a cambio de no dejar pasar nombres. `さん` queda fuera a propósito, porque lo usan los personajes del libro (`アランさん`), que sí son material.
-- **Lista de nombres sacada del propio documento, en dos pasadas.** El parser lee primero todas las pestañas y junta los nombres: los latinos salen de la asistencia; los katakana, de las líneas `カタカナ：Nombre` cuyo lado latino ya está en la asistencia (así `パン：Pan` no cuenta) y de lo que va delante de `せんせい`. Después descarta las líneas que nombran a alguien, con el nombre como palabra completa: `サラ` no tumba `サラダ`. Los nombres solo viven en memoria. Un nombre que no aparece en ninguna de esas fuentes no se detecta; la segunda barrera es el prompt de extracción de la Fase 3.
+- **Lista de nombres sacada del propio documento, en dos pasadas.** El parser lee primero todas las pestañas y junta los nombres: los latinos salen de la asistencia; los katakana, de las líneas `カタカナ：Nombre` cuyo lado latino ya está en la asistencia (así `パン：Pan` no cuenta) y de lo que va delante de `せんせい`. Después descarta las líneas que nombran a alguien, con el nombre como palabra completa: `リサ` no tumba `リサイクル`. Los nombres solo viven en memoria. Un nombre que no aparece en ninguna de esas fuentes no se detecta; la segunda barrera es el prompt de extracción de la Fase 3.
+- **Tres refuerzos tras revisar el bootstrap (2026-10-02).** En el `rawText` de las pestañas 6 a 8 se habían colado un apellido, un diminutivo y el negocio y el trabajo de compañeros:
+  - Se descarta quien dice su nombre o apellido (`みょうじ は ゴメス です`), salvo que el hueco sea de plantilla (`〇〇`, `〜`, `nombre`, `なん`).
+  - El lado latino de `山田ケンジ ／ Yamada Kenji` también cuenta como nombre.
+  - Lo que ninguna regla puede saber (un diminutivo como `Pepe`, el nombre de un negocio, un personaje que no es del libro) va en `GOOGLE_DOC_PERSONAL_TERMS`: los términos latinos se buscan como palabra completa y el resto como texto literal.
+  
+  Los términos son datos personales, así que viven en el entorno y no en el repo. Se descartó detectar diminutivos por prefijo (`Caro` ⊂ `Carolina`): una `Carolina` en la clase tumbaría `たかい：caro`.
 - **`GOOGLE_DOC_SKIP_TABS` excluye pestañas que no son clases.** La `t.0` trae el temario, la lista de la clase y las notas del parcial, que tienen el mismo formato que el vocabulario y no se pueden filtrar con reglas. Una pestaña excluida se lee como fuente de nombres, pero nunca se devuelve como sección. Las demás conservan su `position` original.
 - **Tests con el runner de Node (`node:test`), sin dependencias.** `pnpm --filter @tokito/api test` compila a `dist-test/` y corre los `*.spec.ts`. El parser es una función pura sobre la respuesta de la API, así que se prueba con datos de mentira y sin red.
 
@@ -74,6 +80,14 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **`classDate` sale del título** (`7/10 …`). El año es el de la corrida, o el anterior si la fecha quedaría en el futuro.
 - **La cuota diaria del nivel gratuito es pequeña.** El 2026-10-01 se agotó la de `gemini-3.5-flash` tras unas 20 llamadas, contando las pruebas y los reintentos ante 503. El bootstrap completo necesita unas 12 llamadas si ninguna falla, así que conviene correrlo con la cuota del día intacta. Como es reanudable, si se corta se sigue al día siguiente. Con mucha demanda, `GEMINI_MAX_RETRIES=8` aguanta picos de 503 de unos 3 minutos.
 - **Cada reintento gasta cuota diaria, aunque la respuesta sea 503.** El 2026-10-02 la cuota se agotó tras unas 22 peticiones que solo dieron 4 extracciones buenas; el resto fueron 503 y timeouts. Con el modelo saturado, subir `GEMINI_MAX_RETRIES` cambia cortes por cuota quemada: si los 503 no ceden, conviene parar y retomar más tarde.
+- **Proveedor manual para el bootstrap (`--manual`).** Con la cuota de Gemini agotada, las pestañas 5–11 y la taxonomía se hicieron a mano desde Claude Code, sin API de pago. `ManualProvider` (`ingestion/bootstrap/manual-provider.ts`) implementa `LlmProvider` sobre archivos: cada llamada deja en `.bootstrap/manual/<operación>-<clave>/` un `request.md` (instrucciones, esquema y contenido) y las imágenes ya reducidas, y lanza `LlmPendingError`; `extract` la cuenta como pendiente y sigue. Al volver a correr, el `response.json` se valida con el mismo esquema y las mismas reglas `check*` que una respuesta de Gemini, y la huella sale del flujo normal. La clave es el hash del contenido, así que una pestaña que cambió pide una solicitud nueva. `assignToTopics` no se implementa: la ingesta semanal sigue con Gemini.
+- **Las extracciones se corrigieron a mano antes de importar (2026-10-02).** Una revisión encontró ítems que no se fusionaban por `[type, japanese]`, y se aplicaron estas convenciones a todas las pestañas:
+  - `japanese` va sin espacios internos ni `。`/`？` al final, y con paréntesis de ancho completo.
+  - Los huecos de un `GRAMMAR_POINT` se marcan con `〜`, no con `〈…〉`.
+  - Las preguntas completas son `PHRASE`; `はい` y `いいえ` son `WORD`.
+  - Un mes o un día se escribe en kanji con su lectura (`九月`, `4日`), aunque la clase lo escribiera en kana.
+  
+  Después de cambiar el filtro de datos personales se recalcularon `rawText` y `contentHash` con el parser nuevo, sin volver a extraer, para que la ingesta no tome esas pestañas por modificadas.
 
 ## Estructura
 
@@ -164,6 +178,7 @@ Las lecturas de un kanji son **las que enseñó el curso**, no el juego completo
 
 ### Bootstrap (lectura inicial, script local)
 `pnpm --filter @tokito/api ingest:bootstrap <fase>`, corre en la máquina local contra Neon (sin el límite de 300 s de Vercel). Tres fases, cada una un subcomando:
+Con `--manual`, `extract` y `taxonomy` usan `ManualProvider` en lugar de Gemini.
 1. **`extract`:** ítems con etiqueta sugerida → `apps/api/.bootstrap/extractions/<tabId>.json`. Es reanudable: salta las pestañas cuya huella no cambió (`--force` las rehace) y borra los archivos de pestañas que ya no están.
 2. **`taxonomy`:** una llamada solo texto con las etiquetas y hasta 5 ejemplos de cada una → `.bootstrap/taxonomy.json`, más el árbol impreso para revisarlo. No pisa una taxonomía existente sin `--force`.
 3. **Revisión e `import`:** el autor edita `taxonomy.json` a mano. `import` lo revalida con las mismas reglas que la respuesta del LLM, arma el plan y lo escribe en una transacción con el candado tomado. `--dry-run` solo cuenta lo que escribiría.
@@ -181,7 +196,7 @@ Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de k
 - [x] **Fase 1:** Prisma + Neon: schema, `prisma.config.ts`, migración inicial, `PrismaService` con adaptador Neon, `GET /topics` de prueba.
 - [x] **Fase 2:** módulo `google-docs`: autenticación, lectura de pestañas, parseo a partes ordenadas (texto + imágenes), descarte de datos personales calibrado contra el documento real y exclusión de pestañas que no son clases. Script de prueba que imprime las secciones.
 - [x] **Fase 3:** módulo `llm`: interfaz `LlmProvider` con sus tres métodos, implementación Gemini multimodal, throttle, reintentos y validación zod. Script `llm:try` para calibrar la extracción contra una pestaña real.
-- [ ] **Fase 4:** bootstrap local en tres fases: `ingest:bootstrap extract`, `taxonomy` e `import` (con `--dry-run`). Código listo y probado contra Neon. **Pendiente:** terminar el bootstrap real. Al 2026-10-02 hay 4 de 10 pestañas extraídas; faltan 6 pestañas, `taxonomy`, la revisión e `import`.
+- [x] **Fase 4:** bootstrap local en tres fases: `ingest:bootstrap extract`, `taxonomy` e `import` (con `--dry-run`). Importado en Neon el 2026-10-03: 11 pestañas, 57 temas, 466 ítems (7 kanji) y 19 imágenes en caché. Pestañas 1–4 extraídas con Gemini y 5–11 con `--manual`, revisadas y corregidas a mano antes de importar. Una segunda corrida de `import` no escribe nada.
 - [ ] **Fase 5:** ingesta semanal: endpoint, candado, Vercel Cron, `CRON_SECRET`.
 - [ ] **Fase 6:** API de lectura: árbol de temas, detalle de tema con ítems y clases donde aparecieron.
 - [ ] **Fase 7:** frontend: navegación por temas y vista de ítems.
@@ -195,6 +210,7 @@ DIRECT_URL=            # Neon directa, para migraciones
 GOOGLE_SERVICE_ACCOUNT_KEY=  # JSON de la cuenta de servicio, en base64
 GOOGLE_DOC_ID=               # ID o URL del documento
 GOOGLE_DOC_SKIP_TABS=        # opcional, tabId separados por coma (hoy t.0)
+GOOGLE_DOC_PERSONAL_TERMS=   # opcional, términos personales a descartar, separados por coma
 GEMINI_API_KEY=
 GEMINI_MODEL=          # modelo Flash disponible en el free tier (hoy gemini-3.5-flash)
 GEMINI_MIN_INTERVAL_MS=  # opcional, por defecto 7000
