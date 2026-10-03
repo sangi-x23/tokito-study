@@ -21,4 +21,9 @@ export { GeminiProvider } from './providers/gemini.provider';
 // reglas que la respuesta del LLM.
 export { checkTopicTree } from './schemas/common';
 export { checkTaxonomy, taxonomySchema } from './schemas/taxonomy.schema';
-export { extractionSchema } from './schemas/extraction.schema';
+export { checkExtraction, extractionSchema } from './schemas/extraction.schema';
+// El proveedor manual del bootstrap arma las mismas solicitudes que Gemini y
+// valida las respuestas igual.
+export { parseStructured } from './helpers/structured-output';
+export { EXTRACTION_INSTRUCTIONS, imageMarker } from './prompts/extraction.prompt';
+export { TAXONOMY_INSTRUCTIONS, taxonomyUserMessage } from './prompts/taxonomy.prompt';

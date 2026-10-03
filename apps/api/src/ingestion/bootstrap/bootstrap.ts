@@ -1,7 +1,7 @@
 import { access } from 'node:fs/promises';
 import { Logger } from '@nestjs/common';
 import type { GoogleDocsService } from '../../google-docs';
-import { checkTaxonomy, type LlmProvider, type Taxonomy } from '../../llm';
+import { checkTaxonomy, type Extraction, type LlmProvider, type Taxonomy } from '../../llm';
 import type { PrismaService } from '../../prisma/prisma.service';
 import { buildImportPlan } from '../helpers/import-plan';
 import { downloadImage, shrinkForLlm } from '../helpers/images';
@@ -21,6 +21,7 @@ import {
   writeExtraction,
   writeTaxonomy,
 } from './bootstrap-files';
+import { LlmPendingError } from './manual-provider';
 
 const logger = new Logger('Bootstrap');
 
@@ -55,6 +56,7 @@ export async function extractPhase(deps: BootstrapDeps, options: { force: boolea
   removed.forEach((path) => logger.log(`Borrada la extracción de una pestaña que ya no está: ${path}`));
 
   let extracted = 0;
+  let pending = 0;
 
   for (const section of document.sections) {
     const label = `[${section.position}] ${section.title}`;
@@ -77,8 +79,16 @@ export async function extractPhase(deps: BootstrapDeps, options: { force: boolea
     logger.log(`${label}: extrayendo (${newImages} imágenes nuevas, ${cached.size} de la caché)`);
 
     // Una pestaña vacía no gasta una llamada.
-    const result =
-      parts.length === 0 ? { items: [], imageTexts: [] } : await deps.llm.extractStudyItems(parts);
+    let result: Extraction;
+    try {
+      result = parts.length === 0 ? { items: [], imageTexts: [] } : await deps.llm.extractStudyItems(parts);
+    } catch (error) {
+      // Con el proveedor manual la respuesta llega en otra corrida.
+      if (!(error instanceof LlmPendingError)) throw error;
+      logger.log(`${label}: pendiente, falta la respuesta en ${error.requestDir}`);
+      pending += 1;
+      continue;
+    }
     const imageTexts = new Map(result.imageTexts.map((image) => [image.imageId, image.text]));
 
     const extraction: SectionExtraction = {
@@ -99,7 +109,11 @@ export async function extractPhase(deps: BootstrapDeps, options: { force: boolea
     logger.log(`${label}: ${result.items.length} ítems`);
   }
 
-  logger.log(`Extracción terminada: ${extracted} pestañas extraídas, ${document.sections.length - extracted} sin cambios.`);
+  const unchanged = document.sections.length - extracted - pending;
+  logger.log(
+    `Extracción terminada: ${extracted} pestañas extraídas, ${unchanged} sin cambios` +
+      (pending > 0 ? `, ${pending} pendientes.` : '.'),
+  );
 }
 
 /**
