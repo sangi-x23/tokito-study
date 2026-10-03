@@ -27,7 +27,10 @@ export class GoogleDocsService {
       includeTabsContent: true,
     });
 
-    const parsed = parseDocument(response.data, { skipTabIds: env.GOOGLE_DOC_SKIP_TABS });
+    const parsed = parseDocument(response.data, {
+      skipTabIds: env.GOOGLE_DOC_SKIP_TABS,
+      personalTerms: env.GOOGLE_DOC_PERSONAL_TERMS,
+    });
 
     this.logger.log(
       `${parsed.sections.length} pestañas leídas de "${parsed.title}" (revisión ${parsed.revisionId ?? 'desconocida'})`,

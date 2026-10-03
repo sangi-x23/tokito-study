@@ -1,6 +1,11 @@
 import type { docs_v1 } from 'googleapis';
 import type { DocumentPart, ParsedDocument, ParsedSection } from '../types/document-part';
-import { collectPersonalNames, stripPersonalData, type PersonalNames } from './strip-personal-data';
+import {
+  collectPersonalNames,
+  stripPersonalData,
+  withPersonalTerms,
+  type PersonalNames,
+} from './strip-personal-data';
 
 type InlineObjects = Record<string, docs_v1.Schema$InlineObject>;
 
@@ -168,6 +173,8 @@ function flattenTabs(tabs: docs_v1.Schema$Tab[]): docs_v1.Schema$Tab[] {
 export interface ParseOptions {
   /** Pestañas que no son clases (temario, notas…) y no se devuelven. */
   readonly skipTabIds?: readonly string[];
+  /** Términos a descartar que ninguna regla detecta (ver `withPersonalTerms`). */
+  readonly personalTerms?: readonly string[];
 }
 
 /**
@@ -202,8 +209,9 @@ export function parseDocument(
     return [{ tabId, title: tab.tabProperties?.title?.trim() ?? '', position, parts: builder.build() }];
   });
 
-  const names = collectPersonalNames(
-    tabs.flatMap((tab) => tab.parts.filter(isText).map((part) => part.text)).join('\n'),
+  const names = withPersonalTerms(
+    collectPersonalNames(tabs.flatMap((tab) => tab.parts.filter(isText).map((part) => part.text)).join('\n')),
+    options.personalTerms ?? [],
   );
 
   const sections = tabs
