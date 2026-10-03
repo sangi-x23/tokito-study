@@ -41,8 +41,10 @@ function parseDuration(value: string | undefined): number | null {
  */
 export function classifyGeminiError(error: unknown): ErrorKind {
   if (!(error instanceof ApiError)) {
-    // Fallo de red antes de recibir respuesta: `fetch` lanza TypeError.
-    return error instanceof TypeError ? { kind: 'retryable', retryAfterMs: null } : { kind: 'fatal' };
+    // Fallo de red antes de recibir respuesta: `fetch` lanza TypeError. El
+    // timeout de `httpOptions` aborta la petición y lanza un `AbortError`.
+    const transient = error instanceof TypeError || (error instanceof Error && error.name === 'AbortError');
+    return transient ? { kind: 'retryable', retryAfterMs: null } : { kind: 'fatal' };
   }
 
   if (!RETRYABLE_STATUS.has(error.status)) {

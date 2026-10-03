@@ -13,6 +13,17 @@ const serviceAccountSchema = z.object({
 // uno copia de la barra del navegador.
 const DOCUMENT_URL = /\/document\/d\/([\w-]+)/;
 
+/** Lista separada por comas, sin espacios en los extremos ni elementos vacíos. */
+const commaList = z
+  .string()
+  .default('')
+  .transform((value) =>
+    value
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0),
+  );
+
 const googleEnvSchema = z.object({
   /**
    * El JSON de la cuenta de servicio, codificado en base64.
@@ -50,15 +61,14 @@ const googleEnvSchema = z.object({
    * Pestañas que no son clases, separadas por coma (ej. `t.0`). Se leen para
    * sacar de ellas los nombres a descartar, pero no se devuelven como secciones.
    */
-  GOOGLE_DOC_SKIP_TABS: z
-    .string()
-    .default('')
-    .transform((value) =>
-      value
-        .split(',')
-        .map((tabId) => tabId.trim())
-        .filter((tabId) => tabId.length > 0),
-    ),
+  GOOGLE_DOC_SKIP_TABS: commaList,
+
+  /**
+   * Términos a descartar que ninguna regla detecta, separados por coma: un
+   * diminutivo (`Pepe`), el negocio o el lugar de trabajo de alguien. Va en el
+   * entorno y no en el código porque son datos personales.
+   */
+  GOOGLE_DOC_PERSONAL_TERMS: commaList,
 });
 
 export type GoogleEnv = z.infer<typeof googleEnvSchema>;

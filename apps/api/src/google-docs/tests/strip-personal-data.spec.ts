@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { collectPersonalNames, stripPersonalData } from '../helpers/strip-personal-data';
+import {
+  collectPersonalNames,
+  NO_PERSONAL_NAMES,
+  stripPersonalData,
+  withPersonalTerms,
+} from '../helpers/strip-personal-data';
 
 describe('stripPersonalData', () => {
   it('quita la línea con el enlace de Meet', () => {
@@ -54,42 +59,74 @@ describe('stripPersonalData', () => {
   });
 
   it('quita las líneas que nombran a alguien de la lista, como palabra completa', () => {
-    const names = { latin: ['ana', 'sara'], katakana: ['サラ', 'ケンジ'] };
+    const names = { latin: ['ana', 'lisa'], katakana: ['リサ', 'ケンジ'] };
     const input = [
-      'わたしは　サラです。',
+      'わたしは　リサです。',
       'ケンジちゃんの　おかあさん',
       'La mamá de Ana',
-      'SARADA：サラダ：ensalada',
+      'LISAIKURU：リサイクル：reciclaje',
       'BANANA：バナナ：banano',
     ].join('\n');
 
-    assert.equal(stripPersonalData(input, names), 'SARADA：サラダ：ensalada\nBANANA：バナナ：banano');
+    assert.equal(stripPersonalData(input, names), 'LISAIKURU：リサイクル：reciclaje\nBANANA：バナナ：banano');
+  });
+
+  it('quita a quien dice su nombre o apellido y deja la plantilla y la pregunta', () => {
+    const input = [
+      'わたし　の　みょうじ　は　ゴメス　です。',
+      'わたしのなまえは Pedro です。',
+      'わたしのなまえは 〇〇です。',
+      'おなまえ　は　なんですか？',
+      'なまえ (nombre)… わたしは nombre です。',
+    ].join('\n');
+
+    assert.equal(
+      stripPersonalData(input),
+      'わたしのなまえは 〇〇です。\nおなまえ　は　なんですか？\nなまえ (nombre)… わたしは nombre です。',
+    );
+  });
+
+  it('quita los términos configurados: latinos como palabra completa, el resto literal', () => {
+    const names = withPersonalTerms(NO_PERSONAL_NAMES, ['Pepa', 'すてきなカフェ']);
+    const input = [
+      'は：El tema es sobre Pepa',
+      'わたし　は　すてきなカフェのオーナーです。',
+      'Pepasa：un plato',
+      'カフェ：café',
+    ].join('\n');
+
+    assert.equal(stripPersonalData(input, names), 'Pepasa：un plato\nカフェ：café');
   });
 });
 
 describe('collectPersonalNames', () => {
   it('saca los nombres latinos de la asistencia, sin el 全員', () => {
-    const names = collectPersonalNames('出席者：全員 Ana, Juan Pablo\n欠席者：Marta');
-    assert.deepEqual([...names.latin].sort(), ['ana', 'juan', 'marta', 'pablo']);
+    const names = collectPersonalNames('出席者：全員 Ana, Luis Carlos\n欠席者：Marta');
+    assert.deepEqual([...names.latin].sort(), ['ana', 'carlos', 'luis', 'marta']);
   });
 
   it('toma de la lista solo los katakana cuyo nombre latino es de la asistencia', () => {
     const text = [
-      '出席者：Ana, Juan Pablo',
+      '出席者：Ana, Luis Carlos',
       'アナ：Ana',
-      'フアン・パブロ：Juan Pablo',
+      'ルイス・カルロス：Luis Carlos',
       'パン：Pan',
       'スマホ：smart phone',
     ].join('\n');
 
     assert.deepEqual(
       [...collectPersonalNames(text).katakana].sort(),
-      ['アナ', 'パブロ', 'フアン', 'フアン・パブロ'].sort(),
+      ['アナ', 'カルロス', 'ルイス', 'ルイス・カルロス'].sort(),
     );
   });
 
   it('toma el nombre en katakana de quien va delante de せんせい', () => {
     assert.deepEqual(collectPersonalNames('ケンジせんせい は にほんじん').katakana, ['ケンジ']);
+  });
+
+  it('toma el nombre latino de un profesor escrito en los dos alfabetos', () => {
+    const names = collectPersonalNames('山田ケンジ ／ Yamada Kenji\nケンジせんせい\nパン / Pan');
+    assert.deepEqual([...names.latin].sort(), ['kenji', 'yamada']);
   });
 
   it('no saca nombres de un texto de vocabulario', () => {
