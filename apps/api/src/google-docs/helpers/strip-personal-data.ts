@@ -37,6 +37,15 @@ const NAME_DECLARATION = /(?:なまえ|みょうじ)\s*は\s*([^\s。．、]+?)\
 // `___`, `nombre`, y el `なん` de la pregunta.
 const NAME_PLACEHOLDER = /^(?:[〇○O〜~＿_]+|nombre|apellido|なん|なに)$/i;
 
+// Alguien dice dónde vive: `わたしは 〈barrio〉に すんでいます` y su traducción,
+// `Yo vivo en 〈barrio〉`. Solo en primera persona (también `わたしの はは`):
+// `アランさんは ロンドンに すんでいます` es del libro y sí es material.
+const RESIDENCE_JA = /(?:わたし|わたくし|ぼく|私|僕)\s*(?:の\s*\S+?\s*)?は\s*(.+?)\s*に\s*すんで/u;
+const RESIDENCE_ES = /\bvivo\s+en\s+(.+?)\s*(?:[.。,，]|$)/iu;
+
+// Lo que va en el hueco de lugar de una plantilla: `（ Lugar ）`, `［　］`, `〜`.
+const PLACE_PLACEHOLDER = /^(?:[〇○O〜~＿_]+|lugar|ciudad|pa[ií]s|barrio|どこ|〈[^〉]*〉)?$/i;
+
 // El nombre de un profesor escrito en los dos alfabetos:
 // `山田ケンジ ／ Yamada Kenji`.
 const BILINGUAL_NAME = /^\s*([^／/]+?)\s*[／/]\s*([\p{Script=Latin} ]+?)\s*$/u;
@@ -140,6 +149,11 @@ function declaresName(line: string): boolean {
   return name !== undefined && !NAME_PLACEHOLDER.test(name);
 }
 
+function declaresResidence(line: string): boolean {
+  const place = (RESIDENCE_JA.exec(line) ?? RESIDENCE_ES.exec(line))?.[1];
+  return place !== undefined && !PLACE_PLACEHOLDER.test(place.replace(/[\s　()（）［］[\]]/gu, ''));
+}
+
 const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 /**
@@ -167,7 +181,8 @@ function namePatterns(names: PersonalNames): RegExp[] {
  * Quita del texto los datos personales: enlaces de videollamada, correos,
  * listas de nombres con etiqueta, menciones a profesores, compañeros con
  * `くん`/`ちゃん`, quien dice su nombre o apellido (`みょうじ は 〈nombre〉 です`)
- * y cualquier línea que nombre a alguien de `names`.
+ * o dónde vive (`わたしは 〈lugar〉に すんでいます`, `Yo vivo en 〈lugar〉`) y
+ * cualquier línea que nombre a alguien de `names`.
  *
  * Trabaja por líneas y descarta la línea completa. Se pierde alguna frase de
  * ejemplo que menciona a un compañero, a cambio de no dejar pasar su nombre.
@@ -190,6 +205,7 @@ export function stripPersonalData(text: string, names: PersonalNames = NO_PERSON
         !TEACHER.test(line) &&
         !CLASSMATE.test(line) &&
         !declaresName(line) &&
+        !declaresResidence(line) &&
         !patterns.some((pattern) => pattern.test(line)),
     )
     .join('\n');

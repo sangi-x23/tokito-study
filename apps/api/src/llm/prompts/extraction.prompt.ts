@@ -13,10 +13,13 @@ Devuelve dos cosas:
    - "type":
      - WORD: palabra o expresión corta de vocabulario (ねこ, ちち, コンビニ).
      - KANJI: un único kanji enseñado como tal, no las palabras que lo contienen.
-     - GRAMMAR_POINT: estructura gramatical, escrita como patrón con 〜 (〜は〜です, 〜ができます).
-     - PHRASE: frase hecha o saludo completo (はじめまして, どうぞよろしくおねがいします).
+     - GRAMMAR_POINT: estructura gramatical, escrita como patrón con 〜 en cada hueco (〜は〜です,
+       〜ができます). Nunca 〈…〉 ni 〇〇 en el patrón.
+     - PHRASE: frase hecha, saludo o pregunta completa (はじめまして, おなまえは). はい y いいえ son WORD.
    - "japanese": la forma japonesa tal como la escribe el curso, en kana o kanji. Nunca romaji.
-     Si el diario da romaji y kana ("NEKO → ねこ"), usa la kana.
+     Si el diario da romaji y kana ("NEKO → ねこ"), usa la kana. Sin espacios, sin 。 ni ？ al final y
+     con paréntesis de ancho completo （）. Los meses y los días del mes van en kanji (九月, 4日)
+     aunque la clase los escriba en kana; la kana va en "reading".
    - "reading": la lectura en hiragana solo si "japanese" contiene kanji; si no, null.
      En los ítems KANJI siempre null: sus lecturas van en "kanji".
    - "meaning": significado en español, breve.
@@ -37,9 +40,9 @@ Devuelve dos cosas:
    Extrae también los ítems que aparecen en las imágenes.
 
 Reglas:
-- No extraigas nombres, edades, profesiones ni ningún dato de personas reales (compañeros, profesores).
+- No extraigas nombres, edades, profesiones, lugares donde viven ni ningún dato de personas reales (compañeros, profesores).
   Si una frase de ejemplo menciona a alguien concreto, generalízala con 〇〇 o no la uses. Las
-  autopresentaciones se convierten en su plantilla (わたしは〈なまえ〉です). Los personajes del libro
+  autopresentaciones se convierten en su plantilla (わたしは〜です). Los personajes del libro
   (アランさん, あいさん) sí son material.
 - Ignora la logística de la clase: la fecha del encabezado, el contenido del día (授業内容), los quizzes,
   los enlaces, las tareas y los avisos de exámenes.

@@ -14,7 +14,8 @@
     "test": "tsc -p tsconfig.json --outDir dist-test && node --test \"dist-test/**/*.spec.js\"",
     "docs:print": "node dist/scripts/print-sections.js",
     "llm:try": "node dist/scripts/try-extraction.js",
-    "ingest:bootstrap": "node dist/scripts/bootstrap.js"
+    "ingest:bootstrap": "node dist/scripts/bootstrap.js",
+    "ingest:run": "node dist/scripts/ingest.js"
   },
   "dependencies": {
     "@google/genai": "2.24.0",

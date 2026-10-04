@@ -89,6 +89,19 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
   
   Después de cambiar el filtro de datos personales se recalcularon `rawText` y `contentHash` con el parser nuevo, sin volver a extraer, para que la ingesta no tome esas pestañas por modificadas.
 
+### Decisiones de la Fase 5
+
+- **Cron diario a las 00:00 de Colombia (`0 5 * * *` en UTC), no semanal.** La clase es los viernes, pero la ingesta decide por la huella del contenido y no por el calendario. Revisar cada día recoge las ediciones tardías y las pestañas que no alcanzaron en una corrida, y sigue funcionando sin cambios si la clase se mueve de día. Un día sin cambios no llama a Gemini: solo lee el documento, descarga las imágenes para la huella y despierta Neon unos segundos. En Hobby el cron se dispara en cualquier minuto de esa hora.
+- **`GET /ingestion/run`**, porque Vercel Cron solo hace GET. Un guard compara `Authorization: Bearer <CRON_SECRET>` en tiempo constante (hashes SHA-256 con `timingSafeEqual`). `CRON_SECRET` se valida al recibir la petición y exige al menos 16 caracteres. Responde 401 sin secreto, 409 con el candado tomado, 503 con la cuota diaria agotada y 200 con el resumen.
+- **Presupuesto de 100 s por corrida.** Pasado ese tiempo no se empieza otra pestaña, porque una pestaña con imágenes más la asignación puede superar los 200 s. Lo que queda se detecta en la siguiente corrida por su huella.
+- **Una transacción por pestaña, no una por corrida.** Si la cuota se agota en la tercera pestaña, las dos primeras quedan escritas y no se vuelven a pagar.
+- **Los ítems que ya existen solo ganan la aparición.** Su significado, sus lecturas y sus temas no se tocan, porque los del bootstrap se corrigieron a mano. Solo los ítems nuevos pasan por `assignToTopics` y se ponen al final de cada tema; los temas nuevos van detrás de sus hermanos.
+- **Las apariciones de una pestaña modificada se rehacen.** Si una clase editada deja de mencionar un ítem, pierde esa `ItemOccurrence`. El ítem y sus temas no se borran.
+- **Las convenciones de `japanese` de la Fase 4 viven en código y en el prompt.** `normalizeJapanese` (`ingestion/helpers/item-key.ts`), compartida con el bootstrap, quita los espacios y el `。`/`？` final y pasa los paréntesis a ancho completo. Comprobado que no cambia la clave de ninguno de los 466 ítems importados. Lo que no se puede normalizar a mano (`〜` en los huecos, preguntas como `PHRASE`, meses en kanji) va en el prompt de extracción.
+- **El descarte de datos personales también quita dónde vive alguien (2026-10-04).** La primera corrida real guardó en el `rawText` el barrio de alguien (`わたしは 〈barrio〉に すんでいます` y su traducción `Yo vivo en 〈barrio〉`). Se descarta la línea en primera persona (también `わたしの はは は …`) salvo que el lugar sea un hueco de plantilla (`（ Lugar ）`, `［　］`, `〜`). La tercera persona queda fuera a propósito: `アランさんは ロンドンに すんでいます` es del libro. No cambió la huella de ninguna pestaña del bootstrap; solo se reprocesó la que tenía el dato.
+- **Correcciones a mano tras la primera corrida (2026-10-04).** `〜にすんでいます` y `〜は〜にすんでいます` salieron de clases distintas y se fusionaron en el segundo, con tema primario `estructura-de-la-frase` y también en `casa`. Se borró el tema `gramatica/vivienda`, que había creado `assignToTopics` para ese único ítem. El `example` del ítem traía el barrio de alguien y se reemplazó por la plantilla. Por eso el prompt de extracción ahora también prohíbe los lugares donde vive la gente. Si la pestaña del 10/2 se reprocesa, Gemini puede volver a crear `〜にすんでいます`.
+- **`ingest:run` corre la misma ingesta en local.** `--check` lista las pestañas cambiadas sin llamar al LLM ni escribir; sin flag procesa todas, sin presupuesto de tiempo.
+
 ## Estructura
 
 ```
@@ -118,7 +131,7 @@ apps/
         bootstrap/  las tres fases del bootstrap y sus archivos locales en .bootstrap/
         tests/      *.spec.ts del módulo
       content/    lectura de temas e ítems (API pública)
-      scripts/    scripts sueltos (print-sections, bootstrap) compilados con el resto
+      scripts/    scripts sueltos (print-sections, bootstrap, ingest) compilados con el resto
   web/            Next.js
 packages/
   shared/         tipos y DTOs compartidos (@tokito/shared)
@@ -183,9 +196,10 @@ Con `--manual`, `extract` y `taxonomy` usan `ManualProvider` en lugar de Gemini.
 2. **`taxonomy`:** una llamada solo texto con las etiquetas y hasta 5 ejemplos de cada una → `.bootstrap/taxonomy.json`, más el árbol impreso para revisarlo. No pisa una taxonomía existente sin `--force`.
 3. **Revisión e `import`:** el autor edita `taxonomy.json` a mano. `import` lo revalida con las mismas reglas que la respuesta del LLM, arma el plan y lo escribe en una transacción con el candado tomado. `--dry-run` solo cuenta lo que escribiría.
 
-### Ingesta semanal (Vercel Cron)
-- Endpoint protegido por `CRON_SECRET`, un día después de la clase (horario en UTC; Colombia = UTC-5).
-- Toma el candado (`IngestionRun`), detecta pestañas nuevas o con `contentHash` distinto, extrae, asigna con el catálogo de temas actual, hace upsert y cierra la corrida.
+### Ingesta incremental (Vercel Cron)
+- `GET /ingestion/run`, protegido por `CRON_SECRET`. El cron está en `apps/api/vercel.json` y corre todos los días a las 00:00 de Colombia (`0 5 * * *`, UTC).
+- Toma el candado (`IngestionRun`) y detecta las pestañas nuevas o con `contentHash` distinto. Por cada una: extrae, asigna los ítems nuevos con el catálogo de temas actual y escribe la pestaña en su propia transacción. Al final cierra la corrida.
+- Para correrla a mano: `pnpm --filter @tokito/api ingest:run [--check]`, o el endpoint con el header.
 
 ## Features futuras (no implementar aún)
 Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de kanji (lee `KanjiDetail`, no necesita tablas nuevas). Todas son **por sesión**: se arma la sesión (por tema o por clase), se estudia y el estado vive en memoria (Context o store en el layout raíz de Next.js). Repetición dentro de la sesión estilo Leitner, sin repaso entre días. Aviso `beforeunload` si hay una sesión en curso.
@@ -197,7 +211,7 @@ Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de k
 - [x] **Fase 2:** módulo `google-docs`: autenticación, lectura de pestañas, parseo a partes ordenadas (texto + imágenes), descarte de datos personales calibrado contra el documento real y exclusión de pestañas que no son clases. Script de prueba que imprime las secciones.
 - [x] **Fase 3:** módulo `llm`: interfaz `LlmProvider` con sus tres métodos, implementación Gemini multimodal, throttle, reintentos y validación zod. Script `llm:try` para calibrar la extracción contra una pestaña real.
 - [x] **Fase 4:** bootstrap local en tres fases: `ingest:bootstrap extract`, `taxonomy` e `import` (con `--dry-run`). Importado en Neon el 2026-10-03: 11 pestañas, 57 temas, 466 ítems (7 kanji) y 19 imágenes en caché. Pestañas 1–4 extraídas con Gemini y 5–11 con `--manual`, revisadas y corregidas a mano antes de importar. Una segunda corrida de `import` no escribe nada.
-- [ ] **Fase 5:** ingesta semanal: endpoint, candado, Vercel Cron, `CRON_SECRET`.
+- [x] **Fase 5:** ingesta incremental: `GET /ingestion/run` con `CRON_SECRET`, candado, una transacción por pestaña, presupuesto de tiempo y cron diario en `vercel.json`. Probada en local el 2026-10-04 con las dos clases nuevas (10/2 y 10/3). El cron se activa cuando la API se despliegue en Vercel; hasta entonces la ingesta se corre a mano con `ingest:run`.
 - [ ] **Fase 6:** API de lectura: árbol de temas, detalle de tema con ítems y clases donde aparecieron.
 - [ ] **Fase 7:** frontend: navegación por temas y vista de ítems.
 

@@ -8,19 +8,17 @@ import type {
   SectionExtraction,
 } from '../types/import-plan';
 import { parseClassDate } from './class-date';
+import { itemKey, normalizeJapanese } from './item-key';
 
 // Tema que se crea si hay kanji y la taxonomía no trae ninguno de categoría
 // KANJI: todo kanji tiene que poder practicarse desde un tema de kanji.
-const DEFAULT_KANJI_TOPIC: ProposedTopic = {
+export const DEFAULT_KANJI_TOPIC: ProposedTopic = {
   slug: 'kanji',
   name: 'Kanji',
   description: 'Los kanji que se vieron en el curso.',
   category: 'KANJI',
   parentSlug: null,
 };
-
-/** La clave natural de `StudyItem`, normalizada para no duplicar por un espacio o la forma Unicode. */
-const normalizeJapanese = (value: string): string => value.normalize('NFC').trim();
 
 interface ItemDraft {
   type: PlannedItem['type'];
@@ -61,7 +59,7 @@ export function buildImportPlan(
   for (const extraction of ordered) {
     for (const item of extraction.items) {
       const japanese = normalizeJapanese(item.japanese);
-      const key = `${item.type}\u0000${japanese}`;
+      const key = itemKey(item.type, japanese);
       const slug = slugForLabel.get(item.topicLabel);
 
       if (slug === undefined) {
