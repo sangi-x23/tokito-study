@@ -112,6 +112,17 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **`Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400` solo en las respuestas exitosas**, mediante `PublicCacheInterceptor`. `@Header` también la ponía en los 404, y el CDN seguiría diciendo que un tema no existe después de que la ingesta lo creara.
 - **Las consultas son una sola por endpoint** (más una para las palabras de un kanji), con `include`/`select` declarados junto a sus mappers en `content/helpers/to-dto.ts`. Los mappers y el armado del árbol son funciones puras y se prueban sin base.
 
+### Decisiones de la Fase 7
+
+- **Server Components que llaman a la API desde el servidor de Next** (`apps/web/lib/api.ts`), con `API_URL` solo del lado del servidor. El navegador nunca llama a la API: no hace falta CORS y la navegación no carga JavaScript de cliente. El único componente de cliente es `error.tsx`, porque Next lo exige.
+- **`dynamic = 'force-dynamic'` en las páginas y `revalidate: 3600` en cada `fetch`.** Las páginas se renderizan al pedirlas, así que el build no necesita la API corriendo; los datos igual se cachean una hora, como el `s-maxage` de la API.
+- **Un 400 de la API cuenta como "no encontrado".** Un slug o un id con forma inválida en la URL es, para quien navega, lo mismo que uno que no existe.
+- **Sin `loading.tsx`.** Con él, Next empieza a mandar la página antes de saber si el tema existe, y un tema inexistente respondía 200 en vez de 404.
+- **Rutas en español:** `/temas/[slug]` e `/items/[id]`, porque son las URLs que ven los compañeros.
+- **Noto Sans JP con `next/font`** y modo oscuro según el sistema. Sin dependencias nuevas: `server-only` no se agregó, la regla de que `lib/api.ts` corre solo en el servidor queda en su comentario.
+- **UI mínima a propósito.** La idea es ver el sistema completo funcionando y mejorar la interfaz después. Sin filtros por tipo ni estado de cliente hasta que lleguen las sesiones de estudio.
+- **`pnpm dev` en la raíz levanta todo junto:** `shared` en watch, la API en el puerto 3001 y la web en el 3000.
+
 ## Estructura
 
 ```
@@ -146,6 +157,9 @@ apps/
         tests/      *.spec.ts del módulo
       scripts/    scripts sueltos (print-sections, bootstrap, ingest) compilados con el resto
   web/            Next.js
+    app/          páginas: / (árbol), temas/[slug], items/[id], not-found y error
+    components/   tarjeta de ítem, breadcrumb, etiquetas de tipo y de clase
+    lib/          cliente de la API (solo servidor) y etiquetas en español
 packages/
   shared/         tipos y DTOs compartidos (@tokito/shared)
 ```
@@ -226,7 +240,13 @@ Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de k
 - [x] **Fase 4:** bootstrap local en tres fases: `ingest:bootstrap extract`, `taxonomy` e `import` (con `--dry-run`). Importado en Neon el 2026-10-03: 11 pestañas, 57 temas, 466 ítems (7 kanji) y 19 imágenes en caché. Pestañas 1–4 extraídas con Gemini y 5–11 con `--manual`, revisadas y corregidas a mano antes de importar. Una segunda corrida de `import` no escribe nada.
 - [x] **Fase 5:** ingesta incremental: `GET /ingestion/run` con `CRON_SECRET`, candado, una transacción por pestaña, presupuesto de tiempo y cron diario en `vercel.json`. Probada en local el 2026-10-04 con las dos clases nuevas (10/2 y 10/3). El cron se activa cuando la API se despliegue en Vercel; hasta entonces la ingesta se corre a mano con `ingest:run`.
 - [x] **Fase 6:** API de lectura: `GET /topics` (árbol), `GET /topics/:slug` (detalle con ítems y clases donde aparecieron) y `GET /items/:id` (detalle con temas, clases y palabras de un kanji). Contratos en `@tokito/shared`.
-- [ ] **Fase 7:** frontend: navegación por temas y vista de ítems.
+- [x] **Fase 7:** frontend: inicio con el árbol de temas, página de tema con sus ítems y página de ítem (con lecturas y palabras de un kanji). UI mínima, para mejorar después.
+
+## Variables de entorno de la web (`apps/web/.env.local`, nunca en el repo)
+
+```
+API_URL=               # URL de la API; en local http://localhost:3001
+```
 
 ## Variables de entorno (`apps/api/.env`, nunca en el repo)
 
