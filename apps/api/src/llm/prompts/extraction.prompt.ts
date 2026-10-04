@@ -40,7 +40,7 @@ Devuelve dos cosas:
    Extrae también los ítems que aparecen en las imágenes.
 
 Reglas:
-- No extraigas nombres, edades, profesiones ni ningún dato de personas reales (compañeros, profesores).
+- No extraigas nombres, edades, profesiones, lugares donde viven ni ningún dato de personas reales (compañeros, profesores).
   Si una frase de ejemplo menciona a alguien concreto, generalízala con 〇〇 o no la uses. Las
   autopresentaciones se convierten en su plantilla (わたしは〜です). Los personajes del libro
   (アランさん, あいさん) sí son material.
