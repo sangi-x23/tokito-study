@@ -102,6 +102,16 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **Correcciones a mano tras la primera corrida (2026-10-04).** `〜にすんでいます` y `〜は〜にすんでいます` salieron de clases distintas y se fusionaron en el segundo, con tema primario `estructura-de-la-frase` y también en `casa`. Se borró el tema `gramatica/vivienda`, que había creado `assignToTopics` para ese único ítem. El `example` del ítem traía el barrio de alguien y se reemplazó por la plantilla. Por eso el prompt de extracción ahora también prohíbe los lugares donde vive la gente. Si la pestaña del 10/2 se reprocesa, Gemini puede volver a crear `〜にすんでいます`.
 - **`ingest:run` corre la misma ingesta en local.** `--check` lista las pestañas cambiadas sin llamar al LLM ni escribir; sin flag procesa todas, sin presupuesto de tiempo.
 
+### Decisiones de la Fase 6
+
+- **Tres endpoints públicos:** `GET /topics` (árbol de dos niveles con `itemCount`), `GET /topics/:slug` (tema con su padre, sus subtemas y sus ítems) y `GET /items/:id` (ítem con todos sus temas, sus clases y, si es kanji, las palabras que lo usan). No hay endpoints de clases por ahora; se agregan cuando lleguen las sesiones de estudio.
+- **Los temas se piden por `slug` y los ítems por `id`.** Los dos son estables: el slug es la clave natural del tema y la ingesta nunca recrea ítems.
+- **Un tema muestra solo sus ítems directos.** Un tema de primer nivel no mezcla los ítems de sus subtemas: los lista como hijos con su `itemCount`, que tampoco suma los de los hijos.
+- **Los contratos viven en `@tokito/shared` (`content.ts`)** como interfaces, sin zod: la salida la produce nuestra API. zod valida solo los parámetros de la URL (400 si no tienen forma de slug o de cuid, 404 si no existen).
+- **De las clases solo sale el título y la fecha** (`YYYY-MM-DD`), ordenadas por su posición en el documento. El `rawText`, `ImageAsset` e `IngestionRun` no se exponen.
+- **`Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400` solo en las respuestas exitosas**, mediante `PublicCacheInterceptor`. `@Header` también la ponía en los 404, y el CDN seguiría diciendo que un tema no existe después de que la ingesta lo creara.
+- **Las consultas son una sola por endpoint** (más una para las palabras de un kanji), con `include`/`select` declarados junto a sus mappers en `content/helpers/to-dto.ts`. Los mappers y el armado del árbol son funciones puras y se prueban sin base.
+
 ## Estructura
 
 ```
@@ -131,6 +141,9 @@ apps/
         bootstrap/  las tres fases del bootstrap y sus archivos locales en .bootstrap/
         tests/      *.spec.ts del módulo
       content/    lectura de temas e ítems (API pública)
+        helpers/    consultas de Prisma, mappers a los contratos y árbol de temas
+        schemas/    validación de los parámetros de la URL
+        tests/      *.spec.ts del módulo
       scripts/    scripts sueltos (print-sections, bootstrap, ingest) compilados con el resto
   web/            Next.js
 packages/
@@ -212,7 +225,7 @@ Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de k
 - [x] **Fase 3:** módulo `llm`: interfaz `LlmProvider` con sus tres métodos, implementación Gemini multimodal, throttle, reintentos y validación zod. Script `llm:try` para calibrar la extracción contra una pestaña real.
 - [x] **Fase 4:** bootstrap local en tres fases: `ingest:bootstrap extract`, `taxonomy` e `import` (con `--dry-run`). Importado en Neon el 2026-10-03: 11 pestañas, 57 temas, 466 ítems (7 kanji) y 19 imágenes en caché. Pestañas 1–4 extraídas con Gemini y 5–11 con `--manual`, revisadas y corregidas a mano antes de importar. Una segunda corrida de `import` no escribe nada.
 - [x] **Fase 5:** ingesta incremental: `GET /ingestion/run` con `CRON_SECRET`, candado, una transacción por pestaña, presupuesto de tiempo y cron diario en `vercel.json`. Probada en local el 2026-10-04 con las dos clases nuevas (10/2 y 10/3). El cron se activa cuando la API se despliegue en Vercel; hasta entonces la ingesta se corre a mano con `ingest:run`.
-- [ ] **Fase 6:** API de lectura: árbol de temas, detalle de tema con ítems y clases donde aparecieron.
+- [x] **Fase 6:** API de lectura: `GET /topics` (árbol), `GET /topics/:slug` (detalle con ítems y clases donde aparecieron) y `GET /items/:id` (detalle con temas, clases y palabras de un kanji). Contratos en `@tokito/shared`.
 - [ ] **Fase 7:** frontend: navegación por temas y vista de ítems.
 
 ## Variables de entorno (`apps/api/.env`, nunca en el repo)
