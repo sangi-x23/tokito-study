@@ -86,6 +86,32 @@ describe('stripPersonalData', () => {
     );
   });
 
+  it('quita a quien dice dónde vive y deja la plantilla, la pregunta y el libro', () => {
+    const input = [
+      'わたしは　ソルナレスに　すんでいます。',
+      '→  Yo vivo en Solnares.',
+      'わたしの　ははは　ミラフロルに　すんでいます。',
+      '（ Persona ）は　（ Lugar ）に　すんでいます。',
+      'わたしは（ Lugar ）にすんでいます。→ Yo vivo en (Lugar).',
+      '［　］は［　］に すんでいます。',
+      'どこに　すんでいますか。→ ¿Dónde vives?',
+      'アランさんは　ロンドンに　すんでいます。',
+      'すんでいます：vivo',
+    ].join('\n');
+
+    assert.equal(
+      stripPersonalData(input),
+      [
+        '（ Persona ）は　（ Lugar ）に　すんでいます。',
+        'わたしは（ Lugar ）にすんでいます。→ Yo vivo en (Lugar).',
+        '［　］は［　］に すんでいます。',
+        'どこに　すんでいますか。→ ¿Dónde vives?',
+        'アランさんは　ロンドンに　すんでいます。',
+        'すんでいます：vivo',
+      ].join('\n'),
+    );
+  });
+
   it('quita los términos configurados: latinos como palabra completa, el resto literal', () => {
     const names = withPersonalTerms(NO_PERSONAL_NAMES, ['Pepa', 'すてきなカフェ']);
     const input = [
