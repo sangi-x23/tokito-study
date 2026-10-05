@@ -16,6 +16,9 @@ apps/api/src/generated/
 .env.*
 !.env.example
 
+# Next: lo regenera `next dev`/`next build`/`next typegen` y cambia entre uno y otro
+apps/web/next-env.d.ts
+
 # Vercel
 .vercel/
 
