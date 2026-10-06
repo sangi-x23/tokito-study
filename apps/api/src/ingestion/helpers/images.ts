@@ -1,9 +1,21 @@
 import sharp from 'sharp';
 import type { DownloadedImage } from '../types/prepared-section';
 
+/**
+ * Lo que se usa de la respuesta de `fetch`. El `Response` global sale de
+ * `@types/node` y depende de cómo se compile: el builder de Vercel lo deja
+ * vacío (sin `ok` ni `arrayBuffer`) y el build falla, aunque en local compile.
+ */
+interface ImageResponse {
+  readonly ok: boolean;
+  readonly status: number;
+  readonly headers: { get(name: string): string | null };
+  arrayBuffer(): Promise<ArrayBuffer>;
+}
+
 /** La `contentUri` del documento es temporal y no necesita credenciales. */
 export async function downloadImage(contentUri: string): Promise<DownloadedImage> {
-  const response = await fetch(contentUri);
+  const response = (await fetch(contentUri)) as unknown as ImageResponse;
   if (!response.ok) {
     throw new Error(`No se pudo descargar una imagen del documento: HTTP ${response.status}`);
   }

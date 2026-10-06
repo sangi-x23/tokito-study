@@ -1,4 +1,5 @@
 import { GoogleDocsService, type DocumentPart } from '../google-docs';
+import { downloadImage } from '../ingestion/helpers/images';
 import { GeminiProvider, type LlmPart } from '../llm';
 
 /**
@@ -16,18 +17,8 @@ async function toLlmPart(part: DocumentPart): Promise<LlmPart> {
     return part;
   }
 
-  // La contentUri es temporal y no necesita credenciales.
-  const response = await fetch(part.contentUri);
-  if (!response.ok) {
-    throw new Error(`No se pudo descargar la imagen ${part.objectId}: HTTP ${response.status}`);
-  }
-
-  return {
-    kind: 'image',
-    imageId: part.objectId,
-    mimeType: response.headers.get('content-type')?.split(';')[0] ?? 'image/png',
-    data: Buffer.from(await response.arrayBuffer()),
-  };
+  const image = await downloadImage(part.contentUri);
+  return { kind: 'image', imageId: part.objectId, mimeType: image.mimeType, data: image.data };
 }
 
 async function main(): Promise<void> {
