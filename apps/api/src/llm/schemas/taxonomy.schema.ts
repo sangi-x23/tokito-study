@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import type { LabelWithExamples, Taxonomy } from '../types/llm-provider';
-import { checkTopicTree, proposedTopicSchema } from './common';
+import type { LabelWithExamples, Taxonomy } from '../types/llm-provider.js';
+import { checkTopicTree, proposedTopicSchema } from './common.js';
 
 export const taxonomySchema = z.object({
   topics: z.array(proposedTopicSchema),

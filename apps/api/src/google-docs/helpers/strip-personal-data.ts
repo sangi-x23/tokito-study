@@ -1,4 +1,4 @@
-import type { PersonalNames } from '../types/parser';
+import type { PersonalNames } from '../types/parser.js';
 
 // Enlaces de videollamada: Meet, Zoom y Teams.
 const VIDEO_CALL_LINK = /(?:https?:\/\/)?(?:meet\.google\.com|[\w.-]*\bzoom\.us|teams\.microsoft\.com)\/\S*/i;

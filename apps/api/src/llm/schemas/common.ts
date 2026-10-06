@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { TopicCategory } from '../../generated/prisma/enums';
+import { TopicCategory } from '../../generated/prisma/enums.js';
 
 /**
  * Texto no vacío. Va como `refine` y no como `.min(1)` para que no llegue al

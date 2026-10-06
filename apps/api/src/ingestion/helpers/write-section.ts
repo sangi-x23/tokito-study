@@ -1,8 +1,8 @@
-import type { Prisma } from '../../generated/prisma/client';
-import type { SectionPlan } from '../types/section-plan';
-import type { DocumentMeta, SectionWriteSummary } from '../types/write-plan';
-import { itemKey } from './item-key';
-import { writePlan } from './write-plan';
+import type { Prisma } from '../../generated/prisma/client.js';
+import type { SectionPlan } from '../types/section-plan.js';
+import type { DocumentMeta, SectionWriteSummary } from '../types/write-plan.js';
+import { itemKey } from './item-key.js';
+import { writePlan } from './write-plan.js';
 
 /**
  * Escribe una pestaña de la ingesta semanal dentro de una transacción.

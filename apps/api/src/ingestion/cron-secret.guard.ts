@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { Injectable, UnauthorizedException, type CanActivate, type ExecutionContext } from '@nestjs/common';
 import type { Request } from 'express';
-import { loadIngestionEnv } from './config/ingestion.env';
+import { loadIngestionEnv } from './config/ingestion.env.js';
 
 const digest = (value: string): Buffer => createHash('sha256').update(value).digest();
 

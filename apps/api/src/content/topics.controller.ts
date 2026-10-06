@@ -1,8 +1,8 @@
 import { Controller, Get, NotFoundException, Param, UseInterceptors } from '@nestjs/common';
 import type { TopicDetail, TopicNode } from '@tokito/shared';
-import { PublicCacheInterceptor } from './cache';
-import { parseParam, slugSchema } from './schemas/params.schema';
-import { TopicsService } from './topics.service';
+import { PublicCacheInterceptor } from './cache.js';
+import { parseParam, slugSchema } from './schemas/params.schema.js';
+import { TopicsService } from './topics.service.js';
 
 @UseInterceptors(PublicCacheInterceptor)
 @Controller('topics')

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { ItemDetail, RelatedWord } from '@tokito/shared';
-import { PrismaService } from '../prisma/prisma.service';
-import { itemDetailInclude, toItemDetail } from './helpers/to-dto';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { itemDetailInclude, toItemDetail } from './helpers/to-dto.js';
 
 @Injectable()
 export class ItemsService {

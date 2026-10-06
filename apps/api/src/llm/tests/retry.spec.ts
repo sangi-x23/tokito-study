@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { ApiError } from '@google/genai';
-import { classifyGeminiError, withRetry } from '../helpers/retry';
-import { LlmQuotaExhaustedError } from '../llm.errors';
-import { fakeClock } from './fake-clock';
+import { classifyGeminiError, withRetry } from '../helpers/retry.js';
+import { LlmQuotaExhaustedError } from '../llm.errors.js';
+import { fakeClock } from './fake-clock.js';
 
 /** Un error con el mismo formato que construye el SDK. */
 function apiError(status: number, details: unknown[] = []): ApiError {

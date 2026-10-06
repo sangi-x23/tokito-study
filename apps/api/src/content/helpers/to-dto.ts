@@ -6,7 +6,7 @@ import type {
   RelatedWord,
   TopicSummary,
 } from '@tokito/shared';
-import type { Prisma } from '../../generated/prisma/client';
+import type { Prisma } from '../../generated/prisma/client.js';
 
 /** Lo que hace falta de un ítem para `ItemSummary`. */
 export const itemSummaryInclude = {

@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import type { ParsedSection } from '../../google-docs';
-import { parseClassDate } from '../helpers/class-date';
-import { contentHash, sha256 } from '../helpers/content-hash';
-import { collectLabels } from '../helpers/labels';
-import { prepareSection, toLlmParts } from '../helpers/prepare-section';
-import type { SectionExtraction } from '../types/import-plan';
+import type { ParsedSection } from '../../google-docs/index.js';
+import { parseClassDate } from '../helpers/class-date.js';
+import { contentHash, sha256 } from '../helpers/content-hash.js';
+import { collectLabels } from '../helpers/labels.js';
+import { prepareSection, toLlmParts } from '../helpers/prepare-section.js';
+import type { SectionExtraction } from '../types/import-plan.js';
 
 describe('contentHash', () => {
   it('cambia si cambia una imagen aunque el texto sea el mismo', () => {

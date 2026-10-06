@@ -1,5 +1,5 @@
-import type { Clock } from '../types/retry';
-import { systemClock } from './clock';
+import type { Clock } from '../types/retry.js';
+import { systemClock } from './clock.js';
 
 /**
  * Serializa las llamadas y deja al menos `minIntervalMs` entre el inicio de

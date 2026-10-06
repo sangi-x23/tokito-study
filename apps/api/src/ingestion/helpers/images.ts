@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import type { DownloadedImage } from '../types/prepared-section';
+import type { DownloadedImage } from '../types/prepared-section.js';
 
 /**
  * Lo que se usa de la respuesta de `fetch`. El `Response` global sale de

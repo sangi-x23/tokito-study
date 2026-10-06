@@ -56,11 +56,15 @@ Los scripts de la API corren desde `dist/`, así que necesitan un `build` previo
 ### Versiones fijadas (no actualizar sin revisar)
 
 - **TypeScript `~6.0.3`, no la 7.** `@nestjs/cli@12` depende de `typescript ~6.0.2`.
-- **`module: node20`** en `api` y `shared`: TypeScript 6 deprecó `moduleResolution: node10`.
+- **`module: node20`** en `api` y `shared`: TypeScript 6 deprecó `moduleResolution: node10`. Con `node20`, el formato de salida lo decide el `"type"` del `package.json`.
+- **La API es ESM (`"type": "module"`)** porque NestJS 12 solo se publica como ESM. En CommonJS funcionaba en local (Node 24 permite `require()` de ESM), pero en Vercel la función moría al arrancar con `ERR_REQUIRE_ESM`: su cargador no lo soporta. Consecuencias:
+  - Los imports relativos llevan `.js` (`'./helpers/images.js'`, `'../llm/index.js'`). Sin la extensión, `tsc` no compila.
+  - En vez de `__dirname`, se usa `import.meta.dirname`.
+  - Para probar en local lo que pasaría en Vercel: `node --no-experimental-require-module dist/main.js`.
 - **Prisma `~7.10.0`.** El tag `latest` de `prisma` apuntaba a un release candidate de la 8.
 - **`@google/genai` en 2.24.0**, por el `minimumReleaseAge` de pnpm.
 - **`allowBuilds` en `pnpm-workspace.yaml` decide cada script de instalación.** pnpm 11 rompe el `pnpm install` en CI (Vercel) si una dependencia con scripts queda sin decidir. Todas van en `false`, incluido Prisma: sus scripts solo descargan el motor de migraciones, que no usan ni `prisma generate` ni la API, y en Windows el preinstall de `prisma` revienta dentro de pnpm. El `prisma generate` lo corren el `postinstall` y el `build` de la API.
-- **`@tokito/shared` compila a `dist/`** (CommonJS + `.d.ts`) para que Nest y Next lo consuman igual.
+- **`@tokito/shared` compila a `dist/`** (CommonJS + `.d.ts`) para que la API y Next lo consuman igual. La API solo importa sus tipos.
 
 ## Estructura
 
@@ -207,7 +211,7 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 - **Gemini free tier:** límites por minuto y por día. Nunca asumir límites fijos.
 - **Prisma 7:**
   - La URL va en `prisma.config.ts` y no en el schema.
-  - El generador es `prisma-client` con `moduleFormat = "cjs"`, porque el ESM por defecto revienta desde nuestro build CommonJS. El output va en `src/generated/prisma`.
+  - El generador es `prisma-client` con `moduleFormat = "esm"` e `importFileExtension = "js"`, porque lo compila nuestro `tsc` como el resto de la API. El output va en `src/generated/prisma`.
   - El adaptador es `PrismaNeon` por WebSocket, porque el HTTP no soporta transacciones interactivas.
   - `prisma.config.ts` lee `DIRECT_URL` sin zod, porque `prisma generate` corre en `postinstall` antes de que exista el `.env`.
 

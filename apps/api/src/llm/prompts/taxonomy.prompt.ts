@@ -1,4 +1,4 @@
-import type { LabelWithExamples } from '../types/llm-provider';
+import type { LabelWithExamples } from '../types/llm-provider.js';
 
 // Compartidas con la asignación, que también puede proponer temas nuevos.
 export const TOPIC_RULES = `

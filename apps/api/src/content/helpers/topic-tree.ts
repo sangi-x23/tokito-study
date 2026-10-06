@@ -1,6 +1,6 @@
 import type { TopicNode } from '@tokito/shared';
-import type { TopicTreeRow } from '../types/topic-tree';
-import { toTopicSummary } from './to-dto';
+import type { TopicTreeRow } from '../types/topic-tree.js';
+import { toTopicSummary } from './to-dto.js';
 
 const byPosition = (a: TopicTreeRow, b: TopicTreeRow): number =>
   a.position - b.position || a.name.localeCompare(b.name, 'es');

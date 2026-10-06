@@ -1,4 +1,4 @@
-import type { TopicSummaryRow } from '../helpers/to-dto';
+import type { TopicSummaryRow } from '../helpers/to-dto.js';
 
 export interface TopicTreeRow extends TopicSummaryRow {
   readonly id: string;

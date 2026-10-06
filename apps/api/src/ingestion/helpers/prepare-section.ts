@@ -1,7 +1,7 @@
-import type { ParsedSection } from '../../google-docs';
-import type { LlmPart } from '../../llm';
-import type { DownloadedImage, HashedPart, PreparedPart, PreparedSection } from '../types/prepared-section';
-import { contentHash, sha256 } from './content-hash';
+import type { ParsedSection } from '../../google-docs/index.js';
+import type { LlmPart } from '../../llm/index.js';
+import type { DownloadedImage, HashedPart, PreparedPart, PreparedSection } from '../types/prepared-section.js';
+import { contentHash, sha256 } from './content-hash.js';
 
 /**
  * Descarga las imágenes de una pestaña y calcula su huella. Es el paso previo

@@ -1,7 +1,7 @@
 import type { docs_v1 } from 'googleapis';
-import type { DocumentPart, ParsedDocument, ParsedSection } from '../types/document-part';
-import type { ParseOptions, PersonalNames } from '../types/parser';
-import { collectPersonalNames, stripPersonalData, withPersonalTerms } from './strip-personal-data';
+import type { DocumentPart, ParsedDocument, ParsedSection } from '../types/document-part.js';
+import type { ParseOptions, PersonalNames } from '../types/parser.js';
+import { collectPersonalNames, stripPersonalData, withPersonalTerms } from './strip-personal-data.js';
 
 type InlineObjects = Record<string, docs_v1.Schema$InlineObject>;
 

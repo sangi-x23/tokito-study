@@ -1,8 +1,8 @@
-import { GoogleDocsService } from '../google-docs';
-import { extractPhase, importPhase, taxonomyPhase } from '../ingestion/bootstrap/bootstrap';
-import { ManualProvider } from '../ingestion/bootstrap/manual-provider';
-import { GeminiProvider, type LlmProvider } from '../llm';
-import { PrismaService } from '../prisma/prisma.service';
+import { GoogleDocsService } from '../google-docs/index.js';
+import { extractPhase, importPhase, taxonomyPhase } from '../ingestion/bootstrap/bootstrap.js';
+import { ManualProvider } from '../ingestion/bootstrap/manual-provider.js';
+import { GeminiProvider, type LlmProvider } from '../llm/index.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 /**
  * Lectura inicial del documento, en tres fases que se corren por separado:

@@ -1,4 +1,4 @@
-import type { PrismaClient } from '../../generated/prisma/client';
+import type { PrismaClient } from '../../generated/prisma/client.js';
 
 // Una corrida legítima dura como mucho lo que una función de Vercel (300 s)
 // o un import local. Una en RUNNING más vieja que esto murió sin cerrarse y

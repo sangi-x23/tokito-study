@@ -3,8 +3,8 @@ import { mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, describe, it } from 'node:test';
-import { LlmValidationError, type LlmPart } from '../../llm';
-import { LlmPendingError, ManualProvider } from '../bootstrap/manual-provider';
+import { LlmValidationError, type LlmPart } from '../../llm/index.js';
+import { LlmPendingError, ManualProvider } from '../bootstrap/manual-provider.js';
 
 const parts: LlmPart[] = [
   { kind: 'text', text: 'ねこ = gato' },
