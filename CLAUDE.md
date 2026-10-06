@@ -119,8 +119,9 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **Un 400 de la API cuenta como "no encontrado".** Un slug o un id con forma inválida en la URL es, para quien navega, lo mismo que uno que no existe.
 - **Sin `loading.tsx`.** Con él, Next empieza a mandar la página antes de saber si el tema existe, y un tema inexistente respondía 200 en vez de 404.
 - **Rutas en español y agrupadas por sección:** `/diario`, `/diario/temas/[slug]` y `/diario/items/[id]`, porque son las URLs que ven los compañeros. `/` redirige a `/diario` mientras sea la única sección. Las URLs se arman con `lib/routes.ts`, no a mano.
-- **`AppSidebar` como navegación principal (2026-10-06).** Una entrada por sección, declaradas en `lib/sections.ts` con íconos SVG en línea (sin librería de íconos). Fijo a la izquierda desde `lg`; debajo, un panel que se abre desde la barra superior y se cierra al navegar, al tocar fuera o con Escape. La primera sección es «Diario de clase»: el árbol de temas con sus ítems.
+- **`AppSidebar` como navegación principal (2026-10-06).** Una entrada por sección, declaradas en `sections/` con íconos SVG en línea (sin librería de íconos). Fijo a la izquierda desde `lg`; debajo, un panel que se abre desde la barra superior y se cierra al navegar, al tocar fuera o con Escape. La primera sección es «Diario de clase»: el árbol de temas con sus ítems.
 - **Módulos por datos, no por sección (2026-10-06).** `lib/api-client.ts` solo sabe la URL base, la caché y el manejo de errores; los endpoints viven en `modules/<módulo>/api/`, uno por recurso, junto a los componentes y las etiquetas del módulo. Los módulos siguen a los de la API (`content` agrupa temas e ítems), no a las secciones del sidebar, porque varias secciones van a leer los mismos datos: las tarjetas o los quizzes usarán los ítems del Diario. `app/` solo compone páginas a partir de los módulos.
+- **Tres capas: `app/`, `sections/` y `modules/` (2026-10-06).** `app/` solo tiene lo que Next exige de una ruta: leer los parámetros, pedir los datos, `notFound()`, metadata y `dynamic`. Cada página termina en una vista. `sections/<sección>/` tiene la entrada del sidebar (`section.ts`, `icon.tsx`) y las vistas de esa sección (`views/`). `modules/` tiene lo que pueden usar varias secciones. Regla para decidir: si otra sección podría usarlo, va en `modules/`; si es cómo una sección arma su pantalla, va en `sections/`. Se evaluó migrar a una SPA de React por la estructura y se descartó: se perderían los 404 reales, la caché del servidor y el ocultar la API al navegador, y con `app/` delgado la estructura queda igual que con un `router.tsx`.
 - **Noto Sans JP con `next/font`** y modo oscuro según el sistema. Sin dependencias nuevas: `server-only` no se agregó, la regla de que `lib/api-client.ts` corre solo en el servidor queda en su comentario.
 - **UI mínima a propósito.** La idea es ver el sistema completo funcionando y mejorar la interfaz después. Sin filtros por tipo ni estado de cliente hasta que lleguen las sesiones de estudio.
 - **`pnpm dev` en la raíz levanta todo junto:** `shared` en watch, la API en el puerto 3001 y la web en el 3000.
@@ -160,8 +161,10 @@ apps/
       scripts/    scripts sueltos (print-sections, bootstrap, ingest) compilados con el resto
   web/            Next.js
     app/          solo rutas: / (redirige), diario (árbol), diario/temas/[slug], diario/items/[id], not-found y error
-    components/   lo que no es de ningún módulo: layout/ (sidebar) y breadcrumb
-    lib/          cliente HTTP de la API (solo servidor), rutas y secciones del sidebar
+    components/   piezas generales: layout/ (sidebar), breadcrumb e icon
+    lib/          cliente HTTP de la API (solo servidor) y rutas
+    sections/     una carpeta por sección del sidebar; index.ts fija el orden
+      diary/        section.ts, icon.tsx y views/ (portada, tema e ítem)
     modules/      un módulo por módulo de datos de la API
       content/      temas e ítems: api/ (endpoints), components/ y etiquetas en español
 packages/

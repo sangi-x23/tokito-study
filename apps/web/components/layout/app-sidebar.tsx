@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { APP_SECTIONS } from '@/lib/sections';
-import { SectionIcon } from './section-icon';
+import { APP_SECTIONS } from '@/sections';
 import { SidebarFrame } from './sidebar-frame';
 import { SidebarLink } from './sidebar-link';
 
@@ -25,7 +24,7 @@ export function AppSidebar(): ReactNode {
           {APP_SECTIONS.map((section) => (
             <li key={section.href}>
               <SidebarLink href={section.href}>
-                <SectionIcon name={section.icon} className="size-5 shrink-0" />
+                <section.Icon className="size-5 shrink-0" />
                 {section.label}
               </SidebarLink>
             </li>
