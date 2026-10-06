@@ -19,7 +19,11 @@ export function TopicView({ topic }: { topic: TopicDetail }): ReactNode {
         <Breadcrumb crumbs={crumbs} />
         <h1 className="text-3xl font-semibold tracking-tight">{topic.name}</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          {CATEGORY_LABEL[topic.category]} · {itemCountLabel(topic.itemCount)}
+          {CATEGORY_LABEL[topic.category]} ·{' '}
+          {/* Un tema raíz suele no tener ítems propios: los tienen sus subtemas. */}
+          {topic.children.length > 0 && topic.itemCount === 0
+            ? `${topic.children.length} subtemas`
+            : itemCountLabel(topic.itemCount)}
         </p>
         {topic.description && <p className="text-slate-600 dark:text-slate-400">{topic.description}</p>}
       </div>
@@ -27,15 +31,20 @@ export function TopicView({ topic }: { topic: TopicDetail }): ReactNode {
       {topic.children.length > 0 && (
         <section className="flex flex-col gap-3">
           <h2 className="text-lg font-medium">Subtemas</h2>
-          <ul className="flex flex-wrap gap-2">
+          <ul className="grid gap-3 sm:grid-cols-2">
             {topic.children.map((child) => (
               <li key={child.slug}>
                 <Link
                   href={routes.topic(child.slug)}
-                  className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 text-sm hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+                  className="flex h-full flex-col gap-1 rounded-xl border border-slate-200 p-4 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
                 >
-                  {child.name}
-                  <span className="text-xs text-slate-400">{child.itemCount}</span>
+                  <span className="font-medium">{child.name}</span>
+                  {child.description && (
+                    <span className="text-sm text-slate-600 dark:text-slate-400">{child.description}</span>
+                  )}
+                  <span className="mt-auto pt-1 text-xs text-slate-500 dark:text-slate-400">
+                    {itemCountLabel(child.itemCount)}
+                  </span>
                 </Link>
               </li>
             ))}
