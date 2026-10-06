@@ -112,6 +112,21 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **`Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400` solo en las respuestas exitosas**, mediante `PublicCacheInterceptor`. `@Header` también la ponía en los 404, y el CDN seguiría diciendo que un tema no existe después de que la ingesta lo creara.
 - **Las consultas son una sola por endpoint** (más una para las palabras de un kanji), con `include`/`select` declarados junto a sus mappers en `content/helpers/to-dto.ts`. Los mappers y el armado del árbol son funciones puras y se prueban sin base.
 
+### Decisiones de la Fase 7
+
+- **Server Components que llaman a la API desde el servidor de Next** (`apps/web/lib/api-client.ts`), con `API_URL` solo del lado del servidor. El navegador nunca llama a la API: no hace falta CORS. Los componentes de cliente se limitan a `error.tsx` (Next lo exige), a los dos del sidebar (`sidebar-link.tsx`, que necesita la ruta actual para marcar la sección activa, y `sidebar-frame.tsx`, que abre y cierra el panel en móvil) y a `topic-link.tsx` del Diario, que marca el tema activo. Su estado vive en memoria.
+- **`dynamic = 'force-dynamic'` en las páginas y `revalidate: 3600` en cada `fetch`.** Las páginas se renderizan al pedirlas, así que el build no necesita la API corriendo; los datos igual se cachean una hora, como el `s-maxage` de la API.
+- **Un 400 de la API cuenta como "no encontrado".** Un slug o un id con forma inválida en la URL es, para quien navega, lo mismo que uno que no existe.
+- **Sin `loading.tsx`.** Con él, Next empieza a mandar la página antes de saber si el tema existe, y un tema inexistente respondía 200 en vez de 404.
+- **Rutas en español y agrupadas por sección:** `/diario`, `/diario/temas/[slug]` y `/diario/items/[id]`, porque son las URLs que ven los compañeros. `/` redirige a `/diario` mientras sea la única sección. Las URLs se arman con `lib/routes.ts`, no a mano.
+- **`AppSidebar` como navegación principal (2026-10-06).** Una entrada por sección, declaradas en `sections/` con íconos SVG en línea (sin librería de íconos). Fijo a la izquierda desde `lg`; debajo, un panel que se abre desde la barra superior y se cierra al navegar, al tocar fuera o con Escape. La primera sección es «Diario de clase»: el árbol de temas con sus ítems.
+- **Módulos por datos, no por sección (2026-10-06).** `lib/api-client.ts` solo sabe la URL base, la caché y el manejo de errores; los endpoints viven en `modules/<módulo>/api/`, uno por recurso, junto a los componentes y las etiquetas del módulo. Los módulos siguen a los de la API (`content` agrupa temas e ítems), no a las secciones del sidebar, porque varias secciones van a leer los mismos datos: las tarjetas o los quizzes usarán los ítems del Diario. `app/` solo compone páginas a partir de los módulos.
+- **Tres capas: `app/`, `sections/` y `modules/` (2026-10-06).** `app/` solo tiene lo que Next exige de una ruta: leer los parámetros, pedir los datos, `notFound()`, metadata y `dynamic`. Cada página termina en una vista. `sections/<sección>/` tiene la entrada del sidebar (`section.ts`, `icon.tsx`) y las vistas de esa sección (`views/`). `modules/` tiene lo que pueden usar varias secciones. Regla para decidir: si otra sección podría usarlo, va en `modules/`; si es cómo una sección arma su pantalla, va en `sections/`. Se evaluó migrar a una SPA de React por la estructura y se descartó: se perderían los 404 reales, la caché del servidor y el ocultar la API al navegador, y con `app/` delgado la estructura queda igual que con un `router.tsx`.
+- **El Diario tiene su propia barra de temas (2026-10-06).** `app/diario/layout.tsx` es un layout anidado: lista los temas de primer nivel y no se vuelve a renderizar al navegar dentro del Diario. Un tema queda activo en su página y en las de sus subtemas. La página de un tema raíz muestra sus subtemas como tarjetas; la de un subtema, sus ítems. `/diario` es una bienvenida breve. En pantallas chicas la barra pasa a una fila con scroll horizontal. Por eso el ancho máximo del contenido salió del layout raíz y vive en `PageContainer`: cada sección decide dónde ponerlo, y la barra de temas puede ocupar todo el alto.
+- **Noto Sans JP con `next/font`** y modo oscuro según el sistema. Sin dependencias nuevas: `server-only` no se agregó, la regla de que `lib/api-client.ts` corre solo en el servidor queda en su comentario.
+- **UI mínima a propósito.** La idea es ver el sistema completo funcionando y mejorar la interfaz después. Sin filtros por tipo ni estado de cliente hasta que lleguen las sesiones de estudio.
+- **`pnpm dev` en la raíz levanta todo junto:** `shared` en watch, la API en el puerto 3001 y la web en el 3000.
+
 ## Estructura
 
 ```
@@ -146,6 +161,13 @@ apps/
         tests/      *.spec.ts del módulo
       scripts/    scripts sueltos (print-sections, bootstrap, ingest) compilados con el resto
   web/            Next.js
+    app/          solo rutas: / (redirige), diario (árbol), diario/temas/[slug], diario/items/[id], not-found y error
+    components/   piezas generales: layout/ (sidebar), breadcrumb e icon
+    lib/          cliente HTTP de la API (solo servidor) y rutas
+    sections/     una carpeta por sección del sidebar; index.ts fija el orden
+      diary/        section.ts, icon.tsx, components/ (barra de temas) y views/ (layout, portada, tema e ítem)
+    modules/      un módulo por módulo de datos de la API
+      content/      temas e ítems: api/ (endpoints), components/ y etiquetas en español
 packages/
   shared/         tipos y DTOs compartidos (@tokito/shared)
 ```
@@ -226,7 +248,13 @@ Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de k
 - [x] **Fase 4:** bootstrap local en tres fases: `ingest:bootstrap extract`, `taxonomy` e `import` (con `--dry-run`). Importado en Neon el 2026-10-03: 11 pestañas, 57 temas, 466 ítems (7 kanji) y 19 imágenes en caché. Pestañas 1–4 extraídas con Gemini y 5–11 con `--manual`, revisadas y corregidas a mano antes de importar. Una segunda corrida de `import` no escribe nada.
 - [x] **Fase 5:** ingesta incremental: `GET /ingestion/run` con `CRON_SECRET`, candado, una transacción por pestaña, presupuesto de tiempo y cron diario en `vercel.json`. Probada en local el 2026-10-04 con las dos clases nuevas (10/2 y 10/3). El cron se activa cuando la API se despliegue en Vercel; hasta entonces la ingesta se corre a mano con `ingest:run`.
 - [x] **Fase 6:** API de lectura: `GET /topics` (árbol), `GET /topics/:slug` (detalle con ítems y clases donde aparecieron) y `GET /items/:id` (detalle con temas, clases y palabras de un kanji). Contratos en `@tokito/shared`.
-- [ ] **Fase 7:** frontend: navegación por temas y vista de ítems.
+- [x] **Fase 7:** frontend: inicio con el árbol de temas, página de tema con sus ítems y página de ítem (con lecturas y palabras de un kanji). UI mínima, para mejorar después.
+
+## Variables de entorno de la web (`apps/web/.env.local`, nunca en el repo)
+
+```
+API_URL=               # URL de la API; en local http://localhost:3001
+```
 
 ## Variables de entorno (`apps/api/.env`, nunca en el repo)
 
