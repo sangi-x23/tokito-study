@@ -3,10 +3,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { Breadcrumb, type Crumb } from '@/components/breadcrumb';
-import { ItemCard } from '@/components/item-card';
-import { getTopic } from '@/lib/api';
-import { CATEGORY_LABEL, itemCountLabel } from '@/lib/labels';
 import { routes } from '@/lib/routes';
+import { getTopic } from '@/modules/content/api/topics';
+import { ItemCard } from '@/modules/content/components/item-card';
+import { CATEGORY_LABEL, itemCountLabel } from '@/modules/content/labels';
 
 export const dynamic = 'force-dynamic';
 

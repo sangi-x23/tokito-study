@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { getTopicTree } from '@/lib/api';
-import { CATEGORY_LABEL, itemCountLabel } from '@/lib/labels';
 import { routes } from '@/lib/routes';
+import { getTopicTree } from '@/modules/content/api/topics';
+import { CATEGORY_LABEL, itemCountLabel } from '@/modules/content/labels';
 
 // Se renderiza al pedirla, no en el build: así el build no necesita la API.
 // Los datos igual se cachean una hora en `lib/api.ts`.

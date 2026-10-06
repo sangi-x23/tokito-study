@@ -3,10 +3,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { Breadcrumb, type Crumb } from '@/components/breadcrumb';
-import { ClassList } from '@/components/class-list';
-import { TypeBadge } from '@/components/type-badge';
-import { getItem } from '@/lib/api';
 import { routes } from '@/lib/routes';
+import { getItem } from '@/modules/content/api/items';
+import { ClassList } from '@/modules/content/components/class-list';
+import { TypeBadge } from '@/modules/content/components/type-badge';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,4 +1,6 @@
-import type { ItemDetail, TopicDetail, TopicNode } from '@tokito/shared';
+// Cliente HTTP de la API: URL base, caché y manejo de errores. No sabe nada
+// de temas ni de ítems; los endpoints viven en el `api/` de cada módulo.
+// Corre solo en el servidor de Next.
 
 // Igual que el `s-maxage` de la API: el contenido cambia como mucho una vez
 // al día, con la ingesta.
@@ -21,7 +23,7 @@ function apiUrl(path: string): string {
  * `notFound()`. Un 400 también cuenta: es un slug o un id con forma inválida
  * en la URL, que para quien navega es lo mismo que uno que no existe.
  */
-async function get<T>(path: string): Promise<T | null> {
+export async function get<T>(path: string): Promise<T | null> {
   const response = await fetch(apiUrl(path), { next: { revalidate: REVALIDATE_SECONDS } });
 
   if (response.status === 404 || response.status === 400) {
@@ -31,16 +33,4 @@ async function get<T>(path: string): Promise<T | null> {
     throw new Error(`La API respondió ${response.status} en ${path}`);
   }
   return (await response.json()) as T;
-}
-
-export async function getTopicTree(): Promise<TopicNode[]> {
-  return (await get<TopicNode[]>('/topics')) ?? [];
-}
-
-export function getTopic(slug: string): Promise<TopicDetail | null> {
-  return get<TopicDetail>(`/topics/${encodeURIComponent(slug)}`);
-}
-
-export function getItem(id: string): Promise<ItemDetail | null> {
-  return get<ItemDetail>(`/items/${encodeURIComponent(id)}`);
 }

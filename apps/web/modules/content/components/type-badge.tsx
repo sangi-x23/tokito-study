@@ -1,6 +1,6 @@
 import type { ItemType } from '@tokito/shared';
 import type { ReactNode } from 'react';
-import { ITEM_TYPE_LABEL, ITEM_TYPE_STYLE } from '@/lib/labels';
+import { ITEM_TYPE_LABEL, ITEM_TYPE_STYLE } from '../labels';
 
 export function TypeBadge({ type }: { type: ItemType }): ReactNode {
   return (

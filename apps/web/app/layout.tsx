@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Noto_Sans_JP } from 'next/font/google';
 import type { ReactNode } from 'react';
-import { AppSidebar } from '@/components/app-sidebar';
+import { AppSidebar } from '@/components/layout/app-sidebar';
 import './globals.css';
 
 // Con la fuente servida por Next, el japonés se ve igual en cualquier equipo,
