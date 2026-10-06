@@ -1,4 +1,4 @@
-import type { Clock } from '../helpers/clock';
+import type { Clock } from '../types/retry';
 
 /** Reloj de mentira: `sleep` avanza el tiempo al instante y queda registrado. */
 export function fakeClock(): { clock: Clock; sleeps: number[]; advance(ms: number): void } {

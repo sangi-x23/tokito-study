@@ -2,7 +2,6 @@ import { Logger } from '@nestjs/common';
 import { GoogleGenAI, type GenerateContentParameters, type Part } from '@google/genai';
 import { z } from 'zod';
 import { loadLlmEnv } from '../config/llm.env';
-import type { Clock } from '../helpers/clock';
 import { withRetry } from '../helpers/retry';
 import { parseStructured } from '../helpers/structured-output';
 import { Throttle } from '../helpers/throttle';
@@ -12,6 +11,7 @@ import { TAXONOMY_INSTRUCTIONS, taxonomyUserMessage } from '../prompts/taxonomy.
 import { assignmentSchema, checkAssignment } from '../schemas/assignment.schema';
 import { checkExtraction, extractionSchema } from '../schemas/extraction.schema';
 import { checkTaxonomy, taxonomySchema } from '../schemas/taxonomy.schema';
+import type { GeminiDeps, GeminiSettings, GenerateFn } from '../types/gemini';
 import type {
   CatalogTopic,
   Extraction,
@@ -26,28 +26,6 @@ import type {
 // Una pestaña con varias imágenes tarda bastante más que una llamada de texto,
 // pero tiene que caber holgada en los 300 s de una función de Vercel.
 const REQUEST_TIMEOUT_MS = 120_000;
-
-/** Lo que el proveedor usa de la respuesta del SDK; los tests lo imitan. */
-export interface GeminiResponse {
-  readonly text?: string | undefined;
-  readonly candidates?: readonly { readonly finishReason?: string | undefined }[] | undefined;
-  readonly usageMetadata?: { readonly totalTokenCount?: number | undefined } | undefined;
-}
-
-export type GenerateFn = (params: GenerateContentParameters) => Promise<GeminiResponse>;
-
-export interface GeminiSettings {
-  readonly model: string;
-  readonly minIntervalMs: number;
-  readonly maxRetries: number;
-}
-
-export interface GeminiDeps {
-  readonly generate?: GenerateFn;
-  readonly settings?: GeminiSettings;
-  readonly clock?: Clock;
-  readonly random?: () => number;
-}
 
 /**
  * Convierte las partes de una pestaña en partes de Gemini, con cada imagen

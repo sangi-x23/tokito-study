@@ -1,9 +1,5 @@
 import sharp from 'sharp';
-
-export interface DownloadedImage {
-  readonly data: Buffer;
-  readonly mimeType: string;
-}
+import type { DownloadedImage } from '../types/prepared-section';
 
 /** La `contentUri` del documento es temporal y no necesita credenciales. */
 export async function downloadImage(contentUri: string): Promise<DownloadedImage> {

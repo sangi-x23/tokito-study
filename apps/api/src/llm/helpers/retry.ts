@@ -1,11 +1,7 @@
 import { ApiError } from '@google/genai';
 import { LlmQuotaExhaustedError } from '../llm.errors';
-import { systemClock, type Clock } from './clock';
-
-export type ErrorKind =
-  | { readonly kind: 'retryable'; readonly retryAfterMs: number | null }
-  | { readonly kind: 'daily-quota'; readonly quotaId: string }
-  | { readonly kind: 'fatal' };
+import type { ErrorKind, RetryOptions } from '../types/retry';
+import { systemClock } from './clock';
 
 // Errores transitorios: cuota por minuto, sobrecarga del servidor, timeouts.
 const RETRYABLE_STATUS = new Set([408, 429, 500, 502, 503, 504]);
@@ -65,17 +61,6 @@ export function classifyGeminiError(error: unknown): ErrorKind {
 
   const retryInfo = details.find((detail) => detail['@type']?.endsWith('RetryInfo'));
   return { kind: 'retryable', retryAfterMs: parseDuration(retryInfo?.retryDelay) };
-}
-
-export interface RetryOptions {
-  readonly maxRetries: number;
-  readonly baseDelayMs?: number;
-  readonly maxDelayMs?: number;
-  readonly clock?: Clock;
-  /** Inyectable para que el jitter sea determinista en los tests. */
-  readonly random?: () => number;
-  readonly classify?: (error: unknown) => ErrorKind;
-  readonly onRetry?: (attempt: number, delayMs: number, error: unknown) => void;
 }
 
 /**

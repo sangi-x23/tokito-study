@@ -1,20 +1,7 @@
 import type { ParsedSection } from '../../google-docs';
 import type { LlmPart } from '../../llm';
-import { contentHash, sha256, type HashedPart } from './content-hash';
-import type { DownloadedImage } from './images';
-
-type PreparedPart =
-  | { readonly kind: 'text'; readonly text: string }
-  | { readonly kind: 'image'; readonly hash: string; readonly image: DownloadedImage };
-
-/** Una pestaña con sus imágenes ya descargadas y hasheadas. */
-export interface PreparedSection {
-  readonly section: ParsedSection;
-  readonly contentHash: string;
-  readonly parts: readonly PreparedPart[];
-  /** Hashes distintos de las imágenes, en orden de aparición. */
-  readonly imageHashes: readonly string[];
-}
+import type { DownloadedImage, HashedPart, PreparedPart, PreparedSection } from '../types/prepared-section';
+import { contentHash, sha256 } from './content-hash';
 
 /**
  * Descarga las imágenes de una pestaña y calcula su huella. Es el paso previo

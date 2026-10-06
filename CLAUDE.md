@@ -91,6 +91,10 @@ packages/
 
 Cada módulo de la API sigue la misma forma: `config/`, `types/`, `schemas/`, `helpers/` (funciones puras), `providers/` y `tests/` con los `*.spec.ts`, según lo que necesite.
 
+**Las interfaces y tipos exportados van en `types/<tema>.ts`,** no en servicios, helpers ni providers. Hay dos excepciones:
+- Un tipo privado de un archivo (sin `export`) se queda junto a la función que lo usa.
+- Un tipo derivado de un valor en una línea (`z.infer<typeof schema>` en `config/`, `Prisma.*GetPayload<typeof include>` en `content/helpers/to-dto.ts`) se queda al lado de su esquema.
+
 Vercel: dos proyectos desde este repo, con Root Directory `apps/api` y `apps/web`.
 
 ## Modelo de datos (ver `apps/api/prisma/schema.prisma`)

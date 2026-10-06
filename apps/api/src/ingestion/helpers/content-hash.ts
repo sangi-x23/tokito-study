@@ -1,12 +1,8 @@
 import { createHash } from 'node:crypto';
+import type { HashedPart } from '../types/prepared-section';
 
 export const sha256 = (data: Buffer | string): string =>
   createHash('sha256').update(data).digest('hex');
-
-/** Una parte de la pestaña con la imagen ya reducida a su hash. */
-export type HashedPart =
-  | { readonly kind: 'text'; readonly text: string }
-  | { readonly kind: 'image'; readonly hash: string };
 
 /**
  * Huella del contenido de una pestaña: el texto y los hashes de sus imágenes,

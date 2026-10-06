@@ -1,11 +1,6 @@
 import type { z } from 'zod';
 import { LlmValidationError } from '../llm.errors';
-
-/** Lo mínimo que se necesita de la respuesta del modelo. */
-export interface ModelOutput {
-  readonly text: string | undefined;
-  readonly finishReason: string | undefined;
-}
+import type { ModelOutput } from '../types/structured-output';
 
 /**
  * Convierte la salida del modelo en un valor validado o lanza

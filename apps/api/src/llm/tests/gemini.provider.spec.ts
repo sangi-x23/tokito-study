@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import { ApiError, type GenerateContentParameters } from '@google/genai';
 import { LlmValidationError } from '../llm.errors';
-import { GeminiProvider, toGeminiParts, type GeminiResponse } from '../providers/gemini.provider';
+import { GeminiProvider, toGeminiParts } from '../providers/gemini.provider';
+import type { GeminiResponse } from '../types/gemini';
 import { fakeClock } from './fake-clock';
 
 const SETTINGS = { model: 'gemini-de-prueba', minIntervalMs: 1000, maxRetries: 2 };

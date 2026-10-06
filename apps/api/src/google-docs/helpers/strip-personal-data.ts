@@ -1,3 +1,5 @@
+import type { PersonalNames } from '../types/parser';
+
 // Enlaces de videollamada: Meet, Zoom y Teams.
 const VIDEO_CALL_LINK = /(?:https?:\/\/)?(?:meet\.google\.com|[\w.-]*\bzoom\.us|teams\.microsoft\.com)\/\S*/i;
 
@@ -52,18 +54,6 @@ const BILINGUAL_NAME = /^\s*([^／/]+?)\s*[／/]\s*([\p{Script=Latin} ]+?)\s*$/u
 
 const LATIN_NAME = /^\p{Script=Latin}{3,}$/u;
 const LATIN_TERM = /^\p{Script=Latin}+$/u;
-
-/** Nombres de personas reales sacados del propio documento. */
-export interface PersonalNames {
-  readonly latin: readonly string[];
-  readonly katakana: readonly string[];
-  /**
-   * Términos que ninguna regla detecta (un diminutivo, el negocio de alguien),
-   * configurados a mano. Se buscan como texto literal, sin distinguir
-   * mayúsculas.
-   */
-  readonly literal?: readonly string[];
-}
 
 export const NO_PERSONAL_NAMES: PersonalNames = { latin: [], katakana: [] };
 

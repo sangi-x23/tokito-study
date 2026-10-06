@@ -1,20 +1,6 @@
 import type { Prisma } from '../../generated/prisma/client';
 import type { ImportPlan, PlannedItem } from '../types/import-plan';
-
-export interface DocumentMeta {
-  readonly googleDocId: string;
-  readonly title: string;
-  readonly revisionId: string | null;
-}
-
-export interface WriteSummary {
-  readonly sections: number;
-  readonly topics: { readonly created: number; readonly updated: number };
-  readonly items: { readonly created: number; readonly updated: number };
-  readonly itemTopics: { readonly created: number; readonly updated: number; readonly removed: number };
-  readonly occurrences: number;
-  readonly images: number;
-}
+import type { DocumentMeta, WriteSummary } from '../types/write-plan';
 
 const itemKey = (type: string, japanese: string): string => `${type}\u0000${japanese}`;
 

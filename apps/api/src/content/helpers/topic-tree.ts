@@ -1,11 +1,6 @@
 import type { TopicNode } from '@tokito/shared';
-import { toTopicSummary, type TopicSummaryRow } from './to-dto';
-
-export interface TopicTreeRow extends TopicSummaryRow {
-  readonly id: string;
-  readonly parentId: string | null;
-  readonly position: number;
-}
+import type { TopicTreeRow } from '../types/topic-tree';
+import { toTopicSummary } from './to-dto';
 
 const byPosition = (a: TopicTreeRow, b: TopicTreeRow): number =>
   a.position - b.position || a.name.localeCompare(b.name, 'es');

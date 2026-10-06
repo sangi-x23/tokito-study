@@ -1,4 +1,5 @@
-import { systemClock, type Clock } from './clock';
+import type { Clock } from '../types/retry';
+import { systemClock } from './clock';
 
 /**
  * Serializa las llamadas y deja al menos `minIntervalMs` entre el inicio de

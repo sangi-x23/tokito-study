@@ -1,14 +1,17 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { GoogleDocsService, type ParsedDocument } from '../google-docs';
+import { GoogleDocsService } from '../google-docs';
 import { LLM_PROVIDER, type Extraction, type LlmProvider, type TopicAssignment } from '../llm';
 import { PrismaService } from '../prisma/prisma.service';
 import { downloadImage, shrinkForLlm } from './helpers/images';
 import { withIngestionRun } from './helpers/ingestion-run';
 import { itemKey } from './helpers/item-key';
-import { prepareSection, toLlmParts, type PreparedSection } from './helpers/prepare-section';
-import { buildSectionPlan, toItemsToAssign, uniqueItems, type CatalogEntry } from './helpers/section-plan';
-import { writeSectionPlan, type SectionWriteSummary } from './helpers/write-section';
-import type { DocumentMeta } from './helpers/write-plan';
+import { prepareSection, toLlmParts } from './helpers/prepare-section';
+import { buildSectionPlan, toItemsToAssign, uniqueItems } from './helpers/section-plan';
+import { writeSectionPlan } from './helpers/write-section';
+import type { IngestionSummary, RunOptions, SectionChanges } from './types/ingestion';
+import type { PreparedSection } from './types/prepared-section';
+import type { CatalogEntry } from './types/section-plan';
+import type { DocumentMeta, SectionWriteSummary } from './types/write-plan';
 
 // Una pestaña con imágenes más la asignación puede pasar de 200 s, y Vercel
 // corta a los 300. Pasado este tiempo no se empieza otra pestaña: queda para
@@ -18,30 +21,6 @@ const DEFAULT_TIME_BUDGET_MS = 100_000;
 // Una pestaña son pocas decenas de consultas; el valor por defecto de Prisma
 // (5 s) se queda corto con Neon recién despertado.
 const SECTION_TX_TIMEOUT_MS = 60_000;
-
-export interface SectionChanges {
-  readonly document: ParsedDocument;
-  /** Pestañas nuevas o con huella distinta, en el orden del documento. */
-  readonly changed: readonly PreparedSection[];
-  readonly unchanged: number;
-}
-
-export interface IngestionSummary {
-  readonly sectionsProcessed: number;
-  readonly unchanged: number;
-  /** Pestañas cambiadas que no entraron en el tiempo de esta corrida. */
-  readonly deferred: readonly string[];
-  readonly topicsCreated: number;
-  readonly itemsCreated: number;
-  readonly occurrencesAdded: number;
-  readonly occurrencesRemoved: number;
-  readonly imagesCached: number;
-}
-
-export interface RunOptions {
-  /** Tiempo tras el cual no se empieza otra pestaña. `Infinity` en local. */
-  readonly timeBudgetMs?: number;
-}
 
 /**
  * Ingesta incremental: procesa solo las pestañas nuevas o modificadas.

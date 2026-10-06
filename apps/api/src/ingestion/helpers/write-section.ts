@@ -1,12 +1,8 @@
 import type { Prisma } from '../../generated/prisma/client';
+import type { SectionPlan } from '../types/section-plan';
+import type { DocumentMeta, SectionWriteSummary } from '../types/write-plan';
 import { itemKey } from './item-key';
-import type { SectionPlan } from './section-plan';
-import { writePlan, type DocumentMeta, type WriteSummary } from './write-plan';
-
-export interface SectionWriteSummary extends WriteSummary {
-  /** Apariciones quitadas: ítems que ya no están en la pestaña. */
-  readonly occurrencesRemoved: number;
-}
+import { writePlan } from './write-plan';
 
 /**
  * Escribe una pestaña de la ingesta semanal dentro de una transacción.

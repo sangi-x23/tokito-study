@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { idSchema, slugSchema } from '../schemas/params.schema';
 import { toItemDetail, toItemSummary, type ItemDetailRow, type ItemSummaryRow } from '../helpers/to-dto';
-import { buildTopicTree, type TopicTreeRow } from '../helpers/topic-tree';
+import { buildTopicTree } from '../helpers/topic-tree';
+import { idSchema, slugSchema } from '../schemas/params.schema';
+import type { TopicTreeRow } from '../types/topic-tree';
 
 const topic = (id: string, parentId: string | null, position: number, items = 0): TopicTreeRow => ({
   id,

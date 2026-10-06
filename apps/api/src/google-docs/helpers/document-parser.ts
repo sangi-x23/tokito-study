@@ -1,11 +1,7 @@
 import type { docs_v1 } from 'googleapis';
 import type { DocumentPart, ParsedDocument, ParsedSection } from '../types/document-part';
-import {
-  collectPersonalNames,
-  stripPersonalData,
-  withPersonalTerms,
-  type PersonalNames,
-} from './strip-personal-data';
+import type { ParseOptions, PersonalNames } from '../types/parser';
+import { collectPersonalNames, stripPersonalData, withPersonalTerms } from './strip-personal-data';
 
 type InlineObjects = Record<string, docs_v1.Schema$InlineObject>;
 
@@ -168,13 +164,6 @@ function flattenTabs(tabs: docs_v1.Schema$Tab[]): docs_v1.Schema$Tab[] {
 
   visit(tabs);
   return flat;
-}
-
-export interface ParseOptions {
-  /** Pestañas que no son clases (temario, notas…) y no se devuelven. */
-  readonly skipTabIds?: readonly string[];
-  /** Términos a descartar que ninguna regla detecta (ver `withPersonalTerms`). */
-  readonly personalTerms?: readonly string[];
 }
 
 /**

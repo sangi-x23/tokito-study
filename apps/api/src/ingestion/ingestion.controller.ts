@@ -2,7 +2,8 @@ import { ConflictException, Controller, Get, ServiceUnavailableException, UseGua
 import { LlmQuotaExhaustedError } from '../llm';
 import { CronSecretGuard } from './cron-secret.guard';
 import { IngestionLockedError } from './helpers/ingestion-run';
-import { IngestionService, type IngestionSummary } from './ingestion.service';
+import { IngestionService } from './ingestion.service';
+import type { IngestionSummary } from './types/ingestion';
 
 @Controller('ingestion')
 export class IngestionController {

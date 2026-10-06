@@ -1,15 +1,15 @@
 import { access } from 'node:fs/promises';
 import { Logger } from '@nestjs/common';
-import type { GoogleDocsService } from '../../google-docs';
-import { checkTaxonomy, type Extraction, type LlmProvider, type Taxonomy } from '../../llm';
-import type { PrismaService } from '../../prisma/prisma.service';
-import { buildImportPlan } from '../helpers/import-plan';
+import { checkTaxonomy, type Extraction, type Taxonomy } from '../../llm';
 import { downloadImage, shrinkForLlm } from '../helpers/images';
+import { buildImportPlan } from '../helpers/import-plan';
 import { withIngestionRun } from '../helpers/ingestion-run';
 import { collectLabels } from '../helpers/labels';
 import { prepareSection, toLlmParts } from '../helpers/prepare-section';
-import { writePlan, type WriteSummary } from '../helpers/write-plan';
+import { writePlan } from '../helpers/write-plan';
+import type { BootstrapDeps } from '../types/bootstrap';
 import type { SectionExtraction } from '../types/import-plan';
+import type { WriteSummary } from '../types/write-plan';
 import {
   pruneExtractions,
   readAllExtractions,
@@ -29,12 +29,6 @@ const logger = new Logger('Bootstrap');
 // consultas, pero un re-import que mueve muchos ítems de tema actualiza fila
 // por fila: el valor por defecto de Prisma (5 s) no alcanza.
 const IMPORT_TIMEOUT_MS = 5 * 60 * 1000;
-
-export interface BootstrapDeps {
-  readonly docs: GoogleDocsService;
-  readonly llm: LlmProvider;
-  readonly prisma: PrismaService;
-}
 
 /**
  * Fase 1: extrae los ítems de cada pestaña y los guarda en un JSON por

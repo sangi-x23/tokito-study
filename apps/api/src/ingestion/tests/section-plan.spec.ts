@@ -3,13 +3,8 @@ import { describe, it } from 'node:test';
 import type { ExtractedItem, TopicAssignment } from '../../llm';
 import { isAuthorized } from '../cron-secret.guard';
 import { itemKey, normalizeJapanese } from '../helpers/item-key';
-import {
-  buildSectionPlan,
-  toItemsToAssign,
-  uniqueItems,
-  type CatalogEntry,
-  type SectionPlanInput,
-} from '../helpers/section-plan';
+import { buildSectionPlan, toItemsToAssign, uniqueItems } from '../helpers/section-plan';
+import type { CatalogEntry, SectionPlanInput } from '../types/section-plan';
 
 const word = (japanese: string, topicLabel = 'Animales'): ExtractedItem => ({
   type: 'WORD',

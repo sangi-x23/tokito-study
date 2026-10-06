@@ -3,7 +3,7 @@ import { join, resolve } from 'node:path';
 import { z } from 'zod';
 import { extractionSchema, taxonomySchema, type Taxonomy } from '../../llm';
 import type { SectionExtraction } from '../types/import-plan';
-import type { DocumentMeta } from '../helpers/write-plan';
+import type { DocumentMeta } from '../types/write-plan';
 
 /**
  * Archivos locales del bootstrap, en `apps/api/.bootstrap/` (ignorado por git:
