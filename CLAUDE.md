@@ -58,8 +58,8 @@ Los scripts de la API corren desde `dist/`, así que necesitan un `build` previo
 - **TypeScript `~6.0.3`, no la 7.** `@nestjs/cli@12` depende de `typescript ~6.0.2`.
 - **`module: node20`** en `api` y `shared`: TypeScript 6 deprecó `moduleResolution: node10`.
 - **Prisma `~7.10.0`.** El tag `latest` de `prisma` apuntaba a un release candidate de la 8.
-- **`@google/genai` en 2.24.0**, por el `minimumReleaseAge` de pnpm. `allowBuilds` queda en `false` para `@google/genai` y `protobufjs`.
-- **`onlyBuiltDependencies` en `pnpm-workspace.yaml`:** pnpm 10+ bloquea los postinstall y Prisma los necesita.
+- **`@google/genai` en 2.24.0**, por el `minimumReleaseAge` de pnpm.
+- **`allowBuilds` en `pnpm-workspace.yaml` decide cada script de instalación.** pnpm 11 rompe el `pnpm install` en CI (Vercel) si una dependencia con scripts queda sin decidir. Todas van en `false`, incluido Prisma: sus scripts solo descargan el motor de migraciones, que no usan ni `prisma generate` ni la API, y en Windows el preinstall de `prisma` revienta dentro de pnpm. El `prisma generate` lo corren el `postinstall` y el `build` de la API.
 - **`@tokito/shared` compila a `dist/`** (CommonJS + `.d.ts`) para que Nest y Next lo consuman igual.
 
 ## Estructura

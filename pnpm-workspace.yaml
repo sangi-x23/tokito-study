@@ -2,14 +2,12 @@ packages:
   - apps/*
   - packages/*
 
+# pnpm 11 exige decidir qué dependencias corren scripts de instalación; en CI
+# una sin decidir rompe el `pnpm install`. Los de Prisma solo descargan el
+# motor de migraciones: `prisma generate` y la API (adaptador de Neon) no lo
+# usan, y en Windows el preinstall de `prisma` revienta dentro de pnpm.
 allowBuilds:
   '@google/genai': false
-  '@prisma/engines': set this to true or false
-  prisma: set this to true or false
+  '@prisma/engines': false
+  prisma: false
   protobufjs: false
-
-# pnpm bloquea los scripts de postinstall por defecto. Prisma los necesita
-# para descargar sus motores, así que se autorizan explícitamente.
-onlyBuiltDependencies:
-  - '@prisma/engines'
-  - prisma
