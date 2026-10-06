@@ -1,0 +1,14 @@
+# Finales de línea LF en el repositorio, sin importar el sistema operativo
+* text=auto eol=lf
+
+# Binarios
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+
+# El lockfile no se revisa a mano
+pnpm-lock.yaml linguist-generated=true -diff

@@ -1,0 +1,30 @@
+# Dependencias
+node_modules/
+
+# Builds
+dist/
+dist-test/
+.next/
+out/
+*.tsbuildinfo
+
+# Prisma: cliente generado
+apps/api/src/generated/
+
+# Entorno
+.env
+.env.*
+!.env.example
+
+# Next: lo regenera `next dev`/`next build`/`next typegen` y cambia entre uno y otro
+apps/web/next-env.d.ts
+
+# Vercel
+.vercel/
+
+# Salida del bootstrap local (contenido del documento, no va al repo)
+apps/api/.bootstrap/
+
+# Sistema y editor
+.DS_Store
+Thumbs.db

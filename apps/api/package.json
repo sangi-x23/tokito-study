@@ -1,0 +1,43 @@
+{
+  "name": "@tokito/api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "prisma generate && nest build",
+    "dev": "nest start --watch",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "postinstall": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio",
+    "test": "tsc -p tsconfig.json --outDir dist-test && node --test \"dist-test/**/*.spec.js\"",
+    "docs:print": "node dist/scripts/print-sections.js",
+    "llm:try": "node dist/scripts/try-extraction.js",
+    "ingest:bootstrap": "node dist/scripts/bootstrap.js",
+    "ingest:run": "node dist/scripts/ingest.js"
+  },
+  "dependencies": {
+    "@google/genai": "2.24.0",
+    "@neondatabase/serverless": "^1.1.0",
+    "@nestjs/common": "^12.1.0",
+    "@nestjs/core": "^12.1.0",
+    "@nestjs/platform-express": "^12.1.0",
+    "@prisma/adapter-neon": "7.10.0",
+    "@prisma/client": "7.10.0",
+    "@tokito/shared": "workspace:*",
+    "googleapis": "^182.0.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^12.0.7",
+    "@nestjs/schematics": "^12.0.5",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.19.0",
+    "prisma": "7.10.0",
+    "typescript": "~6.0.3"
+  }
+}
