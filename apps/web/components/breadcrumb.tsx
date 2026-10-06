@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { routes } from '@/lib/routes';
 
 export interface Crumb {
   readonly label: string;
@@ -11,8 +12,8 @@ export function Breadcrumb({ crumbs }: { crumbs: readonly Crumb[] }): ReactNode 
     <nav aria-label="Ruta" className="text-sm text-slate-500 dark:text-slate-400">
       <ol className="flex flex-wrap items-center gap-1">
         <li>
-          <Link href="/" className="hover:text-slate-900 dark:hover:text-slate-100">
-            Temas
+          <Link href={routes.diary} className="hover:text-slate-900 dark:hover:text-slate-100">
+            Diario de clase
           </Link>
         </li>
         {crumbs.map((crumb) => (

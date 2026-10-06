@@ -114,11 +114,12 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 
 ### Decisiones de la Fase 7
 
-- **Server Components que llaman a la API desde el servidor de Next** (`apps/web/lib/api.ts`), con `API_URL` solo del lado del servidor. El navegador nunca llama a la API: no hace falta CORS y la navegación no carga JavaScript de cliente. El único componente de cliente es `error.tsx`, porque Next lo exige.
+- **Server Components que llaman a la API desde el servidor de Next** (`apps/web/lib/api.ts`), con `API_URL` solo del lado del servidor. El navegador nunca llama a la API: no hace falta CORS. Los componentes de cliente se limitan a `error.tsx` (Next lo exige) y a los dos del sidebar: `sidebar-link.tsx`, que necesita la ruta actual para marcar la sección activa, y `sidebar-frame.tsx`, que abre y cierra el panel en móvil. Su estado vive en memoria.
 - **`dynamic = 'force-dynamic'` en las páginas y `revalidate: 3600` en cada `fetch`.** Las páginas se renderizan al pedirlas, así que el build no necesita la API corriendo; los datos igual se cachean una hora, como el `s-maxage` de la API.
 - **Un 400 de la API cuenta como "no encontrado".** Un slug o un id con forma inválida en la URL es, para quien navega, lo mismo que uno que no existe.
 - **Sin `loading.tsx`.** Con él, Next empieza a mandar la página antes de saber si el tema existe, y un tema inexistente respondía 200 en vez de 404.
-- **Rutas en español:** `/temas/[slug]` e `/items/[id]`, porque son las URLs que ven los compañeros.
+- **Rutas en español y agrupadas por sección:** `/diario`, `/diario/temas/[slug]` y `/diario/items/[id]`, porque son las URLs que ven los compañeros. `/` redirige a `/diario` mientras sea la única sección. Las URLs se arman con `lib/routes.ts`, no a mano.
+- **`AppSidebar` como navegación principal (2026-10-06).** Una entrada por sección, declaradas en `lib/sections.ts` con íconos SVG en línea (sin librería de íconos). Fijo a la izquierda desde `lg`; debajo, un panel que se abre desde la barra superior y se cierra al navegar, al tocar fuera o con Escape. La primera sección es «Diario de clase»: el árbol de temas con sus ítems.
 - **Noto Sans JP con `next/font`** y modo oscuro según el sistema. Sin dependencias nuevas: `server-only` no se agregó, la regla de que `lib/api.ts` corre solo en el servidor queda en su comentario.
 - **UI mínima a propósito.** La idea es ver el sistema completo funcionando y mejorar la interfaz después. Sin filtros por tipo ni estado de cliente hasta que lleguen las sesiones de estudio.
 - **`pnpm dev` en la raíz levanta todo junto:** `shared` en watch, la API en el puerto 3001 y la web en el 3000.
@@ -157,9 +158,9 @@ apps/
         tests/      *.spec.ts del módulo
       scripts/    scripts sueltos (print-sections, bootstrap, ingest) compilados con el resto
   web/            Next.js
-    app/          páginas: / (árbol), temas/[slug], items/[id], not-found y error
-    components/   tarjeta de ítem, breadcrumb, etiquetas de tipo y de clase
-    lib/          cliente de la API (solo servidor) y etiquetas en español
+    app/          páginas: / (redirige), diario (árbol), diario/temas/[slug], diario/items/[id], not-found y error
+    components/   sidebar, tarjeta de ítem, breadcrumb, etiquetas de tipo y de clase
+    lib/          cliente de la API (solo servidor), rutas, secciones del sidebar y etiquetas en español
 packages/
   shared/         tipos y DTOs compartidos (@tokito/shared)
 ```

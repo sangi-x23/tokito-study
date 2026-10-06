@@ -1,6 +1,7 @@
 import type { ItemSummary } from '@tokito/shared';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { routes } from '@/lib/routes';
 import { ClassList } from './class-list';
 import { TypeBadge } from './type-badge';
 
@@ -14,7 +15,7 @@ export function ItemCard({ item, currentSlug }: { item: ItemSummary; currentSlug
   return (
     <li className="flex flex-col gap-2 rounded-xl border border-slate-200 p-4 dark:border-slate-800">
       <div className="flex items-start justify-between gap-3">
-        <Link href={`/items/${item.id}`} className="group">
+        <Link href={routes.item(item.id)} className="group">
           <span lang="ja" className="text-2xl font-medium group-hover:underline">
             {item.japanese}
           </span>
@@ -46,7 +47,7 @@ export function ItemCard({ item, currentSlug }: { item: ItemSummary; currentSlug
       {elsewhere && (
         <p className="text-xs text-slate-500 dark:text-slate-400">
           Tema principal:{' '}
-          <Link href={`/temas/${elsewhere.slug}`} className="underline hover:text-slate-900 dark:hover:text-slate-100">
+          <Link href={routes.topic(elsewhere.slug)} className="underline hover:text-slate-900 dark:hover:text-slate-100">
             {elsewhere.name}
           </Link>
         </p>

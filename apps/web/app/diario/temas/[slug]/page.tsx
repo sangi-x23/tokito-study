@@ -6,6 +6,7 @@ import { Breadcrumb, type Crumb } from '@/components/breadcrumb';
 import { ItemCard } from '@/components/item-card';
 import { getTopic } from '@/lib/api';
 import { CATEGORY_LABEL, itemCountLabel } from '@/lib/labels';
+import { routes } from '@/lib/routes';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +26,7 @@ export default async function TopicPage({ params }: TopicPageProps): Promise<Rea
   }
 
   const crumbs: Crumb[] = [
-    ...(topic.parent ? [{ label: topic.parent.name, href: `/temas/${topic.parent.slug}` }] : []),
+    ...(topic.parent ? [{ label: topic.parent.name, href: routes.topic(topic.parent.slug) }] : []),
     { label: topic.name },
   ];
 
@@ -47,7 +48,7 @@ export default async function TopicPage({ params }: TopicPageProps): Promise<Rea
             {topic.children.map((child) => (
               <li key={child.slug}>
                 <Link
-                  href={`/temas/${child.slug}`}
+                  href={routes.topic(child.slug)}
                   className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 text-sm hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
                 >
                   {child.name}

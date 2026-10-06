@@ -6,6 +6,7 @@ import { Breadcrumb, type Crumb } from '@/components/breadcrumb';
 import { ClassList } from '@/components/class-list';
 import { TypeBadge } from '@/components/type-badge';
 import { getItem } from '@/lib/api';
+import { routes } from '@/lib/routes';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +46,7 @@ export default async function ItemPage({ params }: ItemPageProps): Promise<React
   }
 
   const crumbs: Crumb[] = [
-    ...(item.primaryTopic ? [{ label: item.primaryTopic.name, href: `/temas/${item.primaryTopic.slug}` }] : []),
+    ...(item.primaryTopic ? [{ label: item.primaryTopic.name, href: routes.topic(item.primaryTopic.slug) }] : []),
     { label: item.japanese },
   ];
 
@@ -98,7 +99,7 @@ export default async function ItemPage({ params }: ItemPageProps): Promise<React
             {item.relatedWords.map((word) => (
               <li key={word.id}>
                 <Link
-                  href={`/items/${word.id}`}
+                  href={routes.item(word.id)}
                   className="flex items-baseline gap-2 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
                 >
                   <span lang="ja" className="text-lg">
@@ -122,7 +123,7 @@ export default async function ItemPage({ params }: ItemPageProps): Promise<React
           {item.topics.map((topic) => (
             <li key={topic.slug}>
               <Link
-                href={`/temas/${topic.slug}`}
+                href={routes.topic(topic.slug)}
                 className="inline-flex rounded-full border border-slate-200 px-3 py-1 text-sm hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
               >
                 {topic.name}
