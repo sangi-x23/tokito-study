@@ -1,5 +1,5 @@
 import { google, type docs_v1 } from 'googleapis';
-import { loadGoogleEnv } from './google-docs.env';
+import { loadGoogleEnv } from './google-docs.env.js';
 
 /** Solo lectura: esta app nunca escribe en el documento. */
 const SCOPES = ['https://www.googleapis.com/auth/documents.readonly'];

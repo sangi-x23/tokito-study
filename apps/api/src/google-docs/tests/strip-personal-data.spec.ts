@@ -5,7 +5,7 @@ import {
   NO_PERSONAL_NAMES,
   stripPersonalData,
   withPersonalTerms,
-} from '../helpers/strip-personal-data';
+} from '../helpers/strip-personal-data.js';
 
 describe('stripPersonalData', () => {
   it('quita la línea con el enlace de Meet', () => {

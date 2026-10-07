@@ -1,8 +1,8 @@
 import { Controller, Get, NotFoundException, Param, UseInterceptors } from '@nestjs/common';
 import type { ItemDetail } from '@tokito/shared';
-import { PublicCacheInterceptor } from './cache';
-import { ItemsService } from './items.service';
-import { idSchema, parseParam } from './schemas/params.schema';
+import { PublicCacheInterceptor } from './cache.js';
+import { ItemsService } from './items.service.js';
+import { idSchema, parseParam } from './schemas/params.schema.js';
 
 @UseInterceptors(PublicCacheInterceptor)
 @Controller('items')

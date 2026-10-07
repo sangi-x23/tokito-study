@@ -1,15 +1,15 @@
 import { access } from 'node:fs/promises';
 import { Logger } from '@nestjs/common';
-import { checkTaxonomy, type Extraction, type Taxonomy } from '../../llm';
-import { downloadImage, shrinkForLlm } from '../helpers/images';
-import { buildImportPlan } from '../helpers/import-plan';
-import { withIngestionRun } from '../helpers/ingestion-run';
-import { collectLabels } from '../helpers/labels';
-import { prepareSection, toLlmParts } from '../helpers/prepare-section';
-import { writePlan } from '../helpers/write-plan';
-import type { BootstrapDeps } from '../types/bootstrap';
-import type { SectionExtraction } from '../types/import-plan';
-import type { WriteSummary } from '../types/write-plan';
+import { checkTaxonomy, type Extraction, type Taxonomy } from '../../llm/index.js';
+import { downloadImage, shrinkForLlm } from '../helpers/images.js';
+import { buildImportPlan } from '../helpers/import-plan.js';
+import { withIngestionRun } from '../helpers/ingestion-run.js';
+import { collectLabels } from '../helpers/labels.js';
+import { prepareSection, toLlmParts } from '../helpers/prepare-section.js';
+import { writePlan } from '../helpers/write-plan.js';
+import type { BootstrapDeps } from '../types/bootstrap.js';
+import type { SectionExtraction } from '../types/import-plan.js';
+import type { WriteSummary } from '../types/write-plan.js';
 import {
   pruneExtractions,
   readAllExtractions,
@@ -20,8 +20,8 @@ import {
   writeDocumentMeta,
   writeExtraction,
   writeTaxonomy,
-} from './bootstrap-files';
-import { LlmPendingError } from './manual-provider';
+} from './bootstrap-files.js';
+import { LlmPendingError } from './manual-provider.js';
 
 const logger = new Logger('Bootstrap');
 

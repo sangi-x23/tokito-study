@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { GeminiProvider } from './providers/gemini.provider';
-import { LLM_PROVIDER } from './types/llm-provider';
+import { GeminiProvider } from './providers/gemini.provider.js';
+import { LLM_PROVIDER } from './types/llm-provider.js';
 
 // Quien consume el módulo inyecta `LLM_PROVIDER` y recibe la interfaz, no
 // Gemini: cambiar de proveedor es cambiar esta línea.

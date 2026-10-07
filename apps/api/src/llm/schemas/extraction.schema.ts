@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { ItemType } from '../../generated/prisma/enums';
-import type { Extraction } from '../types/llm-provider';
-import { nonEmptyText } from './common';
+import { ItemType } from '../../generated/prisma/enums.js';
+import type { Extraction } from '../types/llm-provider.js';
+import { nonEmptyText } from './common.js';
 
 const kanjiSchema = z.object({
   onyomi: z.array(z.string()),

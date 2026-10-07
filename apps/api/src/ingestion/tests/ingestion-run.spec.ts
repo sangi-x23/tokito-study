@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import type { PrismaClient } from '../../generated/prisma/client';
-import { IngestionLockedError, withIngestionRun } from '../helpers/ingestion-run';
+import type { PrismaClient } from '../../generated/prisma/client.js';
+import { IngestionLockedError, withIngestionRun } from '../helpers/ingestion-run.js';
 
 interface Call {
   readonly method: string;

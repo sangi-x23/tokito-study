@@ -1,7 +1,7 @@
-import { GoogleDocsService } from '../google-docs';
-import { IngestionService } from '../ingestion/ingestion.service';
-import { GeminiProvider } from '../llm';
-import { PrismaService } from '../prisma/prisma.service';
+import { GoogleDocsService } from '../google-docs/index.js';
+import { IngestionService } from '../ingestion/ingestion.service.js';
+import { GeminiProvider } from '../llm/index.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 /**
  * La misma ingesta que dispara el cron, corrida en local:

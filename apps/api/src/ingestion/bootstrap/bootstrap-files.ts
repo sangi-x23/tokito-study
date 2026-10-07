@@ -1,9 +1,9 @@
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { z } from 'zod';
-import { extractionSchema, taxonomySchema, type Taxonomy } from '../../llm';
-import type { SectionExtraction } from '../types/import-plan';
-import type { DocumentMeta } from '../types/write-plan';
+import { extractionSchema, taxonomySchema, type Taxonomy } from '../../llm/index.js';
+import type { SectionExtraction } from '../types/import-plan.js';
+import type { DocumentMeta } from '../types/write-plan.js';
 
 /**
  * Archivos locales del bootstrap, en `apps/api/.bootstrap/` (ignorado por git:
@@ -13,7 +13,7 @@ import type { DocumentMeta } from '../types/write-plan';
  * taxonomía lo edita el autor a mano, y los demás pueden quedar de una versión
  * anterior del código.
  */
-export const BOOTSTRAP_DIR = resolve(__dirname, '../../../.bootstrap');
+export const BOOTSTRAP_DIR = resolve(import.meta.dirname, '../../../.bootstrap');
 const EXTRACTIONS_DIR = join(BOOTSTRAP_DIR, 'extractions');
 export const TAXONOMY_FILE = join(BOOTSTRAP_DIR, 'taxonomy.json');
 const DOCUMENT_FILE = join(BOOTSTRAP_DIR, 'document.json');

@@ -2,6 +2,7 @@
   "name": "@tokito/api",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "prisma generate && nest build",
     "dev": "nest start --watch",

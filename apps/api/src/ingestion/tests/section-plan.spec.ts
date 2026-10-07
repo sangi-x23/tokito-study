@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import type { ExtractedItem, TopicAssignment } from '../../llm';
-import { isAuthorized } from '../cron-secret.guard';
-import { itemKey, normalizeJapanese } from '../helpers/item-key';
-import { buildSectionPlan, toItemsToAssign, uniqueItems } from '../helpers/section-plan';
-import type { CatalogEntry, SectionPlanInput } from '../types/section-plan';
+import type { ExtractedItem, TopicAssignment } from '../../llm/index.js';
+import { isAuthorized } from '../cron-secret.guard.js';
+import { itemKey, normalizeJapanese } from '../helpers/item-key.js';
+import { buildSectionPlan, toItemsToAssign, uniqueItems } from '../helpers/section-plan.js';
+import type { CatalogEntry, SectionPlanInput } from '../types/section-plan.js';
 
 const word = (japanese: string, topicLabel = 'Animales'): ExtractedItem => ({
   type: 'WORD',

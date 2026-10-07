@@ -1,7 +1,7 @@
 import { ApiError } from '@google/genai';
-import { LlmQuotaExhaustedError } from '../llm.errors';
-import type { ErrorKind, RetryOptions } from '../types/retry';
-import { systemClock } from './clock';
+import { LlmQuotaExhaustedError } from '../llm.errors.js';
+import type { ErrorKind, RetryOptions } from '../types/retry.js';
+import { systemClock } from './clock.js';
 
 // Errores transitorios: cuota por minuto, sobrecarga del servidor, timeouts.
 const RETRYABLE_STATUS = new Set([408, 429, 500, 502, 503, 504]);

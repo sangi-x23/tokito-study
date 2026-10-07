@@ -1,5 +1,5 @@
-import type { LabelWithExamples } from '../../llm';
-import type { SectionExtraction } from '../types/import-plan';
+import type { LabelWithExamples } from '../../llm/index.js';
+import type { SectionExtraction } from '../types/import-plan.js';
 
 const EXAMPLES_PER_LABEL = 5;
 

@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { docs_v1 } from 'googleapis';
-import type { ParsedDocument } from './types/document-part';
-import { parseDocument } from './helpers/document-parser';
-import { createDocsClient } from './config/google-docs.client';
-import { loadGoogleEnv } from './config/google-docs.env';
+import type { ParsedDocument } from './types/document-part.js';
+import { parseDocument } from './helpers/document-parser.js';
+import { createDocsClient } from './config/google-docs.client.js';
+import { loadGoogleEnv } from './config/google-docs.env.js';
 
 @Injectable()
 export class GoogleDocsService {

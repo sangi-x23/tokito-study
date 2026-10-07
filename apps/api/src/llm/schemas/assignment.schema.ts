@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import type { CatalogTopic, ItemToAssign, TopicAssignment } from '../types/llm-provider';
-import { checkTopicTree, proposedTopicSchema } from './common';
+import type { CatalogTopic, ItemToAssign, TopicAssignment } from '../types/llm-provider.js';
+import { checkTopicTree, proposedTopicSchema } from './common.js';
 
 export const assignmentSchema = z.object({
   assignments: z.array(

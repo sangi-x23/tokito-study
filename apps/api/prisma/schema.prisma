@@ -1,10 +1,10 @@
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
-  // La API compila a CommonJS. Sin esto el generador emite ESM (usa
-  // import.meta) y Node revienta al cargar el cliente con "exports is not
-  // defined in ES module scope".
-  moduleFormat = "cjs"
+  // La API es ESM (NestJS 12 solo se publica como ESM). Los imports internos
+  // del cliente llevan `.js` porque los compila nuestro tsc con `module: node20`.
+  moduleFormat        = "esm"
+  importFileExtension = "js"
 }
 
 datasource db {

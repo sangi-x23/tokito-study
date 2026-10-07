@@ -1,4 +1,4 @@
-import type { ParsedSection } from '../../google-docs';
+import type { ParsedSection } from '../../google-docs/index.js';
 
 /** Una parte de la pestaña con la imagen ya reducida a su hash. */
 export type HashedPart =

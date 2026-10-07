@@ -1,5 +1,5 @@
 import { defineConfig } from 'prisma/config';
-import { loadEnvFile } from './src/config/load-env-file';
+import { loadEnvFile } from './src/config/load-env-file.js';
 
 loadEnvFile();
 

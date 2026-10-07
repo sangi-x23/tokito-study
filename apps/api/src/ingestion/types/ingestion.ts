@@ -1,5 +1,5 @@
-import type { ParsedDocument } from '../../google-docs';
-import type { PreparedSection } from './prepared-section';
+import type { ParsedDocument } from '../../google-docs/index.js';
+import type { PreparedSection } from './prepared-section.js';
 
 export interface SectionChanges {
   readonly document: ParsedDocument;

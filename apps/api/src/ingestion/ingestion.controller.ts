@@ -1,9 +1,9 @@
 import { ConflictException, Controller, Get, ServiceUnavailableException, UseGuards } from '@nestjs/common';
-import { LlmQuotaExhaustedError } from '../llm';
-import { CronSecretGuard } from './cron-secret.guard';
-import { IngestionLockedError } from './helpers/ingestion-run';
-import { IngestionService } from './ingestion.service';
-import type { IngestionSummary } from './types/ingestion';
+import { LlmQuotaExhaustedError } from '../llm/index.js';
+import { CronSecretGuard } from './cron-secret.guard.js';
+import { IngestionLockedError } from './helpers/ingestion-run.js';
+import { IngestionService } from './ingestion.service.js';
+import type { IngestionSummary } from './types/ingestion.js';
 
 @Controller('ingestion')
 export class IngestionController {

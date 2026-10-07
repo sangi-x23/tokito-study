@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { loadLlmEnv } from '../config/llm.env';
+import { loadLlmEnv } from '../config/llm.env.js';
 
 const base = { GEMINI_API_KEY: 'clave', GEMINI_MODEL: 'gemini-3.5-flash' };
 

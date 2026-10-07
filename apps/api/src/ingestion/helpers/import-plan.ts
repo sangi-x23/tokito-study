@@ -1,4 +1,4 @@
-import { checkTopicTree, type ProposedTopic, type Taxonomy } from '../../llm';
+import { checkTopicTree, type ProposedTopic, type Taxonomy } from '../../llm/index.js';
 import type {
   ImportPlan,
   PlannedItem,
@@ -6,9 +6,9 @@ import type {
   PlannedSection,
   PlannedTopic,
   SectionExtraction,
-} from '../types/import-plan';
-import { parseClassDate } from './class-date';
-import { itemKey, normalizeJapanese } from './item-key';
+} from '../types/import-plan.js';
+import { parseClassDate } from './class-date.js';
+import { itemKey, normalizeJapanese } from './item-key.js';
 
 // Tema que se crea si hay kanji y la taxonomía no trae ninguno de categoría
 // KANJI: todo kanji tiene que poder practicarse desde un tema de kanji.

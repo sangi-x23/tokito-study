@@ -17,9 +17,9 @@ import {
   type LlmProvider,
   type Taxonomy,
   type TopicAssignment,
-} from '../../llm';
-import { sha256 } from '../helpers/content-hash';
-import { BOOTSTRAP_DIR } from './bootstrap-files';
+} from '../../llm/index.js';
+import { sha256 } from '../helpers/content-hash.js';
+import { BOOTSTRAP_DIR } from './bootstrap-files.js';
 
 export const MANUAL_DIR = join(BOOTSTRAP_DIR, 'manual');
 const RESPONSE_FILE = 'response.json';

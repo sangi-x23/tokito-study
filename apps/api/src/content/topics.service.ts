@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import type { TopicDetail, TopicNode } from '@tokito/shared';
-import { PrismaService } from '../prisma/prisma.service';
-import { itemSummaryInclude, toItemSummary, topicSummarySelect, toTopicSummary } from './helpers/to-dto';
-import { buildTopicTree } from './helpers/topic-tree';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { itemSummaryInclude, toItemSummary, topicSummarySelect, toTopicSummary } from './helpers/to-dto.js';
+import { buildTopicTree } from './helpers/topic-tree.js';
 
 @Injectable()
 export class TopicsService {
