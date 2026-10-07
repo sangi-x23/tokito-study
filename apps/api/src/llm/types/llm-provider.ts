@@ -1,4 +1,4 @@
-import type { ItemType, TopicCategory } from '../../generated/prisma/enums';
+import type { ItemType, TopicCategory } from '../../generated/prisma/enums.js';
 
 /**
  * Lo que recibe el LLM de una pestaña: texto e imágenes intercalados en su

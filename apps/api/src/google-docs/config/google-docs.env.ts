@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { parseEnvWith } from '../../config/env';
+import { parseEnvWith } from '../../config/env.js';
 
 /** Lo que necesitamos del JSON de la cuenta de servicio. Trae más campos. */
 const serviceAccountSchema = z.object({

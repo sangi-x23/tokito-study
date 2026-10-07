@@ -1,9 +1,9 @@
-import type { CatalogTopic, ExtractedItem, ItemToAssign, ProposedTopic } from '../../llm';
-import type { PlannedItem, PlannedTopic } from '../types/import-plan';
-import type { ItemRef, SectionPlan, SectionPlanInput } from '../types/section-plan';
-import { parseClassDate } from './class-date';
-import { DEFAULT_KANJI_TOPIC } from './import-plan';
-import { itemKey, normalizeJapanese } from './item-key';
+import type { CatalogTopic, ExtractedItem, ItemToAssign, ProposedTopic } from '../../llm/index.js';
+import type { PlannedItem, PlannedTopic } from '../types/import-plan.js';
+import type { ItemRef, SectionPlan, SectionPlanInput } from '../types/section-plan.js';
+import { parseClassDate } from './class-date.js';
+import { DEFAULT_KANJI_TOPIC } from './import-plan.js';
+import { itemKey, normalizeJapanese } from './item-key.js';
 
 /** Normaliza `japanese` y deja cada ítem una sola vez; manda la primera aparición. */
 export function uniqueItems(items: readonly ExtractedItem[]): ExtractedItem[] {

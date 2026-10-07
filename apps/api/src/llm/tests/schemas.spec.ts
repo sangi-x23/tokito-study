@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { checkAssignment } from '../schemas/assignment.schema';
-import { checkTopicTree } from '../schemas/common';
-import { checkExtraction } from '../schemas/extraction.schema';
-import { checkTaxonomy } from '../schemas/taxonomy.schema';
-import type { ExtractedItem, ProposedTopic } from '../types/llm-provider';
+import { checkAssignment } from '../schemas/assignment.schema.js';
+import { checkTopicTree } from '../schemas/common.js';
+import { checkExtraction } from '../schemas/extraction.schema.js';
+import { checkTaxonomy } from '../schemas/taxonomy.schema.js';
+import type { ExtractedItem, ProposedTopic } from '../types/llm-provider.js';
 
 const word = (japanese: string): ExtractedItem => ({
   type: 'WORD',

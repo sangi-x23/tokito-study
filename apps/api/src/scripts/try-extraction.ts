@@ -1,6 +1,6 @@
-import { GoogleDocsService, type DocumentPart } from '../google-docs';
-import { downloadImage } from '../ingestion/helpers/images';
-import { GeminiProvider, type LlmPart } from '../llm';
+import { GoogleDocsService, type DocumentPart } from '../google-docs/index.js';
+import { downloadImage } from '../ingestion/helpers/images.js';
+import { GeminiProvider, type LlmPart } from '../llm/index.js';
 
 /**
  * Extrae los ítems de una pestaña real e imprime el JSON, para calibrar el

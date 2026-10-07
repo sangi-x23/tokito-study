@@ -1,17 +1,17 @@
 import { Logger } from '@nestjs/common';
 import { GoogleGenAI, type GenerateContentParameters, type Part } from '@google/genai';
 import { z } from 'zod';
-import { loadLlmEnv } from '../config/llm.env';
-import { withRetry } from '../helpers/retry';
-import { parseStructured } from '../helpers/structured-output';
-import { Throttle } from '../helpers/throttle';
-import { ASSIGNMENT_INSTRUCTIONS, assignmentUserMessage } from '../prompts/assignment.prompt';
-import { EXTRACTION_INSTRUCTIONS, imageMarker } from '../prompts/extraction.prompt';
-import { TAXONOMY_INSTRUCTIONS, taxonomyUserMessage } from '../prompts/taxonomy.prompt';
-import { assignmentSchema, checkAssignment } from '../schemas/assignment.schema';
-import { checkExtraction, extractionSchema } from '../schemas/extraction.schema';
-import { checkTaxonomy, taxonomySchema } from '../schemas/taxonomy.schema';
-import type { GeminiDeps, GeminiSettings, GenerateFn } from '../types/gemini';
+import { loadLlmEnv } from '../config/llm.env.js';
+import { withRetry } from '../helpers/retry.js';
+import { parseStructured } from '../helpers/structured-output.js';
+import { Throttle } from '../helpers/throttle.js';
+import { ASSIGNMENT_INSTRUCTIONS, assignmentUserMessage } from '../prompts/assignment.prompt.js';
+import { EXTRACTION_INSTRUCTIONS, imageMarker } from '../prompts/extraction.prompt.js';
+import { TAXONOMY_INSTRUCTIONS, taxonomyUserMessage } from '../prompts/taxonomy.prompt.js';
+import { assignmentSchema, checkAssignment } from '../schemas/assignment.schema.js';
+import { checkExtraction, extractionSchema } from '../schemas/extraction.schema.js';
+import { checkTaxonomy, taxonomySchema } from '../schemas/taxonomy.schema.js';
+import type { GeminiDeps, GeminiSettings, GenerateFn } from '../types/gemini.js';
 import type {
   CatalogTopic,
   Extraction,
@@ -21,7 +21,7 @@ import type {
   LlmProvider,
   Taxonomy,
   TopicAssignment,
-} from '../types/llm-provider';
+} from '../types/llm-provider.js';
 
 // Una pestaña con varias imágenes tarda bastante más que una llamada de texto,
 // pero tiene que caber holgada en los 300 s de una función de Vercel.

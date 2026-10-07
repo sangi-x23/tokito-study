@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { parseEnvWith } from '../../config/env';
+import { parseEnvWith } from '../../config/env.js';
 
 const ingestionEnvSchema = z.object({
   /**

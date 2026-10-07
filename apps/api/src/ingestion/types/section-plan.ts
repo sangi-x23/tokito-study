@@ -1,6 +1,6 @@
-import type { ItemType } from '../../generated/prisma/enums';
-import type { CatalogTopic, ExtractedItem, TopicAssignment } from '../../llm';
-import type { ImportPlan } from './import-plan';
+import type { ItemType } from '../../generated/prisma/enums.js';
+import type { CatalogTopic, ExtractedItem, TopicAssignment } from '../../llm/index.js';
+import type { ImportPlan } from './import-plan.js';
 
 /** Un tema que ya está en la base, con su orden entre hermanos. */
 export interface CatalogEntry extends CatalogTopic {

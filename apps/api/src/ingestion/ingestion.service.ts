@@ -1,17 +1,17 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { GoogleDocsService } from '../google-docs';
-import { LLM_PROVIDER, type Extraction, type LlmProvider, type TopicAssignment } from '../llm';
-import { PrismaService } from '../prisma/prisma.service';
-import { downloadImage, shrinkForLlm } from './helpers/images';
-import { withIngestionRun } from './helpers/ingestion-run';
-import { itemKey } from './helpers/item-key';
-import { prepareSection, toLlmParts } from './helpers/prepare-section';
-import { buildSectionPlan, toItemsToAssign, uniqueItems } from './helpers/section-plan';
-import { writeSectionPlan } from './helpers/write-section';
-import type { IngestionSummary, RunOptions, SectionChanges } from './types/ingestion';
-import type { PreparedSection } from './types/prepared-section';
-import type { CatalogEntry } from './types/section-plan';
-import type { DocumentMeta, SectionWriteSummary } from './types/write-plan';
+import { GoogleDocsService } from '../google-docs/index.js';
+import { LLM_PROVIDER, type Extraction, type LlmProvider, type TopicAssignment } from '../llm/index.js';
+import { PrismaService } from '../prisma/prisma.service.js';
+import { downloadImage, shrinkForLlm } from './helpers/images.js';
+import { withIngestionRun } from './helpers/ingestion-run.js';
+import { itemKey } from './helpers/item-key.js';
+import { prepareSection, toLlmParts } from './helpers/prepare-section.js';
+import { buildSectionPlan, toItemsToAssign, uniqueItems } from './helpers/section-plan.js';
+import { writeSectionPlan } from './helpers/write-section.js';
+import type { IngestionSummary, RunOptions, SectionChanges } from './types/ingestion.js';
+import type { PreparedSection } from './types/prepared-section.js';
+import type { CatalogEntry } from './types/section-plan.js';
+import type { DocumentMeta, SectionWriteSummary } from './types/write-plan.js';
 
 // Una pestaña con imágenes más la asignación puede pasar de 200 s, y Vercel
 // corta a los 300. Pasado este tiempo no se empieza otra pestaña: queda para

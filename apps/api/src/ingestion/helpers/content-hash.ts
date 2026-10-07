@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { HashedPart } from '../types/prepared-section';
+import type { HashedPart } from '../types/prepared-section.js';
 
 export const sha256 = (data: Buffer | string): string =>
   createHash('sha256').update(data).digest('hex');

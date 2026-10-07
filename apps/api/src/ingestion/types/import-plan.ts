@@ -1,5 +1,5 @@
-import type { ExtractedItem, ExtractedKanji, ProposedTopic } from '../../llm';
-import type { ItemType } from '../../generated/prisma/enums';
+import type { ExtractedItem, ExtractedKanji, ProposedTopic } from '../../llm/index.js';
+import type { ItemType } from '../../generated/prisma/enums.js';
 
 /** Lo que dejó la extracción de una pestaña. */
 export interface SectionExtraction {

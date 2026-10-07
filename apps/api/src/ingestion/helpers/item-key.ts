@@ -1,4 +1,4 @@
-import type { ItemType } from '../../generated/prisma/enums';
+import type { ItemType } from '../../generated/prisma/enums.js';
 
 // Signos de cierre que el curso pone o no según el día: `おなまえは？` y
 // `おなまえは` son el mismo ítem.

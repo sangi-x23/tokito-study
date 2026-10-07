@@ -1,5 +1,5 @@
-import type { CatalogTopic, ItemToAssign } from '../types/llm-provider';
-import { TOPIC_RULES } from './taxonomy.prompt';
+import type { CatalogTopic, ItemToAssign } from '../types/llm-provider.js';
+import { TOPIC_RULES } from './taxonomy.prompt.js';
 
 export const ASSIGNMENT_INSTRUCTIONS = `
 Eres un asistente que clasifica el material nuevo de un curso de japonés para hispanohablantes de

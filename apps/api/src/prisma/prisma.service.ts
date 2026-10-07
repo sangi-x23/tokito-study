@@ -1,7 +1,7 @@
 import { Injectable, type OnModuleDestroy } from '@nestjs/common';
 import { PrismaNeon } from '@prisma/adapter-neon';
-import { env } from '../config/env';
-import { PrismaClient } from '../generated/prisma/client';
+import { env } from '../config/env.js';
+import { PrismaClient } from '../generated/prisma/client.js';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleDestroy {

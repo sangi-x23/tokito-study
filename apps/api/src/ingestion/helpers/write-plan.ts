@@ -1,6 +1,6 @@
-import type { Prisma } from '../../generated/prisma/client';
-import type { ImportPlan, PlannedItem } from '../types/import-plan';
-import type { DocumentMeta, WriteSummary } from '../types/write-plan';
+import type { Prisma } from '../../generated/prisma/client.js';
+import type { ImportPlan, PlannedItem } from '../types/import-plan.js';
+import type { DocumentMeta, WriteSummary } from '../types/write-plan.js';
 
 const itemKey = (type: string, japanese: string): string => `${type}\u0000${japanese}`;
 

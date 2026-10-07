@@ -1,5 +1,5 @@
 import type { GenerateContentParameters } from '@google/genai';
-import type { Clock } from './retry';
+import type { Clock } from './retry.js';
 
 /** Lo que el proveedor usa de la respuesta del SDK; los tests lo imitan. */
 export interface GeminiResponse {

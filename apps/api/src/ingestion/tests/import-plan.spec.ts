@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import type { ExtractedItem, ProposedTopic, Taxonomy } from '../../llm';
-import { buildImportPlan } from '../helpers/import-plan';
-import type { SectionExtraction } from '../types/import-plan';
+import type { ExtractedItem, ProposedTopic, Taxonomy } from '../../llm/index.js';
+import { buildImportPlan } from '../helpers/import-plan.js';
+import type { SectionExtraction } from '../types/import-plan.js';
 
 const NOW = new Date(Date.UTC(2026, 9, 1));
 

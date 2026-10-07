@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { Throttle } from '../helpers/throttle';
-import { fakeClock } from './fake-clock';
+import { Throttle } from '../helpers/throttle.js';
+import { fakeClock } from './fake-clock.js';
 
 describe('Throttle', () => {
   it('no espera en la primera llamada', async () => {

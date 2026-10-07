@@ -1,6 +1,6 @@
 import type { z } from 'zod';
-import { LlmValidationError } from '../llm.errors';
-import type { ModelOutput } from '../types/structured-output';
+import { LlmValidationError } from '../llm.errors.js';
+import type { ModelOutput } from '../types/structured-output.js';
 
 /**
  * Convierte la salida del modelo en un valor validado o lanza
