@@ -75,8 +75,8 @@ apps/
     prisma.config.ts
     vercel.json       cron diario de la ingesta
     src/
-      app.module.ts   registra los módulos de Nest, importados de modules.ts
-      modules.ts      barril de los módulos de Nest: un módulo nuevo se exporta aquí
+      app.module.ts   registra todo lo que exporta modules.ts, sin nombrar cada módulo
+      modules.ts      barril de los módulos de Nest: un módulo nuevo solo se agrega aquí
       config/         validación del entorno (env.ts) y carga del .env
       health/         GET /health
       prisma/         PrismaService (adaptador Neon)

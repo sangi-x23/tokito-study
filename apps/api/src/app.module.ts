@@ -1,14 +1,9 @@
 import { Module } from '@nestjs/common';
-import {
-  ContentModule,
-  GoogleDocsModule,
-  HealthModule,
-  IngestionModule,
-  LlmModule,
-  PrismaModule,
-} from './modules.js';
+import * as modules from './modules.js';
 
+// Registra todo lo que exporta el barril: un módulo nuevo solo se agrega en
+// `modules.ts`. El orden no importa, Nest resuelve las dependencias.
 @Module({
-  imports: [PrismaModule, HealthModule, ContentModule, GoogleDocsModule, LlmModule, IngestionModule],
+  imports: Object.values(modules),
 })
 export class AppModule {}
