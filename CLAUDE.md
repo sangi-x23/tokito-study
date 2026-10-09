@@ -21,7 +21,7 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 
 ## Estado actual
 
-- **Corre en local; todavía no está en Vercel.** Todo corre en la máquina del autor contra Neon. No desplegar ni configurar Vercel hasta que el autor lo pida. Mientras tanto, el cron no corre y la ingesta se lanza a mano con `ingest:run`.
+- **Desplegado en Vercel.** La API vive en `https://tokito-study.vercel.app` y la web es un segundo proyecto que la consume por `API_URL`.
 - **Contenido:** importado el 2026-10-03 con un bootstrap revisado a mano. Hoy hay 15 temas raíz, unos 42 subtemas y alrededor de 470 ítems. Las clases nuevas entran por la ingesta incremental.
 - **Web:** una sola sección, «Diario de clase», que navega por temas. La interfaz es mínima a propósito y se irá mejorando.
 - **Lo próximo:** las features de estudio (ver [Features futuras](#features-futuras)).
@@ -85,7 +85,7 @@ apps/
       ingestion/      ingesta incremental (endpoint cron) y bootstrap local
       content/        API pública de lectura de temas e ítems
       scripts/        scripts sueltos compilados con el resto
-  web/                Next.js
+  web/                Next.js (vercel.json compila shared antes del build)
     app/              solo rutas
     sections/         una carpeta por sección del sidebar
     modules/          datos y componentes que comparten las secciones
@@ -102,6 +102,8 @@ Cada módulo de la API sigue la misma forma: `config/`, `types/`, `schemas/`, `h
 - Un tipo derivado de un valor en una línea (`z.infer<typeof schema>` en `config/`, `Prisma.*GetPayload<typeof include>` en `content/helpers/to-dto.ts`) se queda al lado de su esquema.
 
 Vercel: dos proyectos desde este repo, con Root Directory `apps/api` y `apps/web`.
+
+- **`apps/web/vercel.json` compila `@tokito/shared` antes de `next build`.** La web solo importa tipos del paquete, pero el chequeo de tipos de Next necesita su `dist/`, que no está en el repo. Sin ese paso el build en Vercel falla con `Cannot find module '@tokito/shared'`.
 
 ## Modelo de datos (ver `apps/api/prisma/schema.prisma`)
 
