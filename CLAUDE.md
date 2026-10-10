@@ -63,6 +63,7 @@ Los scripts de la API corren desde `dist/`, así que necesitan un `build` previo
   - Para probar en local lo que pasaría en Vercel: `node --no-experimental-require-module dist/main.js`.
 - **Prisma `~7.10.0`.** El tag `latest` de `prisma` apuntaba a un release candidate de la 8.
 - **`@google/genai` en 2.24.0**, por el `minimumReleaseAge` de pnpm.
+- **`animejs` en la 4.** La 5 está en beta.
 - **`allowBuilds` en `pnpm-workspace.yaml` decide cada script de instalación.** pnpm 11 rompe el `pnpm install` en CI (Vercel) si una dependencia con scripts queda sin decidir. Todas van en `false`, incluido Prisma: sus scripts solo descargan el motor de migraciones, que no usan ni `prisma generate` ni la API, y en Windows el preinstall de `prisma` revienta dentro de pnpm. El `prisma generate` lo corren el `postinstall` y el `build` de la API.
 - **`@tokito/shared` compila a `dist/`** (CommonJS + `.d.ts`) para que la API y Next lo consuman igual. La API solo importa sus tipos.
 
@@ -198,13 +199,17 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 ### Reglas
 
 - **Server Components que llaman a la API desde el servidor de Next** (`lib/api-client.ts`, con `API_URL` solo del lado del servidor). El navegador nunca llama a la API: no hace falta CORS.
-- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame` y `topic-link`.
+- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame`, `topic-link` y `sliding-highlight`.
 - **`dynamic = 'force-dynamic'` en las páginas y `revalidate: 3600` en cada `fetch`:** el build no necesita la API y los datos se cachean una hora.
 - **Un 400 de la API cuenta como «no encontrado».**
 - **Sin `loading.tsx`:** con él, un tema inexistente respondía 200 en vez de 404.
 - **URLs en español** (`/diario/temas/[slug]`, `/diario/items/[id]`), armadas siempre con `lib/routes.ts`.
 - **El ancho del contenido lo pone cada sección** con `PageContainer`, no el layout raíz. Así una sección puede tener columnas a todo el alto, como la barra de temas del Diario.
 - **Sin librería de íconos:** SVG en línea sobre `components/icon.tsx`.
+- **Animaciones con Anime.js** (`animejs` 4), en `modules/motion/`. Cada componente crea un `createScope({ root })` en un `useEffect` y lo revierte al desmontarse. Con `prefers-reduced-motion` (la `mediaQuery` del scope) todo salta sin animarse.
+  - **Lo instantáneo va con `utils.set`, no con `animate` y `duration: 0`:** `animate` espera al siguiente frame, y Anime.js pausa su motor con la pestaña oculta.
+  - **`SlidingHighlight`** desliza un fondo hasta el enlace con `aria-current="page"` (hoy, la barra de temas del Diario). Hasta hidratar, el enlace activo pinta su propio fondo; después el contenedor lleva `data-highlight` y el enlace lo apaga con `in-data-highlight:bg-transparent!`, para que no haya un instante sin selección.
+  - Con el App Router la página anterior se desmonta al llegar la nueva: entre páginas solo se puede animar la entrada.
 - Noto Sans JP con `next/font` y modo oscuro según el sistema.
 - **Se evaluó migrar a una SPA de React y se descartó:** se perderían los 404 reales, la caché del servidor y el ocultar la API al navegador.
 
