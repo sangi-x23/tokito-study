@@ -19,6 +19,10 @@ apps/api/src/generated/
 # Next: lo regenera `next dev`/`next build`/`next typegen` y cambia entre uno y otro
 apps/web/next-env.d.ts
 
+# Next: `next dev` los crea cuando lo lanza un agente de IA; su aviso ya está en CLAUDE.md
+apps/web/AGENTS.md
+apps/web/CLAUDE.md
+
 # Vercel
 .vercel/
 
