@@ -18,6 +18,10 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **Commits** en español con prefijo convencional y ámbito: `feat(web): …`, `fix(ingestion): …`, `refactor(api): …`.
 - **Mantener este archivo al día:** cuando se tome una decisión que no se deduce del código, agregarla en la sección del área que toca.
 - **Verificar antes de dar algo por hecho:** `pnpm typecheck`, `pnpm --filter @tokito/api test` y, si se tocó la web, probar las rutas contra la API local.
+- **Las versiones del stack son más nuevas que lo que sabe un modelo** (Next 16, NestJS 12, Prisma 7, TypeScript 6, Tailwind 4): sus APIs, convenciones y estructura pueden haber cambiado. Antes de escribir código con ellas, leer la documentación de la versión instalada en vez de fiarse de la memoria, y hacer caso a los avisos de deprecación.
+  - **Web:** Next trae su documentación en `apps/web/node_modules/next/dist/docs/` (desde la raíz del monorepo, `next` no se ve).
+  - **API:** NestJS y Prisma no la incluyen; los tipos (`.d.ts`) del paquete instalado y su documentación oficial mandan.
+  - **`next dev` crea `apps/web/AGENTS.md` y `apps/web/CLAUDE.md`** cuando lo lanza un agente de IA y no los encuentra. Su único aviso es el de arriba, así que no van al repo: están en `.gitignore`.
 
 ## Estado actual
 
