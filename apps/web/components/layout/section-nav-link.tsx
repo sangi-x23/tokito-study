@@ -5,20 +5,20 @@ import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 /**
- * Un tema de la barra del Diario. Es de cliente solo para saber la ruta
- * actual: el tema queda activo en su página y en las de sus subtemas, que
- * llegan en `activeOn`.
+ * Un enlace de `SectionNav`. Es de cliente solo para saber la ruta actual:
+ * queda activo en su página y en las que llegan en `activeOn` (en el Diario,
+ * las de los subtemas del tema).
  *
  * Su fondo activo solo se ve hasta que hidrata: después lo pinta el fondo
  * deslizante de `SlidingHighlight`, que marca la lista con `data-highlight`.
  */
-export function TopicLink({
+export function SectionNavLink({
   href,
-  activeOn,
+  activeOn = [],
   children,
 }: {
   href: string;
-  activeOn: readonly string[];
+  activeOn?: readonly string[];
   children: ReactNode;
 }): ReactNode {
   const pathname = usePathname();
