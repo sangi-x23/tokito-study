@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { SlidingHighlight } from '@/modules/motion/components/sliding-highlight';
 import { APP_SECTIONS } from '@/sections';
 import { SidebarFrame } from './sidebar-frame';
 import { SidebarLink } from './sidebar-link';
@@ -20,16 +21,18 @@ export function AppSidebar(): ReactNode {
         <Brand />
       </div>
       <nav aria-label="Secciones" className="flex-1 overflow-y-auto px-3 py-2">
-        <ul className="flex flex-col gap-1">
-          {APP_SECTIONS.map((section) => (
-            <li key={section.href}>
-              <SidebarLink href={section.href}>
-                <section.Icon className="size-5 shrink-0" />
-                {section.label}
-              </SidebarLink>
-            </li>
-          ))}
-        </ul>
+        <SlidingHighlight highlightClassName="rounded-lg bg-slate-100 dark:bg-slate-800">
+          <ul className="relative flex flex-col gap-1">
+            {APP_SECTIONS.map((section) => (
+              <li key={section.href}>
+                <SidebarLink href={section.href}>
+                  <section.Icon className="size-5 shrink-0" />
+                  {section.label}
+                </SidebarLink>
+              </li>
+            ))}
+          </ul>
+        </SlidingHighlight>
       </nav>
       <p className="px-5 py-4 text-xs text-slate-400">Material de estudio de japonés</p>
     </SidebarFrame>

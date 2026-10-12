@@ -17,7 +17,11 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **Descripción de los PR:** solo qué incluye el cambio, más una tabla de verificación. El porqué de las decisiones va en este archivo y en los commits.
 - **Commits** en español con prefijo convencional y ámbito: `feat(web): …`, `fix(ingestion): …`, `refactor(api): …`.
 - **Mantener este archivo al día:** cuando se tome una decisión que no se deduce del código, agregarla en la sección del área que toca.
-- **Verificar antes de dar algo por hecho:** `pnpm typecheck`, `pnpm --filter @tokito/api test` y, si se tocó la web, probar las rutas contra la API local.
+- **Verificar antes de dar algo por hecho:** `pnpm typecheck`, `pnpm --filter @tokito/api test` y, si se tocó la web, probar las rutas contra la API local (previa consulta, ver abajo).
+- **Siempre consultar antes de:**
+  - **Iniciar la app** (`pnpm dev`, `next dev`, `next start`, la API con `node dist/main.js` o cualquier servidor local).
+  - **Usar la extensión de Chrome** (navegar, tomar capturas o interactuar con páginas).
+  - **Crear un PR.** Subir la rama no basta como permiso: se pregunta antes de `gh pr create`.
 - **Las versiones del stack son más nuevas que lo que sabe un modelo** (Next 16, NestJS 12, Prisma 7, TypeScript 6, Tailwind 4): sus APIs, convenciones y estructura pueden haber cambiado. Antes de escribir código con ellas, leer la documentación de la versión instalada en vez de fiarse de la memoria, y hacer caso a los avisos de deprecación.
   - **Web:** Next trae su documentación en `apps/web/node_modules/next/dist/docs/` (desde la raíz del monorepo, `next` no se ve).
   - **API:** NestJS y Prisma no la incluyen; los tipos (`.d.ts`) del paquete instalado y su documentación oficial mandan.
@@ -27,7 +31,7 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 
 - **Desplegado en Vercel.** La API vive en `https://tokito-study.vercel.app` y la web es un segundo proyecto que la consume por `API_URL`.
 - **Contenido:** importado el 2026-10-03 con un bootstrap revisado a mano. Hoy hay 15 temas raíz, unos 42 subtemas y alrededor de 470 ítems. Las clases nuevas entran por la ingesta incremental.
-- **Web:** una sola sección, «Diario de clase», que navega por temas. La interfaz es mínima a propósito y se irá mejorando.
+- **Web:** dos secciones. «Diario de clase» navega por temas; «Escritura» tiene las tablas de hiragana y katakana. La interfaz es mínima a propósito y se irá mejorando.
 - **Lo próximo:** las features de estudio (ver [Features futuras](#features-futuras)).
 
 ## Comandos
@@ -207,20 +211,24 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 - **`modules/<módulo>/`:** lo que pueden usar varias secciones. Sigue a los módulos de la API (`content` = temas e ítems): `api/` con un archivo de endpoints por recurso, `components/` y etiquetas.
 - **Regla para decidir:** si otra sección podría usarlo, va en `modules/`; si es cómo una sección arma su pantalla, va en `sections/`.
 - **Agregar una sección:** crear su carpeta en `sections/`, sumarla a `sections/index.ts` y crear sus rutas en `app/`.
+- **La barra interna de una sección** (temas del Diario, silabarios de Escritura) es `SectionNav` con un `SectionNavLink` por entrada, en `components/layout/`. El `Breadcrumb` empieza por la sección: cada vista pasa su primer crumb.
+- **Escritura:** los silabarios son fijos (`sections/writing/scripts.ts`), así que su barra y su portada no piden nada a la API. `/escritura/[script]` pide `GET /kana/:script` y pinta cada grupo como cuadrícula, con cada kana en su `row`/`column` y los huecos vacíos. Los kana básicos son tarjetas que abren un `<dialog>` nativo (`showModal()`, sin URL propia) con su orden de trazos y los kana que salen de él. El modal cita a KanjiVG (CC BY-SA 3.0), como exige la licencia.
+  - **Las relaciones (tenten, maru, combinaciones, extendidos) no se guardan:** `modules/writing/kana-relations.ts` las deriva de los caracteres. Con NFD, `が` es `か` + U+3099 y `ぱ` es `は` + U+309A; una combinación o un extendido cuelga del primer carácter sin su marca (`ぎゃ` → `き`, `ディ` → `テ`). Se calculan en el servidor para mandar al navegador solo los básicos.
+  - **`StrokeOrder`** (`modules/writing/components/`) dibuja los trazos con `svg.createDrawable` de Anime.js, uno tras otro, con el número junto al primer punto de cada path y la secuencia paso a paso debajo. Lo reutilizará la práctica de dibujo.
 
 ### Reglas
 
 - **Server Components que llaman a la API desde el servidor de Next** (`lib/api-client.ts`, con `API_URL` solo del lado del servidor). El navegador nunca llama a la API: no hace falta CORS.
-- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame`, `topic-link` y `sliding-highlight`.
+- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame`, `section-nav-link`, `sliding-highlight` y, en Escritura, `basic-kana-grid`, `kana-dialog` y `stroke-order`.
 - **`dynamic = 'force-dynamic'` en las páginas y `revalidate: 3600` en cada `fetch`:** el build no necesita la API y los datos se cachean una hora.
 - **Un 400 de la API cuenta como «no encontrado».**
 - **Sin `loading.tsx`:** con él, un tema inexistente respondía 200 en vez de 404.
-- **URLs en español** (`/diario/temas/[slug]`, `/diario/items/[id]`), armadas siempre con `lib/routes.ts`.
+- **URLs en español** (`/diario/temas/[slug]`, `/diario/items/[id]`, `/escritura/[script]`), armadas siempre con `lib/routes.ts`.
 - **El ancho del contenido lo pone cada sección** con `PageContainer`, no el layout raíz. Así una sección puede tener columnas a todo el alto, como la barra de temas del Diario.
 - **Sin librería de íconos:** SVG en línea sobre `components/icon.tsx`.
 - **Animaciones con Anime.js** (`animejs` 4), en `modules/motion/`. Cada componente crea un `createScope({ root })` en un `useEffect` y lo revierte al desmontarse. Con `prefers-reduced-motion` (la `mediaQuery` del scope) todo salta sin animarse.
   - **Lo instantáneo va con `utils.set`, no con `animate` y `duration: 0`:** `animate` espera al siguiente frame, y Anime.js pausa su motor con la pestaña oculta.
-  - **`SlidingHighlight`** desliza un fondo hasta el enlace con `aria-current="page"` (hoy, la barra de temas del Diario). Hasta hidratar, el enlace activo pinta su propio fondo; después el contenedor lleva `data-highlight` y el enlace lo apaga con `in-data-highlight:bg-transparent!`, para que no haya un instante sin selección.
+  - **`SlidingHighlight`** desliza un fondo hasta el enlace con `aria-current="page"`: lo usan el sidebar de la app (`AppSidebar`) y la barra interna de cada sección (`SectionNav`). Hasta hidratar, el enlace activo pinta su propio fondo; después el contenedor lleva `data-highlight` y el enlace lo apaga con `in-data-highlight:bg-transparent!`, para que no haya un instante sin selección.
   - Con el App Router la página anterior se desmonta al llegar la nueva: entre páginas solo se puede animar la entrada.
 - Noto Sans JP con `next/font` y modo oscuro según el sistema.
 - **Se evaluó migrar a una SPA de React y se descartó:** se perderían los 404 reales, la caché del servidor y el ocultar la API al navegador.

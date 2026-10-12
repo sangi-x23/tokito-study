@@ -5,10 +5,12 @@ import { Breadcrumb, type Crumb } from '@/components/breadcrumb';
 import { routes } from '@/lib/routes';
 import { ItemCard } from '@/modules/content/components/item-card';
 import { CATEGORY_LABEL, itemCountLabel } from '@/modules/content/labels';
+import { diarySection } from '../section';
 
 /** Un tema: sus subtemas y sus ítems directos. */
 export function TopicView({ topic }: { topic: TopicDetail }): ReactNode {
   const crumbs: Crumb[] = [
+    { label: diarySection.label, href: diarySection.href },
     ...(topic.parent ? [{ label: topic.parent.name, href: routes.topic(topic.parent.slug) }] : []),
     { label: topic.name },
   ];
