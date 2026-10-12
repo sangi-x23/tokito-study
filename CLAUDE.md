@@ -17,7 +17,11 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 - **Descripción de los PR:** solo qué incluye el cambio, más una tabla de verificación. El porqué de las decisiones va en este archivo y en los commits.
 - **Commits** en español con prefijo convencional y ámbito: `feat(web): …`, `fix(ingestion): …`, `refactor(api): …`.
 - **Mantener este archivo al día:** cuando se tome una decisión que no se deduce del código, agregarla en la sección del área que toca.
-- **Verificar antes de dar algo por hecho:** `pnpm typecheck`, `pnpm --filter @tokito/api test` y, si se tocó la web, probar las rutas contra la API local.
+- **Verificar antes de dar algo por hecho:** `pnpm typecheck`, `pnpm --filter @tokito/api test` y, si se tocó la web, probar las rutas contra la API local (previa consulta, ver abajo).
+- **Siempre consultar antes de:**
+  - **Iniciar la app** (`pnpm dev`, `next dev`, `next start`, la API con `node dist/main.js` o cualquier servidor local).
+  - **Usar la extensión de Chrome** (navegar, tomar capturas o interactuar con páginas).
+  - **Crear un PR.** Subir la rama no basta como permiso: se pregunta antes de `gh pr create`.
 - **Las versiones del stack son más nuevas que lo que sabe un modelo** (Next 16, NestJS 12, Prisma 7, TypeScript 6, Tailwind 4): sus APIs, convenciones y estructura pueden haber cambiado. Antes de escribir código con ellas, leer la documentación de la versión instalada en vez de fiarse de la memoria, y hacer caso a los avisos de deprecación.
   - **Web:** Next trae su documentación en `apps/web/node_modules/next/dist/docs/` (desde la raíz del monorepo, `next` no se ve).
   - **API:** NestJS y Prisma no la incluyen; los tipos (`.d.ts`) del paquete instalado y su documentación oficial mandan.
