@@ -1,6 +1,6 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
   // La API es ESM (NestJS 12 solo se publica como ESM). Los imports internos
   // del cliente llevan `.js` porque los compila nuestro tsc con `module: node20`.
   moduleFormat        = "esm"
@@ -153,4 +153,43 @@ model IngestionRun {
   finishedAt        DateTime?
   sectionsProcessed Int       @default(0)
   error             String?
+}
+
+// ── Escritura ────────────────────────────────────────────────────────────
+// Los kana no salen del documento: son un conjunto cerrado que se carga con
+// un seed versionado. La ingesta no los toca y no viven en StudyItem, para
+// no chocar con partículas como は o を ni aparecer en el árbol de temas.
+
+enum KanaScript {
+  HIRAGANA
+  KATAKANA
+}
+
+enum KanaKind {
+  BASIC // あ … ん
+  DAKUTEN // が, じ, ヅ
+  HANDAKUTEN // ぱ … ぽ
+  SMALL // ぁ, っ, ゃ, ゎ y ー: sueltos y como piezas de otros kana
+  COMBINATION // きゃ, ぎゅ, ピョ
+  EXTENDED // katakana para sonidos extranjeros: ファ, ティ, ヴ
+}
+
+model Kana {
+  id        String     @id @default(cuid())
+  character String     @unique // き, きゃ, ファ
+  script    KanaScript
+  kind      KanaKind
+  // Hepburn. No es único: じ y ぢ son ji, ず y づ son zu.
+  romaji    String
+  // Celda en la tabla de su script y kind, para dibujar la cuadrícula
+  // con sus huecos (や no tiene yi ni ye).
+  row       Int
+  column    Int
+  // Trazos en orden, como el atributo `d` de un <path> SVG sobre un lienzo
+  // de 109×109. Vienen de KanjiVG (CC BY-SA 3.0, hay que citarlo en la web).
+  // Vacío en los kana de varios caracteres: se dibujan con los trazos de
+  // cada carácter (きゃ = き + ゃ).
+  strokes   String[]
+
+  @@unique([script, kind, row, column])
 }
