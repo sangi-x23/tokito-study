@@ -212,12 +212,14 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 - **Regla para decidir:** si otra sección podría usarlo, va en `modules/`; si es cómo una sección arma su pantalla, va en `sections/`.
 - **Agregar una sección:** crear su carpeta en `sections/`, sumarla a `sections/index.ts` y crear sus rutas en `app/`.
 - **La barra interna de una sección** (temas del Diario, silabarios de Escritura) es `SectionNav` con un `SectionNavLink` por entrada, en `components/layout/`. El `Breadcrumb` empieza por la sección: cada vista pasa su primer crumb.
-- **Escritura:** los silabarios son fijos (`sections/writing/scripts.ts`), así que su barra y su portada no piden nada a la API. `/escritura/[script]` pide `GET /kana/:script` y pinta cada grupo como cuadrícula, con cada kana en su `row`/`column` y los huecos vacíos. Cuando se muestren los trazos, hay que citar a KanjiVG (CC BY-SA 3.0).
+- **Escritura:** los silabarios son fijos (`sections/writing/scripts.ts`), así que su barra y su portada no piden nada a la API. `/escritura/[script]` pide `GET /kana/:script` y pinta cada grupo como cuadrícula, con cada kana en su `row`/`column` y los huecos vacíos. Los kana básicos son tarjetas que abren un `<dialog>` nativo (`showModal()`, sin URL propia) con su orden de trazos y los kana que salen de él. El modal cita a KanjiVG (CC BY-SA 3.0), como exige la licencia.
+  - **Las relaciones (tenten, maru, combinaciones, extendidos) no se guardan:** `modules/writing/kana-relations.ts` las deriva de los caracteres. Con NFD, `が` es `か` + U+3099 y `ぱ` es `は` + U+309A; una combinación o un extendido cuelga del primer carácter sin su marca (`ぎゃ` → `き`, `ディ` → `テ`). Se calculan en el servidor para mandar al navegador solo los básicos.
+  - **`StrokeOrder`** (`modules/writing/components/`) dibuja los trazos con `svg.createDrawable` de Anime.js, uno tras otro, con el número junto al primer punto de cada path y la secuencia paso a paso debajo. Lo reutilizará la práctica de dibujo.
 
 ### Reglas
 
 - **Server Components que llaman a la API desde el servidor de Next** (`lib/api-client.ts`, con `API_URL` solo del lado del servidor). El navegador nunca llama a la API: no hace falta CORS.
-- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame`, `section-nav-link` y `sliding-highlight`.
+- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame`, `section-nav-link`, `sliding-highlight` y, en Escritura, `basic-kana-grid`, `kana-dialog` y `stroke-order`.
 - **`dynamic = 'force-dynamic'` en las páginas y `revalidate: 3600` en cada `fetch`:** el build no necesita la API y los datos se cachean una hora.
 - **Un 400 de la API cuenta como «no encontrado».**
 - **Sin `loading.tsx`:** con él, un tema inexistente respondía 200 en vez de 404.
