@@ -11,8 +11,9 @@ export const KANA_KIND_LABEL: Record<KanaKind, string> = {
 
 export const KANA_KIND_DESCRIPTION: Record<KanaKind, string> = {
   BASIC: 'Los sonidos base, en el orden de la tabla tradicional.',
-  DAKUTEN: 'Con las dos comillas ゛ la consonante se vuelve sonora: k → g, s → z, t → d, h → b.',
-  HANDAKUTEN: 'Con el círculo ゜ la fila de h pasa a p.',
+  DAKUTEN:
+    'Llevan el tenten ゛, dos comillas arriba a la derecha que vuelven sonora la consonante: k → g, s → z, t → d, h → b.',
+  HANDAKUTEN: 'Llevan el maru ゜, un círculo arriba a la derecha que convierte la fila de h en p.',
   SMALL:
     'Se escriben más chicos y modifican al kana de al lado: la tsu pequeña alarga la consonante siguiente y ya, yu, yo forman combinaciones.',
   COMBINATION: 'Un kana de la columna i seguido de ya, yu o yo pequeños: se leen como una sola sílaba.',
