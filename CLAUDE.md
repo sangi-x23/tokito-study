@@ -114,6 +114,7 @@ Cada módulo de la API sigue la misma forma: `config/`, `types/`, `schemas/`, `h
 Vercel: dos proyectos desde este repo, con Root Directory `apps/api` y `apps/web`.
 
 - **`apps/web/vercel.json` compila `@tokito/shared` antes de `next build`.** La web solo importa tipos del paquete, pero el chequeo de tipos de Next necesita su `dist/`, que no está en el repo. Sin ese paso el build en Vercel falla con `Cannot find module '@tokito/shared'`.
+- **Las previews de la web usan la API de producción** (la de `main`). Un endpoint nuevo tiene que llegar a `main` antes de probar en una preview la web que lo usa: si no, la API responde 404 y la página también (`get()` lo toma como «no encontrado»). Por eso, cuando una feature toca API y web, primero se hace el release de la API.
 
 ## Modelo de datos (ver `apps/api/prisma/schema.prisma`)
 
