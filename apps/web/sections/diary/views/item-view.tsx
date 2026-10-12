@@ -5,6 +5,7 @@ import { Breadcrumb, type Crumb } from '@/components/breadcrumb';
 import { routes } from '@/lib/routes';
 import { ClassList } from '@/modules/content/components/class-list';
 import { TypeBadge } from '@/modules/content/components/type-badge';
+import { diarySection } from '../section';
 
 function Panel({ title, children }: { title: string; children: ReactNode }): ReactNode {
   return (
@@ -29,6 +30,7 @@ function Readings({ label, readings }: { label: string; readings: readonly strin
 /** Un ítem: lecturas, ejemplo, palabras de un kanji, temas y clases. */
 export function ItemView({ item }: { item: ItemDetail }): ReactNode {
   const crumbs: Crumb[] = [
+    { label: diarySection.label, href: diarySection.href },
     ...(item.primaryTopic ? [{ label: item.primaryTopic.name, href: routes.topic(item.primaryTopic.slug) }] : []),
     { label: item.japanese },
   ];

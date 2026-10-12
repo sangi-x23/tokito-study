@@ -4,4 +4,6 @@ export const routes = {
   diary: '/diario',
   topic: (slug: string): string => `/diario/temas/${slug}`,
   item: (id: string): string => `/diario/items/${id}`,
+  writing: '/escritura',
+  kanaTable: (script: string): string => `/escritura/${script}`,
 } as const;
