@@ -42,6 +42,7 @@ pnpm --filter @tokito/api ingest:run       # ingesta incremental en local; --che
 pnpm --filter @tokito/api ingest:bootstrap <extract|taxonomy|import>   # lectura inicial (ya hecha)
 pnpm --filter @tokito/api docs:print       # imprime las secciones parseadas del documento
 pnpm --filter @tokito/api llm:try          # prueba la extracción contra una pestaña real
+pnpm --filter @tokito/api kana:seed        # carga los kana con sus trazos de KanjiVG; --dry-run solo compara
 ```
 
 Los scripts de la API corren desde `dist/`, así que necesitan un `build` previo.
@@ -120,6 +121,7 @@ Vercel: dos proyectos desde este repo, con Root Directory `apps/api` y `apps/web
 - `KanjiDetail`: 1:1 con un ítem `KANJI`. `onyomi` y `kunyomi` son **las lecturas que enseñó el curso**, no las del diccionario. `strokeCount` y `jlptLevel` son opcionales: mejor `null` que un dato inventado por el LLM.
 - `ItemOccurrence`: en qué clases apareció cada ítem.
 - `ImageAsset`: caché del texto extraído de cada imagen, por hash SHA-256 del contenido. Las imágenes **no se almacenan**.
+- `Kana`: hiragana y katakana para la sección Escritura (básicos, dakuten, handakuten, pequeños, combinaciones y katakana extendida). No sale del documento: es un conjunto cerrado que se carga con un seed y que la ingesta no toca. Va aparte de `StudyItem` para no chocar con partículas como `は` o `を` ni aparecer en el árbol de temas. `row`/`column` ubican cada kana en la cuadrícula de su `script` y `kind`. `strokes` guarda los trazos en orden, como `d` de un `<path>` sobre un lienzo de 109×109, sacados de **KanjiVG (CC BY-SA 3.0, hay que citarlo en la web)**. Los kana de varios caracteres no tienen trazos propios: se dibujan con los de cada carácter (`きゃ` = `き` + `ゃ`). La tabla vive en `writing/helpers/kana-table.ts`; `kana:seed` descarga los SVG de un release fijado de KanjiVG (`KANJIVG_TAG`), crea lo que falta y actualiza lo que cambió, sin borrar ni recrear filas. Rōmaji Hepburn, salvo `を` = `wo`, y los pequeños llevan el de su versión grande.
 - `IngestionRun`: registro de cada corrida. Una en `RUNNING` es el candado, garantizado por un **índice único parcial** (`IngestionRun_one_running`) escrito a mano en la migración inicial, porque Prisma no sabe expresarlo. `prisma migrate dev` no intenta borrarlo.
 
 ### Invariantes
