@@ -192,6 +192,12 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 - `Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400` **solo en respuestas exitosas** (`PublicCacheInterceptor`), para que el CDN no recuerde un 404 de un tema que la ingesta crea después.
 - Una consulta por endpoint, con `include`/`select` junto a sus mappers en `content/helpers/to-dto.ts`.
 
+### Escritura (`writing/`)
+
+- `GET /kana/:script` (`hiragana` o `katakana`, en minúsculas): la tabla del script agrupada por tipo (básicos → dakuten → handakuten → pequeños → combinaciones → extendidos, sin grupos vacíos), cada grupo ordenado por fila y columna. Los contratos están en `@tokito/shared` (`writing.ts`).
+- **Va con los trazos.** Son unos 35 KB por script sin comprimir, y así una sola petición sirve para la cuadrícula, el orden de trazos y la práctica de dibujo. Los kana de varios caracteres no traen trazos: la web los arma con los de cada carácter, que están en la misma tabla.
+- Usa el mismo `PublicCacheInterceptor` y `parseParam` de `content/`: 400 si el script no es válido.
+
 ## Web (`apps/web`)
 
 ### Tres capas
