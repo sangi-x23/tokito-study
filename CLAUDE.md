@@ -27,7 +27,7 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 
 - **Desplegado en Vercel.** La API vive en `https://tokito-study.vercel.app` y la web es un segundo proyecto que la consume por `API_URL`.
 - **Contenido:** importado el 2026-10-03 con un bootstrap revisado a mano. Hoy hay 15 temas raíz, unos 42 subtemas y alrededor de 470 ítems. Las clases nuevas entran por la ingesta incremental.
-- **Web:** una sola sección, «Diario de clase», que navega por temas. La interfaz es mínima a propósito y se irá mejorando.
+- **Web:** dos secciones. «Diario de clase» navega por temas; «Escritura» tiene las tablas de hiragana y katakana. La interfaz es mínima a propósito y se irá mejorando.
 - **Lo próximo:** las features de estudio (ver [Features futuras](#features-futuras)).
 
 ## Comandos
@@ -207,15 +207,17 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 - **`modules/<módulo>/`:** lo que pueden usar varias secciones. Sigue a los módulos de la API (`content` = temas e ítems): `api/` con un archivo de endpoints por recurso, `components/` y etiquetas.
 - **Regla para decidir:** si otra sección podría usarlo, va en `modules/`; si es cómo una sección arma su pantalla, va en `sections/`.
 - **Agregar una sección:** crear su carpeta en `sections/`, sumarla a `sections/index.ts` y crear sus rutas en `app/`.
+- **La barra interna de una sección** (temas del Diario, silabarios de Escritura) es `SectionNav` con un `SectionNavLink` por entrada, en `components/layout/`. El `Breadcrumb` empieza por la sección: cada vista pasa su primer crumb.
+- **Escritura:** los silabarios son fijos (`sections/writing/scripts.ts`), así que su barra y su portada no piden nada a la API. `/escritura/[script]` pide `GET /kana/:script` y pinta cada grupo como cuadrícula, con cada kana en su `row`/`column` y los huecos vacíos. Cuando se muestren los trazos, hay que citar a KanjiVG (CC BY-SA 3.0).
 
 ### Reglas
 
 - **Server Components que llaman a la API desde el servidor de Next** (`lib/api-client.ts`, con `API_URL` solo del lado del servidor). El navegador nunca llama a la API: no hace falta CORS.
-- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame`, `topic-link` y `sliding-highlight`.
+- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame`, `section-nav-link` y `sliding-highlight`.
 - **`dynamic = 'force-dynamic'` en las páginas y `revalidate: 3600` en cada `fetch`:** el build no necesita la API y los datos se cachean una hora.
 - **Un 400 de la API cuenta como «no encontrado».**
 - **Sin `loading.tsx`:** con él, un tema inexistente respondía 200 en vez de 404.
-- **URLs en español** (`/diario/temas/[slug]`, `/diario/items/[id]`), armadas siempre con `lib/routes.ts`.
+- **URLs en español** (`/diario/temas/[slug]`, `/diario/items/[id]`, `/escritura/[script]`), armadas siempre con `lib/routes.ts`.
 - **El ancho del contenido lo pone cada sección** con `PageContainer`, no el layout raíz. Así una sección puede tener columnas a todo el alto, como la barra de temas del Diario.
 - **Sin librería de íconos:** SVG en línea sobre `components/icon.tsx`.
 - **Animaciones con Anime.js** (`animejs` 4), en `modules/motion/`. Cada componente crea un `createScope({ root })` en un `useEffect` y lo revierte al desmontarse. Con `prefers-reduced-motion` (la `mediaQuery` del scope) todo salta sin animarse.
