@@ -6,3 +6,4 @@ export { HealthModule } from './health/health.module.js';
 export { IngestionModule } from './ingestion/ingestion.module.js';
 export { LlmModule } from './llm/llm.module.js';
 export { PrismaModule } from './prisma/prisma.module.js';
+export { WritingModule } from './writing/writing.module.js';
