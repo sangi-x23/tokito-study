@@ -226,7 +226,7 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 - **Sin librería de íconos:** SVG en línea sobre `components/icon.tsx`.
 - **Animaciones con Anime.js** (`animejs` 4), en `modules/motion/`. Cada componente crea un `createScope({ root })` en un `useEffect` y lo revierte al desmontarse. Con `prefers-reduced-motion` (la `mediaQuery` del scope) todo salta sin animarse.
   - **Lo instantáneo va con `utils.set`, no con `animate` y `duration: 0`:** `animate` espera al siguiente frame, y Anime.js pausa su motor con la pestaña oculta.
-  - **`SlidingHighlight`** desliza un fondo hasta el enlace con `aria-current="page"` (hoy, la barra de temas del Diario). Hasta hidratar, el enlace activo pinta su propio fondo; después el contenedor lleva `data-highlight` y el enlace lo apaga con `in-data-highlight:bg-transparent!`, para que no haya un instante sin selección.
+  - **`SlidingHighlight`** desliza un fondo hasta el enlace con `aria-current="page"`: lo usan el sidebar de la app (`AppSidebar`) y la barra interna de cada sección (`SectionNav`). Hasta hidratar, el enlace activo pinta su propio fondo; después el contenedor lleva `data-highlight` y el enlace lo apaga con `in-data-highlight:bg-transparent!`, para que no haya un instante sin selección.
   - Con el App Router la página anterior se desmonta al llegar la nueva: entre páginas solo se puede animar la entrada.
 - Noto Sans JP con `next/font` y modo oscuro según el sistema.
 - **Se evaluó migrar a una SPA de React y se descartó:** se perderían los 404 reales, la caché del servidor y el ocultar la API al navegador.
