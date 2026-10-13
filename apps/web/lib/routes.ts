@@ -6,4 +6,8 @@ export const routes = {
   item: (id: string): string => `/diario/items/${id}`,
   writing: '/escritura',
   kanaTable: (script: string): string => `/escritura/${script}`,
+  kanji: '/escritura/kanji',
+  kanjiGrade: (slug: string): string => `/escritura/kanji/grado/${slug}`,
+  // Route Handler que el modal de un kanji llama desde el navegador.
+  kanjiData: (character: string): string => `/datos/kanji/${encodeURIComponent(character)}`,
 } as const;
