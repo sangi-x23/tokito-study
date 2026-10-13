@@ -81,4 +81,6 @@ export interface ItemDetail extends ItemSummary {
   readonly topics: readonly ItemTopicRef[];
   /** Si es un kanji, las palabras del curso que lo usan; si no, vacío. */
   readonly relatedWords: readonly RelatedWord[];
+  /** Si es un kanji del catálogo de Escritura (`GET /kanji/:character`), para enlazar su orden de trazos. */
+  readonly inKanjiCatalog: boolean;
 }

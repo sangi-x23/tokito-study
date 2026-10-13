@@ -99,13 +99,19 @@ describe('toItemDetail', () => {
         { isPrimary: true, topic: { slug: 'fechas', name: 'Fechas' } },
       ],
     };
-    const detail = toItemDetail(row, []);
+    const detail = toItemDetail(row, [], true);
 
     assert.deepEqual(
       detail.topics.map((entry) => entry.slug),
       ['fechas', 'calendario', 'kanji'],
     );
     assert.deepEqual(detail.primaryTopic, { slug: 'fechas', name: 'Fechas' });
+  });
+
+  it('dice si el kanji está en el catálogo de Escritura', () => {
+    const row: ItemDetailRow = { ...kanjiRow, topics: [{ isPrimary: true, topic: { slug: 'fechas', name: 'Fechas' } }] };
+    assert.equal(toItemDetail(row, [], true).inKanjiCatalog, true);
+    assert.equal(toItemDetail(row, [], false).inKanjiCatalog, false);
   });
 });
 
