@@ -5,6 +5,7 @@ import { Breadcrumb, type Crumb } from '@/components/breadcrumb';
 import { routes } from '@/lib/routes';
 import { ClassList } from '@/modules/content/components/class-list';
 import { TypeBadge } from '@/modules/content/components/type-badge';
+import { KanjiDialogButton } from '@/modules/kanji/components/kanji-dialog-button';
 import { diarySection } from '../section';
 
 function Panel({ title, children }: { title: string; children: ReactNode }): ReactNode {
@@ -68,12 +69,12 @@ export function ItemView({ item }: { item: ItemDetail }): ReactNode {
             </div>
           </dl>
           {item.inKanjiCatalog && (
-            <Link
-              href={routes.kanjiDetail(item.japanese)}
-              className="self-start text-sm text-sky-700 hover:underline dark:text-sky-400"
+            <KanjiDialogButton
+              character={item.japanese}
+              className="cursor-pointer self-start text-sm text-sky-700 hover:underline dark:text-sky-400"
             >
-              Ver orden de trazos en Escritura →
-            </Link>
+              Ver orden de trazos →
+            </KanjiDialogButton>
           )}
         </Panel>
       )}

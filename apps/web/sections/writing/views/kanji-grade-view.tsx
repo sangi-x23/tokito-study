@@ -4,7 +4,7 @@ import { Breadcrumb } from '@/components/breadcrumb';
 import { routes } from '@/lib/routes';
 import { KanjiGradeNav } from '../components/kanji-grade-nav';
 import { KanjiGrid } from '../components/kanji-grid';
-import type { KanjiGradeEntry } from '../kanji-grades';
+import type { KanjiGradeEntry } from '@/modules/kanji/grades';
 import { writingSection } from '../section';
 
 /** Los kanji de un grado, del más al menos usado. */

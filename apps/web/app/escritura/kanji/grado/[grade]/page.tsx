@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { getKanjiGrade } from '@/modules/kanji/api/kanji';
-import { findGradeBySlug } from '@/sections/writing/kanji-grades';
+import { findGradeBySlug } from '@/modules/kanji/grades';
 import { KanjiGradeView } from '@/sections/writing/views/kanji-grade-view';
 
 export const dynamic = 'force-dynamic';

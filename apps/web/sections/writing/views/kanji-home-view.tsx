@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { routes } from '@/lib/routes';
-import { KANJI_GRADES } from '../kanji-grades';
+import { KANJI_GRADES } from '@/modules/kanji/grades';
 import { writingSection } from '../section';
 
 /** Portada de Kanji: qué son los jōyō y un acceso por grado. */

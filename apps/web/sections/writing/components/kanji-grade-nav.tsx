@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { routes } from '@/lib/routes';
-import { KANJI_GRADES, type KanjiGradeEntry } from '../kanji-grades';
+import { KANJI_GRADES, type KanjiGradeEntry } from '@/modules/kanji/grades';
 
 /** Los grados como pestañas, para saltar de uno a otro sin volver a la portada. */
 export function KanjiGradeNav({ current }: { current: KanjiGradeEntry }): ReactNode {
