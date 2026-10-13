@@ -14,8 +14,14 @@ export class ItemsService {
       return null;
     }
 
-    const relatedWords = item.type === 'KANJI' ? await this.wordsUsing(item.japanese) : [];
-    return toItemDetail(item, relatedWords);
+    if (item.type !== 'KANJI') {
+      return toItemDetail(item, [], false);
+    }
+    const [relatedWords, inKanjiCatalog] = await Promise.all([
+      this.wordsUsing(item.japanese),
+      this.isInKanjiCatalog(item.japanese),
+    ]);
+    return toItemDetail(item, relatedWords, inKanjiCatalog);
   }
 
   /**
@@ -29,5 +35,14 @@ export class ItemsService {
       select: { id: true, japanese: true, reading: true, meaning: true },
       orderBy: { japanese: 'asc' },
     });
+  }
+
+  /**
+   * El Diario depende del catálogo de Escritura, y no al revés: se buscan por
+   * el carácter, sin relación en el schema. Un kanji del curso que no es jōyō
+   * simplemente no enlaza a sus trazos.
+   */
+  private async isInKanjiCatalog(kanji: string): Promise<boolean> {
+    return (await this.prisma.kanji.count({ where: { character: kanji } })) > 0;
   }
 }

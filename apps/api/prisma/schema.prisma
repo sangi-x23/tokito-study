@@ -193,3 +193,27 @@ model Kana {
 
   @@unique([script, kind, row, column])
 }
+
+// Los kanji jōyō para la sección Escritura. Igual que Kana, no salen del
+// documento: es un conjunto cerrado que carga el seed `kanji:seed` y que la
+// ingesta no toca. No se relaciona con StudyItem: si el Diario lo necesita,
+// lo busca por `character`.
+model Kanji {
+  id        String   @id @default(cuid())
+  character String   @unique // 日
+  // 1–6 son los de primaria (kyōiku); 8, los de secundaria. Como en KANJIDIC2.
+  grade     Int
+  // Puesto entre los 2 500 más usados en prensa. Null fuera de ellos.
+  frequency Int?
+  // De KANJIDIC2 (CC BY-SA 4.0, hay que citarlo en la web), en español. Son
+  // las del diccionario: las que enseñó el curso viven en KanjiDetail.
+  meanings  String[]
+  onyomi    String[] // en katakana: ニチ, ジツ
+  kunyomi   String[] // en hiragana, con la notación de KANJIDIC2: まな.ぶ, -び
+  // Como en Kana: trazos de KanjiVG sobre 109×109. Su largo es el número de
+  // trazos, que puede diferir en uno del de KANJIDIC2 (餌, 謎): se cuenta lo que
+  // se dibuja.
+  strokes   String[]
+
+  @@index([grade])
+}

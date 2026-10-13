@@ -6,8 +6,9 @@ import type { ReactNode } from 'react';
 
 /**
  * Un enlace de `SectionNav`. Es de cliente solo para saber la ruta actual:
- * queda activo en su página y en las que llegan en `activeOn` (en el Diario,
- * las de los subtemas del tema).
+ * queda activo en su página, en las que llegan en `activeOn` (en el Diario,
+ * las de los subtemas del tema) y, con `activePrefix`, en todas las que cuelgan
+ * de ella (en Escritura, cada kanji).
  *
  * Su fondo activo solo se ve hasta que hidrata: después lo pinta el fondo
  * deslizante de `SlidingHighlight`, que marca la lista con `data-highlight`.
@@ -15,14 +16,17 @@ import type { ReactNode } from 'react';
 export function SectionNavLink({
   href,
   activeOn = [],
+  activePrefix = false,
   children,
 }: {
   href: string;
   activeOn?: readonly string[];
+  activePrefix?: boolean;
   children: ReactNode;
 }): ReactNode {
   const pathname = usePathname();
-  const active = pathname === href || activeOn.includes(pathname);
+  const active =
+    pathname === href || activeOn.includes(pathname) || (activePrefix && pathname.startsWith(`${href}/`));
 
   return (
     <Link

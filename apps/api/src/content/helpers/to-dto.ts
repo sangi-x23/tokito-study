@@ -79,7 +79,11 @@ export function toItemSummary(row: ItemSummaryRow): ItemSummary {
   return { ...toItemBase(row), primaryTopic: row.topics[0]?.topic ?? null };
 }
 
-export function toItemDetail(row: ItemDetailRow, relatedWords: readonly RelatedWord[]): ItemDetail {
+export function toItemDetail(
+  row: ItemDetailRow,
+  relatedWords: readonly RelatedWord[],
+  inKanjiCatalog: boolean,
+): ItemDetail {
   const topics: ItemTopicRef[] = row.topics
     .map((link) => ({ slug: link.topic.slug, name: link.topic.name, isPrimary: link.isPrimary }))
     .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary) || a.name.localeCompare(b.name, 'es'));
@@ -90,5 +94,6 @@ export function toItemDetail(row: ItemDetailRow, relatedWords: readonly RelatedW
     primaryTopic: primary ? { slug: primary.slug, name: primary.name } : null,
     topics,
     relatedWords,
+    inKanjiCatalog,
   };
 }
