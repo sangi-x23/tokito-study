@@ -4,4 +4,5 @@
 export const SHARED_PACKAGE_NAME = '@tokito/shared';
 
 export type * from './content';
+export type * from './kanji';
 export type * from './writing';
