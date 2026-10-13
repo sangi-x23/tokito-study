@@ -39,9 +39,10 @@ export function Modal({
           event.currentTarget.close();
         }
       }}
-      className="m-auto max-h-[calc(100dvh-2rem)] w-[min(32rem,calc(100%-2rem))] overflow-y-auto rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-xl backdrop:bg-slate-950/50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+      className="m-auto max-h-none w-[min(32rem,calc(100%-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-xl backdrop:bg-slate-950/50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
     >
-      <div className="flex flex-col gap-6 p-6">
+      {/* El scroll va aquí y no en el <dialog>, para que la barra quede dentro de las esquinas redondeadas. */}
+      <div className="flex max-h-[calc(100dvh-2rem-2px)] flex-col gap-6 overflow-y-auto p-6">
         <div className="flex items-start justify-between gap-4">
           <h2 id={titleId} className="flex items-baseline gap-3">
             {title}
