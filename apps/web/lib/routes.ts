@@ -6,4 +6,7 @@ export const routes = {
   item: (id: string): string => `/diario/items/${id}`,
   writing: '/escritura',
   kanaTable: (script: string): string => `/escritura/${script}`,
+  kanji: '/escritura/kanji',
+  kanjiGrade: (slug: string): string => `/escritura/kanji/grado/${slug}`,
+  kanjiDetail: (character: string): string => `/escritura/kanji/${encodeURIComponent(character)}`,
 } as const;

@@ -67,6 +67,14 @@ export function ItemView({ item }: { item: ItemDetail }): ReactNode {
               <dd className="text-lg">{item.kanji.jlptLevel ? `N${item.kanji.jlptLevel}` : '—'}</dd>
             </div>
           </dl>
+          {item.inKanjiCatalog && (
+            <Link
+              href={routes.kanjiDetail(item.japanese)}
+              className="self-start text-sm text-sky-700 hover:underline dark:text-sky-400"
+            >
+              Ver orden de trazos en Escritura →
+            </Link>
+          )}
         </Panel>
       )}
 
