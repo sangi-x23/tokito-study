@@ -31,7 +31,7 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 
 - **Desplegado en Vercel.** La API vive en `https://tokito-study.vercel.app` y la web es un segundo proyecto que la consume por `API_URL`.
 - **Contenido:** importado el 2026-10-03 con un bootstrap revisado a mano. Hoy hay 15 temas raíz, unos 42 subtemas y alrededor de 470 ítems. Las clases nuevas entran por la ingesta incremental.
-- **Web:** dos secciones. «Diario de clase» navega por temas; «Escritura» tiene las tablas de hiragana y katakana. La interfaz es mínima a propósito y se irá mejorando.
+- **Web:** dos secciones. «Diario de clase» navega por temas; «Escritura» tiene las tablas de hiragana y katakana y los 2136 kanji jōyō por grado. La interfaz es mínima a propósito y se irá mejorando.
 - **Lo próximo:** las features de estudio (ver [Features futuras](#features-futuras)).
 
 ## Comandos
@@ -47,6 +47,7 @@ pnpm --filter @tokito/api ingest:bootstrap <extract|taxonomy|import>   # lectura
 pnpm --filter @tokito/api docs:print       # imprime las secciones parseadas del documento
 pnpm --filter @tokito/api llm:try          # prueba la extracción contra una pestaña real
 pnpm --filter @tokito/api kana:seed        # carga los kana con sus trazos de KanjiVG; --dry-run solo compara
+pnpm --filter @tokito/api kanji:seed       # carga los kanji jōyō de KANJIDIC2 y KanjiVG; --dry-run solo compara
 ```
 
 Los scripts de la API corren desde `dist/`, así que necesitan un `build` previo.
@@ -94,6 +95,8 @@ apps/
       llm/            interfaz LlmProvider + implementación Gemini (schemas, prompts, reintentos)
       ingestion/      ingesta incremental (endpoint cron) y bootstrap local
       content/        API pública de lectura de temas e ítems
+      writing/        API pública de los kana (sección Escritura)
+      kanji/          API pública del catálogo de kanji jōyō (sección Escritura)
       scripts/        scripts sueltos compilados con el resto
   web/                Next.js (vercel.json compila shared antes del build)
     app/              solo rutas
@@ -105,7 +108,7 @@ packages/
   shared/             contratos compartidos (@tokito/shared)
 ```
 
-Cada módulo de la API sigue la misma forma: `config/`, `types/`, `schemas/`, `helpers/` (funciones puras), `providers/` y `tests/` con los `*.spec.ts`, según lo que necesite.
+**Un módulo por recurso, con un solo controller y un solo service.** Si algo nuevo tiene su propio recurso (como los kanji junto a los kana), va en un módulo nuevo, aunque lo muestre la misma sección de la web. Cada módulo de la API sigue la misma forma: `config/`, `types/`, `schemas/`, `helpers/` (funciones puras), `providers/` y `tests/` con los `*.spec.ts`, según lo que necesite.
 
 **Las interfaces y tipos exportados van en `types/<tema>.ts`,** no en servicios, helpers ni providers. Hay dos excepciones:
 - Un tipo privado de un archivo (sin `export`) se queda junto a la función que lo usa.
@@ -127,6 +130,11 @@ Vercel: dos proyectos desde este repo, con Root Directory `apps/api` y `apps/web
 - `ItemOccurrence`: en qué clases apareció cada ítem.
 - `ImageAsset`: caché del texto extraído de cada imagen, por hash SHA-256 del contenido. Las imágenes **no se almacenan**.
 - `Kana`: hiragana y katakana para la sección Escritura (básicos, dakuten, handakuten, pequeños, combinaciones y katakana extendida). No sale del documento: es un conjunto cerrado que se carga con un seed y que la ingesta no toca. Va aparte de `StudyItem` para no chocar con partículas como `は` o `を` ni aparecer en el árbol de temas. `row`/`column` ubican cada kana en la cuadrícula de su `script` y `kind`. `strokes` guarda los trazos en orden, como `d` de un `<path>` sobre un lienzo de 109×109, sacados de **KanjiVG (CC BY-SA 3.0, hay que citarlo en la web)**. Los kana de varios caracteres no tienen trazos propios: se dibujan con los de cada carácter (`きゃ` = `き` + `ゃ`). La tabla vive en `writing/helpers/kana-table.ts`; `kana:seed` descarga los SVG de un release fijado de KanjiVG (`KANJIVG_TAG`), crea lo que falta y actualiza lo que cambió, sin borrar ni recrear filas. Rōmaji Hepburn, salvo `を` = `wo`, y los pequeños llevan el de su versión grande.
+- `Kanji`: los 2136 kanji jōyō para la sección Escritura. Como `Kana`, es un conjunto cerrado que carga un seed y que la ingesta no toca, y **no se relaciona con `StudyItem`**: el catálogo no sabe nada del Diario. Si el Diario necesita algo del catálogo, lo busca por el carácter (hoy, `inKanjiCatalog` en `GET /items/:id`). Guarda `grade` (1–6 primaria, 8 secundaria, como KANJIDIC2), `frequency` (puesto entre los 2500 más usados en prensa; null en unos 100 de secundaria), `meanings` en español, `onyomi`/`kunyomi` **de diccionario** (las del curso siguen en `KanjiDetail`) y `strokes` de KanjiVG.
+  - **Datos de KANJIDIC2 (EDRDG, CC BY-SA 4.0, hay que citarlo en la web).** No tiene versiones fijas: el seed baja la última y actualiza lo que cambió. Las lecturas kun conservan su notación: el punto separa el okurigana (`まな.ぶ`) y el guion marca prefijo o sufijo (`-び`).
+  - **73 jōyō de secundaria no traen español en KANJIDIC2** (casi todos de la revisión de 2010). Están traducidos a mano en `kanji/helpers/kanji-meanings-es.ts`. El seed falla si a un kanji le falta significado o trazos, y avisa de las traducciones que sobran porque KANJIDIC2 ya las tiene.
+  - **El número de trazos es `strokes.length`, no el de KANJIDIC2:** en 9 kanji (餌, 謎…) difieren en uno porque KanjiVG dibuja la forma jōyō. Se cuenta lo que se dibuja.
+  - **`kanji:seed` baja dos archivos** (`kanjidic2.xml.gz` y el `kanjivg-<fecha>.xml.gz` del mismo `KANJIVG_TAG` que los kana), no un SVG por kanji.
 - `IngestionRun`: registro de cada corrida. Una en `RUNNING` es el candado, garantizado por un **índice único parcial** (`IngestionRun_one_running`) escrito a mano en la migración inicial, porque Prisma no sabe expresarlo. `prisma migrate dev` no intenta borrarlo.
 
 ### Invariantes
@@ -202,6 +210,12 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 - `GET /kana/:script` (`hiragana` o `katakana`, en minúsculas): la tabla del script agrupada por tipo (básicos → dakuten → handakuten → pequeños → combinaciones → extendidos, sin grupos vacíos), cada grupo ordenado por fila y columna. Los contratos están en `@tokito/shared` (`writing.ts`).
 - **Va con los trazos.** Son unos 35 KB por script sin comprimir, y así una sola petición sirve para la cuadrícula, el orden de trazos y la práctica de dibujo. Los kana de varios caracteres no traen trazos: la web los arma con los de cada carácter, que están en la misma tabla.
 - Usa el mismo `PublicCacheInterceptor` y `parseParam` de `content/`: 400 si el script no es válido.
+### Kanji (`kanji/`)
+
+- **Es un módulo aparte de `writing/`**, aunque los dos alimentan la sección Escritura: cada recurso tiene su propio módulo, con un solo controller y un solo service. Del de kana solo reutiliza los helpers de KanjiVG (`KANJIVG_TAG`, `parseStrokes`); el XML del release lo lee `kanji/helpers/kanjivg-bundle.ts`.
+- `GET /kanji/grades/:grade` (`1`–`6` u `8`): los kanji del grado, del más al menos frecuente y, sin frecuencia, por carácter. **Sin trazos**, porque secundaria tiene 1110 kanji: solo el carácter y su primer significado.
+- `GET /kanji/:character`: un kanji con lecturas, significados y trazos. 400 si no es un solo carácter Han (`\p{Script=Han}`, que admite `𠮟`, fuera del BMP), 404 si no es jōyō.
+- Los contratos están en `@tokito/shared` (`kanji.ts`). Usa el mismo `PublicCacheInterceptor` y `parseParam` de `content/`.
 
 ## Web (`apps/web`)
 
@@ -212,7 +226,7 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 - **`modules/<módulo>/`:** lo que pueden usar varias secciones. Sigue a los módulos de la API (`content` = temas e ítems): `api/` con un archivo de endpoints por recurso, `components/` y etiquetas.
 - **Regla para decidir:** si otra sección podría usarlo, va en `modules/`; si es cómo una sección arma su pantalla, va en `sections/`.
 - **Agregar una sección:** crear su carpeta en `sections/`, sumarla a `sections/index.ts` y crear sus rutas en `app/`.
-- **La barra interna de una sección** (temas del Diario, silabarios de Escritura) es `SectionNav` con un `SectionNavLink` por entrada, en `components/layout/`. El `Breadcrumb` empieza por la sección: cada vista pasa su primer crumb.
+- **La barra interna de una sección** (temas del Diario, sistemas de Escritura) es `SectionNav` con un `SectionNavLink` por entrada, en `components/layout/`. El `Breadcrumb` empieza por la sección: cada vista pasa su primer crumb.
 - **Escritura:** los silabarios son fijos (`sections/writing/scripts.ts`), así que su barra y su portada no piden nada a la API. `/escritura/[script]` pide `GET /kana/:script` y pinta cada grupo como cuadrícula, con cada kana en su `row`/`column` y los huecos vacíos. Los kana básicos son tarjetas que abren un `<dialog>` nativo (`showModal()`, sin URL propia) con su orden de trazos y los kana que salen de él. El modal cita a KanjiVG (CC BY-SA 3.0), como exige la licencia.
   - **Las relaciones (tenten, maru, combinaciones, extendidos) no se guardan:** `modules/writing/kana-relations.ts` las deriva de los caracteres. Con NFD, `が` es `か` + U+3099 y `ぱ` es `は` + U+309A; una combinación o un extendido cuelga del primer carácter sin su marca (`ぎゃ` → `き`, `ディ` → `テ`). Se calculan en el servidor para mandar al navegador solo los básicos.
   - **`StrokeOrder`** (`modules/writing/components/`) dibuja los trazos con `svg.createDrawable` de Anime.js, uno tras otro, con el número junto al primer punto de cada path y la secuencia paso a paso debajo. Lo reutilizará la práctica de dibujo.
@@ -226,6 +240,10 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 - **Sin `loading.tsx`:** con él, un tema inexistente respondía 200 en vez de 404.
 - **URLs en español** (`/diario/temas/[slug]`, `/diario/items/[id]`, `/escritura/[script]`), armadas siempre con `lib/routes.ts`.
 - **El ancho del contenido lo pone cada sección** con `PageContainer`, no el layout raíz. Así una sección puede tener columnas a todo el alto, como la barra de temas del Diario.
+- **Kanji en Escritura** (`/escritura/kanji`): la portada lista los grados, que son fijos (`sections/writing/kanji-grades.ts`) y no piden nada a la API. `/escritura/kanji/grado/[grade]` (`1`–`6` o `secundaria`) es la cuadrícula; `/escritura/kanji/[character]` es la página del kanji, con URL propia en vez de modal porque tiene más contenido que un kana. La ruta estática `kanji` le gana a `[script]`.
+  - **El kanji va en la URL codificado** (`routes.kanjiDetail` usa `encodeURIComponent`). La página lo decodifica con `try` sin asumir si Next ya lo hizo, porque su documentación no lo dice.
+  - `SectionNavLink` con `activePrefix` queda activo en todas las páginas que cuelgan de su `href`: así «Kanji» sigue marcado en cada kanji.
+  - Cada página de kanji cita KanjiVG y KANJIDIC2 (`kanji-credits.tsx`).
 - **Sin librería de íconos:** SVG en línea sobre `components/icon.tsx`.
 - **Animaciones con Anime.js** (`animejs` 4), en `modules/motion/`. Cada componente crea un `createScope({ root })` en un `useEffect` y lo revierte al desmontarse. Con `prefers-reduced-motion` (la `mediaQuery` del scope) todo salta sin animarse.
   - **Lo instantáneo va con `utils.set`, no con `animate` y `duration: 0`:** `animate` espera al siguiente frame, y Anime.js pausa su motor con la pestaña oculta.
