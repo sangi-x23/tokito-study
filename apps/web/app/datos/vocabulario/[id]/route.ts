@@ -1,4 +1,5 @@
 import type { NextRequest } from 'next/server';
+import { CATALOG_CACHE_CONTROL } from '@/lib/api-client';
 import { getVocabularyWord } from '@/modules/vocabulary/api/vocabulary';
 
 /**
@@ -12,6 +13,6 @@ export async function GET(_request: NextRequest, ctx: RouteContext<'/datos/vocab
     return Response.json({ message: 'Palabra no encontrada' }, { status: 404 });
   }
   return Response.json(word, {
-    headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
+    headers: { 'Cache-Control': CATALOG_CACHE_CONTROL },
   });
 }
