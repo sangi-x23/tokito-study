@@ -214,25 +214,26 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 - Los contratos son interfaces en `@tokito/shared` (`content.ts`), sin zod. zod valida solo los parámetros de la URL: 400 si no tienen forma de slug o cuid, 404 si no existen.
 - **No se exponen** `rawText`, `ImageAsset` ni `IngestionRun`. De las clases solo sale el título y la fecha.
 - `Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400` **solo en respuestas exitosas** (`PublicCacheInterceptor`), para que el CDN no recuerde un 404 de un tema que la ingesta crea después.
+- **Los catálogos cerrados (kana, kanji y vocabulario) usan `CatalogCacheInterceptor`**, con `s-maxage=86400, stale-while-revalidate=2592000`: solo cambian con su seed. El cuello de botella medido era el arranque en frío: sin caché, la primera petición tardaba 3.6 s (función de Vercel más Neon despertando) y las siguientes, 0.3 s. Con un mes de copia vieja servida mientras se renueva, casi ninguna visita espera a Neon. Después de correr un seed, los cambios tardan hasta un día en verse, salvo que se haga un deploy, que purga el CDN.
 - Una consulta por endpoint, con `include`/`select` junto a sus mappers en `content/helpers/to-dto.ts`.
 
 ### Escritura (`writing/`)
 
 - `GET /kana/:script` (`hiragana` o `katakana`, en minúsculas): la tabla del script agrupada por tipo (básicos → dakuten → handakuten → pequeños → combinaciones → extendidos, sin grupos vacíos), cada grupo ordenado por fila y columna. Los contratos están en `@tokito/shared` (`writing.ts`).
 - **Va con los trazos.** Son unos 35 KB por script sin comprimir, y así una sola petición sirve para la cuadrícula, el orden de trazos y la práctica de dibujo. Los kana de varios caracteres no traen trazos: la web los arma con los de cada carácter, que están en la misma tabla.
-- Usa el mismo `PublicCacheInterceptor` y `parseParam` de `content/`: 400 si el script no es válido.
+- Usa `CatalogCacheInterceptor` y el `parseParam` de `content/`: 400 si el script no es válido.
 ### Kanji (`kanji/`)
 
 - **Es un módulo aparte de `writing/`**, aunque los dos alimentan la sección Escritura: cada recurso tiene su propio módulo, con un solo controller y un solo service. Del de kana solo reutiliza los helpers de KanjiVG (`KANJIVG_TAG`, `parseStrokes`); el XML del release lo lee `kanji/helpers/kanjivg-bundle.ts`.
 - `GET /kanji/grades/:grade` (`1`–`6` u `8`): los kanji del grado, del más al menos frecuente y, sin frecuencia, por carácter. **Sin trazos**, porque secundaria tiene 1110 kanji: solo el carácter y su primer significado.
 - `GET /kanji/:character`: un kanji con lecturas, significados y trazos. 400 si no es un solo carácter Han (`\p{Script=Han}`, que admite `𠮟`, fuera del BMP), 404 si no es jōyō.
-- Los contratos están en `@tokito/shared` (`kanji.ts`). Usa el mismo `PublicCacheInterceptor` y `parseParam` de `content/`.
+- Los contratos están en `@tokito/shared` (`kanji.ts`). Usa `CatalogCacheInterceptor` y el `parseParam` de `content/`.
 
 ### Vocabulario (`vocabulary/`)
 
 - `GET /vocabulary/levels/:level` (`1`–`5`, sin la N): las palabras del nivel en orden del silabario por la lectura, con `Intl.Collator('ja')`, que no distingue hiragana de katakana y trata la `ー` como alargamiento. Solo grafía, lectura y equivalentes: N1 tiene unas 3400 palabras.
 - `GET /vocabulary/words/:id`: la palabra con categorías, significado y ejemplos. 400 si el id no tiene forma de cuid, 404 si no existe.
-- Los contratos están en `@tokito/shared` (`vocabulary.ts`). Usa el mismo `PublicCacheInterceptor` y `parseParam` de `content/`.
+- Los contratos están en `@tokito/shared` (`vocabulary.ts`). Usa `CatalogCacheInterceptor` y el `parseParam` de `content/`.
 
 ## Web (`apps/web`)
 
@@ -251,11 +252,13 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 ### Reglas
 
 - **Server Components que llaman a la API desde el servidor de Next** (`lib/api-client.ts`, con `API_URL` solo del lado del servidor). El navegador nunca llama a la API: no hace falta CORS.
-- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame`, `section-nav-link`, `sliding-highlight`, `modal`, `kanji-dialog` y `kanji-dialog-button` y, en Escritura, `basic-kana-grid`, `kana-dialog`, `kanji-grid` y `stroke-order` y, en Vocabulario, `word-list` y `vocabulary-dialog`.
+- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame`, `section-nav-link`, `link-pending-hint`, `sliding-highlight`, `modal`, `kanji-dialog` y `kanji-dialog-button` y, en Escritura, `basic-kana-grid`, `kana-dialog`, `kanji-grid` y `stroke-order` y, en Vocabulario, `word-list` y `vocabulary-dialog`.
 - **Los modales usan `components/modal.tsx`:** un `<dialog>` nativo con `showModal()`, que ya cierra con Esc y retiene el foco, más el botón de cerrar y el clic fuera del cuadro. Todo cierre pasa por su evento `close`.
-- **`dynamic = 'force-dynamic'` en las páginas y `revalidate: 3600` en cada `fetch`:** el build no necesita la API y los datos se cachean una hora.
+- **`dynamic = 'force-dynamic'` en las páginas y `revalidate: 3600` en cada `fetch`:** el build no necesita la API y los datos se cachean una hora. Los catálogos pasan `CATALOG_REVALIDATE_SECONDS` (un día) a `get()`, y sus Route Handlers responden con `CATALOG_CACHE_CONTROL`, igual que la API.
 - **Un 400 de la API cuenta como «no encontrado».**
 - **Sin `loading.tsx`:** con él, un tema inexistente respondía 200 en vez de 404.
+  - **Cada `<Link>` a una página dinámica lleva `LinkPendingHint`** (`components/layout/`). Sin `loading.tsx`, Next no prefetchea las rutas dinámicas y la navegación espera al servidor sin mostrar nada, y parecía que la app se trababa. El hint usa `useLinkStatus` y debe ir dentro del `<Link>`. Aparece pasados 120 ms para no parpadear en las navegaciones rápidas y reserva su espacio con `invisible` para no mover el texto. Es la opción que recomienda la documentación de Next 16 para rutas dinámicas sin `loading.tsx`. Sus animaciones están en el `@theme` de `globals.css`.
+- **Las listas largas usan `content-visibility: auto`** con `contain-intrinsic-size: auto <alto>` en cada grupo (bloques de kanji, filas del vocabulario): el navegador no pinta lo que está fuera de pantalla. Se descartó cargar a medida que se hace scroll: no acelera la entrada, que espera al servidor, el buscador necesita la lista completa de todas formas, y rompería el índice de anclas, el Ctrl+F y la posición del scroll al volver.
 - **URLs en español** (`/diario/temas/[slug]`, `/diario/items/[id]`, `/escritura/[script]`), armadas siempre con `lib/routes.ts`.
 - **El ancho del contenido lo pone cada sección** con `PageContainer`, no el layout raíz. Así una sección puede tener columnas a todo el alto, como la barra de temas del Diario.
 - **Kanji en Escritura** (`/escritura/kanji`): la portada lista los grados, que son fijos (`modules/kanji/grades.ts`) y no piden nada a la API. `/escritura/kanji/grado/[grade]` (`1`–`6` o `secundaria`) es la cuadrícula. La ruta estática `kanji` le gana a `[script]`.
