@@ -1,11 +1,11 @@
 import { Controller, Get, NotFoundException, Param, UseInterceptors } from '@nestjs/common';
 import type { KanjiDetail, KanjiGradeTable } from '@tokito/shared';
-import { PublicCacheInterceptor } from '../content/cache.js';
+import { CatalogCacheInterceptor } from '../content/cache.js';
 import { parseParam } from '../content/schemas/params.schema.js';
 import { KanjiService } from './kanji.service.js';
 import { gradeSchema, kanjiCharacterSchema } from './schemas/params.schema.js';
 
-@UseInterceptors(PublicCacheInterceptor)
+@UseInterceptors(CatalogCacheInterceptor)
 @Controller('kanji')
 export class KanjiController {
   constructor(private readonly kanji: KanjiService) {}

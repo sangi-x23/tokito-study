@@ -1,11 +1,11 @@
 import { Controller, Get, Param, UseInterceptors } from '@nestjs/common';
 import type { KanaTable } from '@tokito/shared';
-import { PublicCacheInterceptor } from '../content/cache.js';
+import { CatalogCacheInterceptor } from '../content/cache.js';
 import { parseParam } from '../content/schemas/params.schema.js';
 import { KanaService } from './kana.service.js';
 import { scriptSchema } from './schemas/params.schema.js';
 
-@UseInterceptors(PublicCacheInterceptor)
+@UseInterceptors(CatalogCacheInterceptor)
 @Controller('kana')
 export class KanaController {
   constructor(private readonly kana: KanaService) {}
