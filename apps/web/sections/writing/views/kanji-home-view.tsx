@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { LinkPendingHint } from '@/components/layout/link-pending-hint';
 import { routes } from '@/lib/routes';
 import { KANJI_GRADES } from '@/modules/kanji/grades';
 import { writingSection } from '../section';
@@ -27,9 +28,10 @@ export function KanjiHomeView(): ReactNode {
           <li key={entry.slug}>
             <Link
               href={routes.kanjiGrade(entry.slug)}
-              className="flex rounded-xl border border-slate-200 px-4 py-3 font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+              className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 px-4 py-3 font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
             >
               {entry.label}
+              <LinkPendingHint />
             </Link>
           </li>
         ))}

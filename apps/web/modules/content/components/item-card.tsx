@@ -1,6 +1,7 @@
 import type { ItemSummary } from '@tokito/shared';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { LinkPendingHint } from '@/components/layout/link-pending-hint';
 import { routes } from '@/lib/routes';
 import { ClassList } from './class-list';
 import { TypeBadge } from './type-badge';
@@ -24,6 +25,7 @@ export function ItemCard({ item, currentSlug }: { item: ItemSummary; currentSlug
               {item.reading}
             </span>
           )}
+          <LinkPendingHint className="ml-2 inline-block align-middle" />
         </Link>
         <TypeBadge type={item.type} />
       </div>

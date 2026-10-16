@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Breadcrumb } from '@/components/breadcrumb';
+import { LinkPendingHint } from '@/components/layout/link-pending-hint';
 import { routes } from '@/lib/routes';
 import { JLPT_LEVELS } from '@/modules/vocabulary/levels';
 import { vocabularySection } from '../section';
@@ -33,7 +34,10 @@ export function VocabularyHome(): ReactNode {
               href={routes.vocabularyLevel(entry.slug)}
               className="flex h-full flex-col gap-1 rounded-xl border border-slate-200 px-4 py-3 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
             >
-              <span className="font-medium">{entry.label}</span>
+              <span className="flex items-center justify-between gap-2 font-medium">
+                {entry.label}
+                <LinkPendingHint />
+              </span>
               <span className="text-sm text-slate-600 dark:text-slate-400">{entry.description}</span>
             </Link>
           </li>

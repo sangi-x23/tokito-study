@@ -101,7 +101,14 @@ export function WordList({ words }: { words: readonly VocabularySummary[] }): Re
         </section>
       ) : (
         groups.map((group) => (
-          <section key={group.anchor} id={group.anchor} className="flex scroll-mt-4 flex-col gap-3">
+          // El navegador no pinta las filas fuera de pantalla hasta que se
+          // acercan: N1 tiene unas 3400 palabras. `auto` recuerda la altura
+          // real, y las anclas del índice siguen llevando a cada fila.
+          <section
+            key={group.anchor}
+            id={group.anchor}
+            className="flex scroll-mt-4 flex-col gap-3 [contain-intrinsic-size:auto_60rem] [content-visibility:auto]"
+          >
             <h2 className="flex items-baseline gap-2 text-sm font-medium text-slate-500 dark:text-slate-400">
               <span lang="ja" className="text-lg text-slate-900 dark:text-slate-100">
                 {group.row.label}

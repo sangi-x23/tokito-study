@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { LinkPendingHint } from '@/components/layout/link-pending-hint';
 import { routes } from '@/lib/routes';
 import { KANJI_GRADES, type KanjiGradeEntry } from '@/modules/kanji/grades';
 
@@ -15,13 +16,14 @@ export function KanjiGradeNav({ current }: { current: KanjiGradeEntry }): ReactN
               <Link
                 href={routes.kanjiGrade(entry.slug)}
                 aria-current={active ? 'page' : undefined}
-                className={`inline-flex rounded-full border px-3 py-1 text-sm transition-colors ${
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors ${
                   active
                     ? 'border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900'
                     : 'border-slate-200 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900'
                 }`}
               >
                 {entry.shortLabel}
+                <LinkPendingHint className="size-3.5" />
               </Link>
             </li>
           );
