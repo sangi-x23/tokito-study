@@ -31,7 +31,7 @@ Web app gratuita para estudiar japonés a partir de los diarios de clase del cur
 
 - **Desplegado en Vercel.** La API vive en `https://tokito-study.vercel.app` y la web es un segundo proyecto que la consume por `API_URL`.
 - **Contenido:** importado el 2026-10-03 con un bootstrap revisado a mano. Hoy hay 15 temas raíz, unos 42 subtemas y alrededor de 470 ítems. Las clases nuevas entran por la ingesta incremental.
-- **Web:** dos secciones. «Diario de clase» navega por temas; «Escritura» tiene las tablas de hiragana y katakana y los 2136 kanji jōyō por grado. La interfaz es mínima a propósito y se irá mejorando.
+- **Web:** tres secciones. «Diario de clase» navega por temas; «Escritura» tiene las tablas de hiragana y katakana y los 2136 kanji jōyō por grado; «Vocabulario» es un diccionario de unas 8300 palabras por nivel del JLPT (N5–N1). La interfaz es mínima a propósito y se irá mejorando.
 - **Lo próximo:** las features de estudio (ver [Features futuras](#features-futuras)).
 
 ## Comandos
@@ -48,6 +48,8 @@ pnpm --filter @tokito/api docs:print       # imprime las secciones parseadas del
 pnpm --filter @tokito/api llm:try          # prueba la extracción contra una pestaña real
 pnpm --filter @tokito/api kana:seed        # carga los kana con sus trazos de KanjiVG; --dry-run solo compara
 pnpm --filter @tokito/api kanji:seed       # carga los kanji jōyō de KANJIDIC2 y KanjiVG; --dry-run solo compara
+pnpm --filter @tokito/api vocab:translate <requests|merge>   # lotes de traducción del vocabulario (ver Vocabulario)
+pnpm --filter @tokito/api vocab:seed       # carga el vocabulario JLPT con sus traducciones; --dry-run solo compara
 ```
 
 Los scripts de la API corren desde `dist/`, así que necesitan un `build` previo.
@@ -97,7 +99,9 @@ apps/
       content/        API pública de lectura de temas e ítems
       writing/        API pública de los kana (sección Escritura)
       kanji/          API pública del catálogo de kanji jōyō (sección Escritura)
+      vocabulary/     API pública del vocabulario JLPT (sección Vocabulario)
       scripts/        scripts sueltos compilados con el resto
+    data/vocabulary/  traducciones al español del vocabulario, una por nivel (van al repo)
   web/                Next.js (vercel.json compila shared antes del build)
     app/              solo rutas
     sections/         una carpeta por sección del sidebar
@@ -135,6 +139,13 @@ Vercel: dos proyectos desde este repo, con Root Directory `apps/api` y `apps/web
   - **73 jōyō de secundaria no traen español en KANJIDIC2** (casi todos de la revisión de 2010). Están traducidos a mano en `kanji/helpers/kanji-meanings-es.ts`. El seed falla si a un kanji le falta significado o trazos, y avisa de las traducciones que sobran porque KANJIDIC2 ya las tiene.
   - **El número de trazos es `strokes.length`, no el de KANJIDIC2:** en 9 kanji (餌, 謎…) difieren en uno porque KanjiVG dibuja la forma jōyō. Se cuenta lo que se dibuja.
   - **`kanji:seed` baja dos archivos** (`kanjidic2.xml.gz` y el `kanjivg-<fecha>.xml.gz` del mismo `KANJIVG_TAG` que los kana), no un SVG por kanji.
+- `Vocabulary`: unas 8300 palabras por nivel del JLPT para la sección Vocabulario. Como `Kanji`, es un conjunto cerrado que carga un seed, que la ingesta no toca y que **no se relaciona con `StudyItem`**. Clave natural `[japanese, reading]`: la misma entrada de JMdict puede salir con dos grafías en niveles distintos (`会う` en N5, `遭う` en N4) y son dos palabras. `japanese` es la grafía usual y `reading` va solo en kana (katakana en las palabras que se escriben así). `examples` es `Json` (`[{ japanese, spanish, tatoebaId, spanishTatoebaId }]`) porque solo se lee con su palabra; `examples.schema.ts` lo valida al leerlo.
+  - **No hay lista oficial:** el JLPT no publica vocabulario desde 2010. Los niveles son los de las listas de Jonathan Waller (CC BY), las más usadas, en la versión de stephenmk/yomitan-jlpt-vocab (CC BY-SA 4.0), que trae el `seq` de JMdict de cada palabra y cambió las grafías raras por las usuales. Commit fijado en `WALLER_COMMIT`. Unas 14 filas de N1 sin `seq` son lecturas on de un kanji suelto (`,い,依`) y se saltan. Si una palabra está en dos niveles, se queda el más fácil.
+  - **Algunas filas apuntan a un homónimo equivocado de JMdict** (`コップ` a «cop», `ボタン` a 牡丹). `waller-corrections.ts` corrige la entrada o la grafía de cada una. Se encontraron comparando la definición inglesa de Waller con las glosas de la entrada; cuando el que falla es Waller (`そっと` como «face of the earth»), se deja la entrada. Las lecturas raras que trae la lista (`乗客|じょうかく` junto a `じょうきゃく`) se dejan: son de Waller y su significado aclara la usual.
+  - **Acepciones, categorías y ejemplos de JMdict** (`JMdict_e_examp.gz`, EDRDG, CC BY-SA 4.0, sin versiones fijas como KANJIDIC2). Se quitan las acepciones restringidas a otra grafía (`<stagk>`) y las arcaicas u obsoletas, salvo que no quede otra. Los ejemplos son las oraciones de Tatoeba (CC BY 2.0 FR) que JMdict asigna a cada acepción: hasta dos de las tres primeras, primero las que ya tienen traducción humana al español en Tatoeba (solo un 15 %). La licencia pide citar al autor: la web enlaza cada oración a su página de Tatoeba.
+  - **El español lo escribió Claude**, no Gemini: la cuota gratuita no alcanza para unas 8300 palabras y 7400 oraciones. Se tradujo del inglés de JMdict (obra derivada, CC BY-SA), en español latinoamericano neutro. `equivalents` son traducciones cortas y `meaning` explica el uso y los matices. Las traducciones viven en `apps/api/data/vocabulary/n<nivel>.json`, en el repo y fuera de `src/` para no entrar en la función de Vercel. **Cada una guarda `source`, la huella del inglés del que salió:** si JMdict lo cambia, el seed falla y hay que retraducir esas palabras (`vocab:translate requests` solo pide las que faltan o quedaron viejas, y `merge` valida las respuestas con zod y las suma).
+  - **Las traducciones humanas de Tatoeba solo las lee `vocab:translate`**, de dos exportaciones en `.bz2` que hay que descomprimir a mano en `apps/api/.vocabulary/tatoeba/`: Node no trae bzip2 y no vale una dependencia para un paso que se corre una vez. Quedan copiadas en los JSON, así que el seed no las necesita.
+  - `partsOfSpeech` traduce las etiquetas de JMdict (`part-of-speech.ts`). Si aparece una nueva, el seed falla y pide agregarla.
 - `IngestionRun`: registro de cada corrida. Una en `RUNNING` es el candado, garantizado por un **índice único parcial** (`IngestionRun_one_running`) escrito a mano en la migración inicial, porque Prisma no sabe expresarlo. `prisma migrate dev` no intenta borrarlo.
 
 ### Invariantes
@@ -203,19 +214,26 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 - Los contratos son interfaces en `@tokito/shared` (`content.ts`), sin zod. zod valida solo los parámetros de la URL: 400 si no tienen forma de slug o cuid, 404 si no existen.
 - **No se exponen** `rawText`, `ImageAsset` ni `IngestionRun`. De las clases solo sale el título y la fecha.
 - `Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400` **solo en respuestas exitosas** (`PublicCacheInterceptor`), para que el CDN no recuerde un 404 de un tema que la ingesta crea después.
+- **Los catálogos cerrados (kana, kanji y vocabulario) usan `CatalogCacheInterceptor`**, con `s-maxage=86400, stale-while-revalidate=2592000`: solo cambian con su seed. El cuello de botella medido era el arranque en frío: sin caché, la primera petición tardaba 3.6 s (función de Vercel más Neon despertando) y las siguientes, 0.3 s. Con un mes de copia vieja servida mientras se renueva, casi ninguna visita espera a Neon. Después de correr un seed, los cambios tardan hasta un día en verse, salvo que se haga un deploy, que purga el CDN.
 - Una consulta por endpoint, con `include`/`select` junto a sus mappers en `content/helpers/to-dto.ts`.
 
 ### Escritura (`writing/`)
 
 - `GET /kana/:script` (`hiragana` o `katakana`, en minúsculas): la tabla del script agrupada por tipo (básicos → dakuten → handakuten → pequeños → combinaciones → extendidos, sin grupos vacíos), cada grupo ordenado por fila y columna. Los contratos están en `@tokito/shared` (`writing.ts`).
 - **Va con los trazos.** Son unos 35 KB por script sin comprimir, y así una sola petición sirve para la cuadrícula, el orden de trazos y la práctica de dibujo. Los kana de varios caracteres no traen trazos: la web los arma con los de cada carácter, que están en la misma tabla.
-- Usa el mismo `PublicCacheInterceptor` y `parseParam` de `content/`: 400 si el script no es válido.
+- Usa `CatalogCacheInterceptor` y el `parseParam` de `content/`: 400 si el script no es válido.
 ### Kanji (`kanji/`)
 
 - **Es un módulo aparte de `writing/`**, aunque los dos alimentan la sección Escritura: cada recurso tiene su propio módulo, con un solo controller y un solo service. Del de kana solo reutiliza los helpers de KanjiVG (`KANJIVG_TAG`, `parseStrokes`); el XML del release lo lee `kanji/helpers/kanjivg-bundle.ts`.
 - `GET /kanji/grades/:grade` (`1`–`6` u `8`): los kanji del grado, del más al menos frecuente y, sin frecuencia, por carácter. **Sin trazos**, porque secundaria tiene 1110 kanji: solo el carácter y su primer significado.
 - `GET /kanji/:character`: un kanji con lecturas, significados y trazos. 400 si no es un solo carácter Han (`\p{Script=Han}`, que admite `𠮟`, fuera del BMP), 404 si no es jōyō.
-- Los contratos están en `@tokito/shared` (`kanji.ts`). Usa el mismo `PublicCacheInterceptor` y `parseParam` de `content/`.
+- Los contratos están en `@tokito/shared` (`kanji.ts`). Usa `CatalogCacheInterceptor` y el `parseParam` de `content/`.
+
+### Vocabulario (`vocabulary/`)
+
+- `GET /vocabulary/levels/:level` (`1`–`5`, sin la N): las palabras del nivel en orden del silabario por la lectura, con `Intl.Collator('ja')`, que no distingue hiragana de katakana y trata la `ー` como alargamiento. Solo grafía, lectura y equivalentes: N1 tiene unas 3400 palabras.
+- `GET /vocabulary/words/:id`: la palabra con categorías, significado y ejemplos. 400 si el id no tiene forma de cuid, 404 si no existe.
+- Los contratos están en `@tokito/shared` (`vocabulary.ts`). Usa `CatalogCacheInterceptor` y el `parseParam` de `content/`.
 
 ## Web (`apps/web`)
 
@@ -234,11 +252,13 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
 ### Reglas
 
 - **Server Components que llaman a la API desde el servidor de Next** (`lib/api-client.ts`, con `API_URL` solo del lado del servidor). El navegador nunca llama a la API: no hace falta CORS.
-- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame`, `section-nav-link`, `sliding-highlight`, `modal`, `kanji-dialog` y `kanji-dialog-button` y, en Escritura, `basic-kana-grid`, `kana-dialog`, `kanji-grid` y `stroke-order`.
+- **Componentes de cliente solo cuando hacen falta** y con estado en memoria. Hoy: `error.tsx`, `sidebar-link`, `sidebar-frame`, `section-nav-link`, `link-pending-hint`, `sliding-highlight`, `modal`, `kanji-dialog` y `kanji-dialog-button` y, en Escritura, `basic-kana-grid`, `kana-dialog`, `kanji-grid` y `stroke-order` y, en Vocabulario, `word-list` y `vocabulary-dialog`.
 - **Los modales usan `components/modal.tsx`:** un `<dialog>` nativo con `showModal()`, que ya cierra con Esc y retiene el foco, más el botón de cerrar y el clic fuera del cuadro. Todo cierre pasa por su evento `close`.
-- **`dynamic = 'force-dynamic'` en las páginas y `revalidate: 3600` en cada `fetch`:** el build no necesita la API y los datos se cachean una hora.
+- **`dynamic = 'force-dynamic'` en las páginas y `revalidate: 3600` en cada `fetch`:** el build no necesita la API y los datos se cachean una hora. Los catálogos pasan `CATALOG_REVALIDATE_SECONDS` (un día) a `get()`, y sus Route Handlers responden con `CATALOG_CACHE_CONTROL`, igual que la API.
 - **Un 400 de la API cuenta como «no encontrado».**
 - **Sin `loading.tsx`:** con él, un tema inexistente respondía 200 en vez de 404.
+  - **Cada `<Link>` a una página dinámica lleva `LinkPendingHint`** (`components/layout/`). Sin `loading.tsx`, Next no prefetchea las rutas dinámicas y la navegación espera al servidor sin mostrar nada, y parecía que la app se trababa. El hint usa `useLinkStatus` y debe ir dentro del `<Link>`. Aparece pasados 120 ms para no parpadear en las navegaciones rápidas y reserva su espacio con `invisible` para no mover el texto. Es la opción que recomienda la documentación de Next 16 para rutas dinámicas sin `loading.tsx`. Sus animaciones están en el `@theme` de `globals.css`.
+- **Las listas largas usan `content-visibility: auto`** con `contain-intrinsic-size: auto <alto>` en cada grupo (bloques de kanji, filas del vocabulario): el navegador no pinta lo que está fuera de pantalla. Se descartó cargar a medida que se hace scroll: no acelera la entrada, que espera al servidor, el buscador necesita la lista completa de todas formas, y rompería el índice de anclas, el Ctrl+F y la posición del scroll al volver.
 - **URLs en español** (`/diario/temas/[slug]`, `/diario/items/[id]`, `/escritura/[script]`), armadas siempre con `lib/routes.ts`.
 - **El ancho del contenido lo pone cada sección** con `PageContainer`, no el layout raíz. Así una sección puede tener columnas a todo el alto, como la barra de temas del Diario.
 - **Kanji en Escritura** (`/escritura/kanji`): la portada lista los grados, que son fijos (`modules/kanji/grades.ts`) y no piden nada a la API. `/escritura/kanji/grado/[grade]` (`1`–`6` o `secundaria`) es la cuadrícula. La ruta estática `kanji` le gana a `[script]`.
@@ -248,6 +268,10 @@ La segunda barrera es el prompt de extracción: prohíbe nombres, edades, profes
   - **El kanji va en la URL del handler codificado** (`encodeURIComponent`). El handler lo decodifica con `characterFromParam` (`modules/kanji/`), con `try` y sin asumir si Next ya lo hizo, porque su documentación no lo dice.
   - `SectionNavLink` con `activePrefix` queda activo en todas las páginas que cuelgan de su `href`: así «Kanji» sigue marcado en cada grado.
   - El modal cita KanjiVG y KANJIDIC2 (`kanji-credits.tsx`).
+- **Vocabulario** (`/vocabulario`): la barra y la portada listan los niveles N5–N1, que son fijos (`modules/vocabulary/levels.ts`), y la portada avisa que las listas no son oficiales. `/vocabulario/nivel/[n5…n1]` es la lista del nivel.
+  - **Va como un diccionario:** agrupada por fila del silabario (あ か さ…, `sections/vocabulary/kana-rows.ts`), con un índice de anclas para saltar a cada fila. A diferencia de los bloques de kanji, aquí el índice sí sirve porque el orden es alfabético. El buscador filtra en memoria por grafía, por lectura sin distinguir hiragana de katakana o por cualquier equivalente sin tildes, y mientras tiene texto reemplaza las filas por los resultados.
+  - **El detalle es un modal sin URL**, igual que el de un kanji: se abre con lo que trae la lista y pide significado y ejemplos al Route Handler `app/datos/vocabulario/[id]/route.ts` (`routes.vocabularyData`). Vive en `modules/vocabulary/components/` para que otra sección pueda abrirlo.
+  - Cada ejemplo enlaza a su oración en Tatoeba y dice si la traducción es de Tatoeba o nuestra. El modal cita JMdict, las listas de Waller, yomitan-jlpt-vocab y Tatoeba (`vocabulary-credits.tsx`).
 - **Barra de scroll propia** en `app/globals.css`: delgada, slate y sin flechas. Chrome, Edge y Safari usan solo `::-webkit-scrollbar`, porque con `scrollbar-width`/`scrollbar-color` Chrome pinta la barra nativa con flechas que no se pueden quitar; esas propiedades van solo para Firefox, con `@supports not selector(::-webkit-scrollbar)`. En `Modal` el scroll va en un contenedor interno y no en el `<dialog>`, para que la barra no pise las esquinas redondeadas.
 - **Sin librería de íconos:** SVG en línea sobre `components/icon.tsx`.
 - **Animaciones con Anime.js** (`animejs` 4), en `modules/motion/`. Cada componente crea un `createScope({ root })` en un `useEffect` y lo revierte al desmontarse. Con `prefers-reduced-motion` (la `mediaQuery` del scope) todo salta sin animarse.
@@ -300,7 +324,7 @@ API_URL=                     # en local http://localhost:3001
 
 ## Features futuras
 
-Tarjetas de estudio, vocabulario, quizzes, práctica de dictado y práctica de kanji (esta lee `KanjiDetail` y no necesita tablas nuevas). Cada una será una sección nueva del sidebar.
+Tarjetas de estudio, quizzes, práctica de dictado y práctica de kanji (esta lee `KanjiDetail` y no necesita tablas nuevas). Cada una será una sección nueva del sidebar.
 
 - **Todas son por sesión:** se arma la sesión (por tema o por clase), se estudia y el estado vive en memoria, en un Context o store del layout raíz de Next, que no se desmonta al navegar.
 - **Repetición dentro de la sesión** estilo Leitner, sin repaso entre días.

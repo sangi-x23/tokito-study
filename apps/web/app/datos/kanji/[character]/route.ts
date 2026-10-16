@@ -1,4 +1,5 @@
 import type { NextRequest } from 'next/server';
+import { CATALOG_CACHE_CONTROL } from '@/lib/api-client';
 import { getKanji } from '@/modules/kanji/api/kanji';
 import { characterFromParam } from '@/modules/kanji/character-param';
 
@@ -13,6 +14,6 @@ export async function GET(_request: NextRequest, ctx: RouteContext<'/datos/kanji
     return Response.json({ message: 'Kanji no encontrado' }, { status: 404 });
   }
   return Response.json(kanji, {
-    headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
+    headers: { 'Cache-Control': CATALOG_CACHE_CONTROL },
   });
 }

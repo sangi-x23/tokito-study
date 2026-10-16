@@ -77,7 +77,12 @@ export function KanjiGrid({ kanji }: { kanji: readonly KanjiSummary[] }): ReactN
         </section>
       ) : (
         blocks.map((block) => (
-          <section key={block.start} className="flex flex-col gap-3">
+          // El navegador no pinta los bloques fuera de pantalla hasta que se
+          // acercan: secundaria tiene 23. `auto` recuerda la altura real.
+          <section
+            key={block.start}
+            className="flex flex-col gap-3 [contain-intrinsic-size:auto_40rem] [content-visibility:auto]"
+          >
             <h2 className="text-sm font-medium tracking-wide text-slate-500 uppercase tabular-nums dark:text-slate-400">
               {block.start}–{block.end}
             </h2>

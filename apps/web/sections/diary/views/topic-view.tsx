@@ -2,6 +2,7 @@ import type { TopicDetail } from '@tokito/shared';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Breadcrumb, type Crumb } from '@/components/breadcrumb';
+import { LinkPendingHint } from '@/components/layout/link-pending-hint';
 import { routes } from '@/lib/routes';
 import { ItemCard } from '@/modules/content/components/item-card';
 import { CATEGORY_LABEL, itemCountLabel } from '@/modules/content/labels';
@@ -40,7 +41,10 @@ export function TopicView({ topic }: { topic: TopicDetail }): ReactNode {
                   href={routes.topic(child.slug)}
                   className="flex h-full flex-col gap-1 rounded-xl border border-slate-200 p-4 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
                 >
-                  <span className="font-medium">{child.name}</span>
+                  <span className="flex items-center justify-between gap-2 font-medium">
+                    {child.name}
+                    <LinkPendingHint />
+                  </span>
                   {child.description && (
                     <span className="text-sm text-slate-600 dark:text-slate-400">{child.description}</span>
                   )}
