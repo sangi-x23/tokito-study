@@ -18,7 +18,9 @@
     "ingest:bootstrap": "node dist/scripts/bootstrap.js",
     "ingest:run": "node dist/scripts/ingest.js",
     "kana:seed": "node dist/scripts/seed-kana.js",
-    "kanji:seed": "node dist/scripts/seed-kanji.js"
+    "kanji:seed": "node dist/scripts/seed-kanji.js",
+    "vocab:translate": "node dist/scripts/translate-vocabulary.js",
+    "vocab:seed": "node dist/scripts/seed-vocabulary.js"
   },
   "dependencies": {
     "@google/genai": "2.24.0",

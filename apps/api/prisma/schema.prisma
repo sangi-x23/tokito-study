@@ -217,3 +217,30 @@ model Kanji {
 
   @@index([grade])
 }
+
+// El vocabulario por nivel del JLPT de la sección Vocabulario. Como Kanji, es
+// un conjunto cerrado que carga `vocab:seed` y que la ingesta no toca, y no se
+// relaciona con StudyItem.
+model Vocabulary {
+  id            String   @id @default(cuid())
+  // Como se escribe normalmente (会う, パン). Con la lectura, la clave natural.
+  japanese      String
+  reading       String // solo en kana: hiragana, o katakana si se escribe así
+  // 5–1, de N5 a N1. De las listas de Jonathan Waller (CC BY), que no son
+  // oficiales: el JLPT no publica listas desde 2010.
+  level         Int
+  // Entrada de JMdict (CC BY-SA 4.0, hay que citarlo en la web).
+  jmdictSeq     Int
+  partsOfSpeech String[] // en español: sustantivo, verbo godan…
+  // Tiene kanji, pero JMdict dice que suele escribirse solo en kana.
+  usuallyKana   Boolean
+  // Traducidos del inglés de JMdict (apps/api/data/vocabulary/).
+  equivalents   String[]
+  meaning       String
+  // [{ japanese, spanish, tatoebaId, spanishTatoebaId }]: oraciones de Tatoeba
+  // (CC BY 2.0 FR). Va en Json porque solo se lee con su palabra.
+  examples      Json
+
+  @@unique([japanese, reading])
+  @@index([level])
+}

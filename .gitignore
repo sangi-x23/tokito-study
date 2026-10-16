@@ -29,6 +29,9 @@ apps/web/CLAUDE.md
 # Salida del bootstrap local (contenido del documento, no va al repo)
 apps/api/.bootstrap/
 
+# Lotes de traducción del vocabulario y exportaciones de Tatoeba (se regeneran)
+apps/api/.vocabulary/
+
 # Sistema y editor
 .DS_Store
 Thumbs.db

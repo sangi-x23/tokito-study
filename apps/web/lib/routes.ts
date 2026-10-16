@@ -10,4 +10,8 @@ export const routes = {
   kanjiGrade: (slug: string): string => `/escritura/kanji/grado/${slug}`,
   // Route Handler que el modal de un kanji llama desde el navegador.
   kanjiData: (character: string): string => `/datos/kanji/${encodeURIComponent(character)}`,
+  vocabulary: '/vocabulario',
+  vocabularyLevel: (slug: string): string => `/vocabulario/nivel/${slug}`,
+  // Route Handler que el modal de una palabra llama desde el navegador.
+  vocabularyData: (id: string): string => `/datos/vocabulario/${id}`,
 } as const;
