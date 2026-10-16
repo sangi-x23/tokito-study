@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
+import { LinkPendingHint } from './link-pending-hint';
 
 /**
  * Un enlace de `SectionNav`. Es de cliente solo para saber la ruta actual:
@@ -32,13 +33,14 @@ export function SectionNavLink({
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={`block rounded-lg px-3 py-1.5 text-sm whitespace-nowrap transition-colors lg:whitespace-normal ${
+      className={`flex items-center justify-between gap-2 rounded-lg px-3 py-1.5 text-sm whitespace-nowrap transition-colors lg:whitespace-normal ${
         active
           ? 'bg-slate-100 font-medium text-slate-900 in-data-highlight:bg-transparent! dark:bg-slate-800 dark:text-slate-100'
           : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100'
       }`}
     >
-      {children}
+      <span>{children}</span>
+      <LinkPendingHint className="size-3.5" />
     </Link>
   );
 }

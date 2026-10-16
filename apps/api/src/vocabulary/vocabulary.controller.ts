@@ -1,11 +1,11 @@
 import { Controller, Get, NotFoundException, Param, UseInterceptors } from '@nestjs/common';
 import type { VocabularyLevelList, VocabularyWord } from '@tokito/shared';
-import { PublicCacheInterceptor } from '../content/cache.js';
+import { CatalogCacheInterceptor } from '../content/cache.js';
 import { idSchema, parseParam } from '../content/schemas/params.schema.js';
 import { levelSchema } from './schemas/params.schema.js';
 import { VocabularyService } from './vocabulary.service.js';
 
-@UseInterceptors(PublicCacheInterceptor)
+@UseInterceptors(CatalogCacheInterceptor)
 @Controller('vocabulary')
 export class VocabularyController {
   constructor(private readonly vocabulary: VocabularyService) {}

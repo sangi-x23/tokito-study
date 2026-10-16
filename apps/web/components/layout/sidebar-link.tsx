@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
+import { LinkPendingHint } from './link-pending-hint';
 
 /**
  * Enlace a una sección del sidebar. Es de cliente solo para saber la ruta
@@ -27,6 +28,7 @@ export function SidebarLink({ href, children }: { href: string; children: ReactN
       }`}
     >
       {children}
+      <LinkPendingHint className="ml-auto" />
     </Link>
   );
 }
