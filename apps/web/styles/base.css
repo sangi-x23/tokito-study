@@ -32,6 +32,13 @@
   --color-accent: oklch(68.5% 0.169 237.323); /* sky-500 */
   --color-accent-ink: oklch(50% 0.134 242.749); /* sky-700 */
 
+  /*
+   * Calendario: como en los calendarios japoneses, domingos y feriados en rojo
+   * y sábados en azul.
+   */
+  --color-holiday: oklch(57.7% 0.245 27.325); /* red-600 */
+  --color-saturday: oklch(54.6% 0.245 262.881); /* blue-600 */
+
   /* Fondo detrás de modales y del sidebar móvil (se usa con opacidad). */
   --color-overlay: oklch(12.9% 0.042 264.695); /* slate-950 */
 
@@ -56,6 +63,9 @@
     --color-line-strong: oklch(37.2% 0.044 257.287); /* slate-700 */
 
     --color-accent-ink: oklch(74.6% 0.16 232.661); /* sky-400 */
+
+    --color-holiday: oklch(70.4% 0.191 22.216); /* red-400 */
+    --color-saturday: oklch(70.7% 0.165 254.624); /* blue-400 */
 
     --color-scrollbar-thumb: oklch(37.2% 0.044 257.287); /* slate-700 */
     --color-scrollbar-thumb-hover: oklch(44.6% 0.043 257.281); /* slate-600 */

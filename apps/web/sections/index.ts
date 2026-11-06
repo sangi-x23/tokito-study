@@ -1,3 +1,4 @@
+import { calendarSection } from './calendar/section';
 import { diarySection } from './diary/section';
 import { vocabularySection } from './vocabulary/section';
 import { writingSection } from './writing/section';
@@ -9,4 +10,4 @@ export type { AppSection } from './types';
  * Las secciones del sidebar, en el orden en que aparecen. Una sección nueva
  * crea su carpeta (`section.ts`, `icon.tsx` y `views/`) y se agrega aquí.
  */
-export const APP_SECTIONS: readonly AppSection[] = [diarySection, writingSection, vocabularySection];
+export const APP_SECTIONS: readonly AppSection[] = [diarySection, writingSection, vocabularySection, calendarSection];
