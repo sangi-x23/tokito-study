@@ -81,10 +81,10 @@ export function KanaDialog({
       )}
 
       <p className="text-xs text-ink-subtle">
-        Trazos de{''}
+        Trazos de{' '}
         <a href="https://kanjivg.tagaini.net" target="_blank" rel="noreferrer" className="underline">
           KanjiVG
-        </a>{''}
+        </a>{' '}
         (CC BY-SA 3.0).
       </p>
     </Modal>

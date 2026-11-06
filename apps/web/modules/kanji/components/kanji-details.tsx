@@ -25,8 +25,8 @@ export function KanjiDetails({ kanji }: { kanji: KanjiDetail }): ReactNode {
   return (
     <>
       <div className="flex flex-col gap-1">
-        <p className="text-lg">{kanji.meanings.join(',')}</p>
-        <p className="text-sm text-ink-subtle">{facts.join(' ·')}</p>
+        <p className="text-lg">{kanji.meanings.join(', ')}</p>
+        <p className="text-sm text-ink-subtle">{facts.join(' · ')}</p>
       </div>
 
       <Panel title="Lecturas">
