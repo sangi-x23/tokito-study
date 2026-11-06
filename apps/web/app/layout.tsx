@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import { Noto_Sans_JP } from 'next/font/google';
+import { connection } from 'next/server';
 import type { ReactNode } from 'react';
 import { AppSidebar } from '@/components/layout/app-sidebar';
+import { today } from '@/modules/calendar/calendar-dates';
+import { themedDayOn } from '@/modules/calendar/cultural-days';
+import { ThemePreviewProvider } from '@/modules/theme/components/theme-preview';
 import './globals.css';
 
 // Con la fuente servida por Next, el japonés se ve igual en cualquier equipo,
@@ -13,16 +17,22 @@ export const metadata: Metadata = {
   description: 'Material de estudio de japonés organizado por temas',
 };
 
-export default function RootLayout({ children }: { children: ReactNode }): ReactNode {
+export default async function RootLayout({ children }: { children: ReactNode }): Promise<ReactNode> {
+  // El tema depende del día: sin esto, las páginas estáticas quedarían con el
+  // tema del día del build.
+  await connection();
+  const now = today();
+  const theme = themedDayOn(now)?.slug ?? null;
+
   return (
-    <html lang="es">
-      <body
-        className={`${notoSansJp.className} min-h-screen bg-surface text-ink antialiased`}
-      >
-        <div className="lg:flex">
-          <AppSidebar />
-          <main className="min-w-0 flex-1">{children}</main>
-        </div>
+    <html lang="es" data-theme={theme ?? undefined}>
+      <body className={`${notoSansJp.className} min-h-screen bg-surface text-ink antialiased`}>
+        <ThemePreviewProvider serverTheme={theme}>
+          <div className="lg:flex">
+            <AppSidebar today={now} />
+            <main className="min-w-0 flex-1">{children}</main>
+          </div>
+        </ThemePreviewProvider>
       </body>
     </html>
   );

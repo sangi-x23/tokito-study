@@ -1,0 +1,51 @@
+/*
+ * Los adornos de un día temático, comunes a todos los temas. Cada tema solo
+ * define las variables:
+ *
+ * - `--theme-pattern`: un SVG en mosaico (data URI) que se usa como máscara,
+ *   así su color sale de `--theme-pattern-color` y sigue al modo oscuro.
+ * - `--theme-mark`: el nombre del día en kanji, en vertical y casi
+ *   transparente en la esquina inferior derecha.
+ *
+ * Van en pseudo-elementos fijos del `<body>` con `z-index: -1`: quedan detrás
+ * del contenido y debajo de todo lo que tiene fondo propio (sidebar, modales,
+ * tarjetas). No reciben clics ni los lee un lector de pantalla.
+ */
+:root[data-theme] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--theme-pattern-color);
+  -webkit-mask-image: var(--theme-pattern);
+  mask-image: var(--theme-pattern);
+  -webkit-mask-size: 160px;
+  mask-size: 160px;
+  opacity: 0.12;
+}
+
+:root[data-theme] body::after {
+  content: var(--theme-mark) / '';
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: -1;
+  pointer-events: none;
+  writing-mode: vertical-rl;
+  font-size: clamp(4rem, 9vw, 7.5rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-accent);
+  opacity: 0.1;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme] body::before {
+    opacity: 0.16;
+  }
+
+  :root[data-theme] body::after {
+    opacity: 0.14;
+  }
+}

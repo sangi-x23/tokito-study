@@ -11,6 +11,11 @@ export interface CulturalDay extends JapaneseLabel {
   readonly spanish: string;
   /** Feriado nacional (国民の祝日). Los demás son celebraciones sin día libre. */
   readonly holiday: boolean;
+  /**
+   * Día temático: mientras dura, la interfaz de todo el sitio usa su tema
+   * (`styles/themes/<slug>.css`).
+   */
+  readonly themed?: boolean;
   /** Cuándo cae en un año dado. `end` solo en las que duran varios días. */
   readonly dates: (year: number) => {
     readonly start: MonthDay;
@@ -48,6 +53,7 @@ export const CULTURAL_DAYS: readonly CulturalDay[] = [
     reading: 'おしょうがつ',
     spanish: 'Los primeros días del año',
     holiday: false,
+    themed: true,
     dates: between({ month: 1, day: 1 }, { month: 1, day: 3 }),
   },
   {
@@ -64,6 +70,7 @@ export const CULTURAL_DAYS: readonly CulturalDay[] = [
     reading: 'せつぶん',
     spanish: 'Víspera de la primavera',
     holiday: false,
+    themed: true,
     dates: on(2, 3),
   },
   {
@@ -88,6 +95,7 @@ export const CULTURAL_DAYS: readonly CulturalDay[] = [
     reading: 'ひなまつり',
     spanish: 'Día de las Niñas',
     holiday: false,
+    themed: true,
     dates: on(3, 3),
   },
   {
@@ -104,6 +112,7 @@ export const CULTURAL_DAYS: readonly CulturalDay[] = [
     reading: 'おはなみ',
     spanish: 'Temporada de los cerezos en flor',
     holiday: false,
+    themed: true,
     // La floración cambia cada año y según la región: es la de Tokio en un año típico.
     dates: between({ month: 3, day: 25 }, { month: 4, day: 7 }),
   },
@@ -137,6 +146,7 @@ export const CULTURAL_DAYS: readonly CulturalDay[] = [
     reading: 'こどものひ',
     spanish: 'Día de los Niños',
     holiday: true,
+    themed: true,
     dates: on(5, 5),
   },
   {
@@ -145,6 +155,7 @@ export const CULTURAL_DAYS: readonly CulturalDay[] = [
     reading: 'たなばた',
     spanish: 'Festival de las Estrellas',
     holiday: false,
+    themed: true,
     dates: on(7, 7),
   },
   {
@@ -169,6 +180,7 @@ export const CULTURAL_DAYS: readonly CulturalDay[] = [
     reading: 'おぼん',
     spanish: 'Fiesta de los antepasados',
     holiday: false,
+    themed: true,
     dates: between({ month: 8, day: 13 }, { month: 8, day: 16 }),
   },
   {
@@ -209,6 +221,7 @@ export const CULTURAL_DAYS: readonly CulturalDay[] = [
     reading: 'しちごさん',
     spanish: 'Fiesta de los niños de siete, cinco y tres años',
     holiday: false,
+    themed: true,
     dates: on(11, 15),
   },
   {
@@ -225,6 +238,7 @@ export const CULTURAL_DAYS: readonly CulturalDay[] = [
     reading: 'クリスマス',
     spanish: 'Navidad',
     holiday: false,
+    themed: true,
     dates: between({ month: 12, day: 24 }, { month: 12, day: 25 }),
   },
   {
@@ -233,6 +247,7 @@ export const CULTURAL_DAYS: readonly CulturalDay[] = [
     reading: 'おおみそか',
     spanish: 'Último día del año',
     holiday: false,
+    themed: true,
     dates: on(12, 31),
   },
 ];
@@ -263,4 +278,9 @@ export function culturalDaysInMonth(year: number, month: number, lastDay: number
     const to = Math.min(monthDay(end.month, end.day), monthEnd);
     return from <= to ? [{ entry, startDay: from % 100, endDay: to % 100 }] : [];
   });
+}
+
+/** La fecha temática de `date`, si hay una. Si se cruzan dos, gana la primera de `CULTURAL_DAYS`. */
+export function themedDayOn(date: CalendarDate): CulturalDay | null {
+  return culturalDaysOn(date).find((entry) => entry.themed) ?? null;
 }

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { weekdayOf } from '@/modules/calendar/calendar-dates';
 import type { CulturalDayInMonth } from '@/modules/calendar/cultural-days';
 import { WEEKDAYS } from '@/modules/calendar/japanese-dates';
+import { ThemePreviewButton } from '@/modules/theme/components/theme-preview';
 import { READING_CLASS } from '../readings';
 
 /** `13日（木）`: la fecha como se escribe en japonés, para seguir practicando. */
@@ -41,11 +42,15 @@ export function MonthEvents({
             </ruby>
             <span className="text-sm text-ink-muted">{entry.spanish}</span>
           </span>
-          {entry.holiday && (
-            <span className="ml-auto rounded-md bg-surface-strong px-2 py-0.5 text-xs text-holiday">
-              Feriado nacional
-            </span>
-          )}
+          <span className="ml-auto flex items-center gap-2">
+            {entry.holiday && (
+              <span className="rounded-md bg-surface-strong px-2 py-0.5 text-xs text-holiday">Feriado nacional</span>
+            )}
+            {entry.themed && (
+              // Solo los datos planos: `entry.dates` es una función y no cruza al cliente.
+              <ThemePreviewButton theme={{ slug: entry.slug, japanese: entry.japanese, spanish: entry.spanish }} />
+            )}
+          </span>
         </li>
       ))}
     </ul>

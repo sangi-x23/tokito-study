@@ -1,0 +1,34 @@
+/*
+ * Tema de 節分: Rojo del oni sobre beige de soya, con frijoles esparcidos.
+ * Solo redefine tokens de `styles/base.css` y las variables de adorno de
+ * `decoration.css`; los componentes no se tocan.
+ */
+:root[data-theme='setsubun'] {
+  --color-surface: oklch(99.3% 0.006 70);
+  --color-surface-muted: oklch(97.6% 0.014 70);
+  --color-surface-strong: oklch(95% 0.025 70);
+  --color-line: oklch(91.5% 0.03 70);
+  --color-line-strong: oklch(86% 0.045 70);
+  --color-accent: oklch(62% 0.18 35);
+  --color-accent-ink: oklch(48% 0.153 35);
+  --color-scrollbar-thumb: oklch(86% 0.045 70);
+  --color-scrollbar-thumb-hover: oklch(72% 0.06 70);
+
+  --theme-mark: '節分';
+  --theme-pattern-color: oklch(62% 0.09 60);
+  --theme-pattern: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><ellipse cx='18' cy='20' rx='6' ry='4.5' transform='rotate(20 18 20)'/><ellipse cx='58' cy='14' rx='6' ry='4.5' transform='rotate(-30 58 14)'/><ellipse cx='40' cy='46' rx='6' ry='4.5' transform='rotate(10 40 46)'/><ellipse cx='12' cy='62' rx='6' ry='4.5' transform='rotate(45 12 62)'/><ellipse cx='66' cy='60' rx='6' ry='4.5' transform='rotate(-15 66 60)'/></svg>");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='setsubun'] {
+    --color-surface: oklch(15% 0.03 70);
+    --color-surface-muted: oklch(20% 0.035 70);
+    --color-surface-strong: oklch(26.5% 0.04 70);
+    --color-line: oklch(27% 0.04 70);
+    --color-line-strong: oklch(36% 0.045 70);
+    --color-accent: oklch(70% 0.18 35);
+    --color-accent-ink: oklch(78% 0.144 35);
+    --color-scrollbar-thumb: oklch(36% 0.045 70);
+    --color-scrollbar-thumb-hover: oklch(45% 0.05 70);
+  }
+}

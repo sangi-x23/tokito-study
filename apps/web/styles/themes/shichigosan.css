@@ -1,0 +1,34 @@
+/*
+ * Tema de 七五三: Carmesí, con las rayas del chitose-ame.
+ * Solo redefine tokens de `styles/base.css` y las variables de adorno de
+ * `decoration.css`; los componentes no se tocan.
+ */
+:root[data-theme='shichigosan'] {
+  --color-surface: oklch(99.3% 0.006 10);
+  --color-surface-muted: oklch(97.6% 0.014 10);
+  --color-surface-strong: oklch(95% 0.025 10);
+  --color-line: oklch(91.5% 0.03 10);
+  --color-line-strong: oklch(86% 0.045 10);
+  --color-accent: oklch(62% 0.19 15);
+  --color-accent-ink: oklch(48% 0.162 15);
+  --color-scrollbar-thumb: oklch(86% 0.045 10);
+  --color-scrollbar-thumb-hover: oklch(72% 0.06 10);
+
+  --theme-mark: '七五三';
+  --theme-pattern-color: oklch(65% 0.15 15);
+  --theme-pattern: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g stroke='black' stroke-width='5'><path d='M-10 30L30-10M-10 70L70-10M10 90L90 10M50 90L90 50'/></g></svg>");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='shichigosan'] {
+    --color-surface: oklch(15% 0.03 10);
+    --color-surface-muted: oklch(20% 0.035 10);
+    --color-surface-strong: oklch(26.5% 0.04 10);
+    --color-line: oklch(27% 0.04 10);
+    --color-line-strong: oklch(36% 0.045 10);
+    --color-accent: oklch(70% 0.19 15);
+    --color-accent-ink: oklch(78% 0.152 15);
+    --color-scrollbar-thumb: oklch(36% 0.045 10);
+    --color-scrollbar-thumb-hover: oklch(45% 0.05 10);
+  }
+}

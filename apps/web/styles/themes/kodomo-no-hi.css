@@ -1,0 +1,34 @@
+/*
+ * Tema de こどもの日: Azul de las koinobori, con escamas de carpa.
+ * Solo redefine tokens de `styles/base.css` y las variables de adorno de
+ * `decoration.css`; los componentes no se tocan.
+ */
+:root[data-theme='kodomo-no-hi'] {
+  --color-surface: oklch(99.3% 0.006 230);
+  --color-surface-muted: oklch(97.6% 0.014 230);
+  --color-surface-strong: oklch(95% 0.025 230);
+  --color-line: oklch(91.5% 0.03 230);
+  --color-line-strong: oklch(86% 0.045 230);
+  --color-accent: oklch(62% 0.18 250);
+  --color-accent-ink: oklch(48% 0.153 250);
+  --color-scrollbar-thumb: oklch(86% 0.045 230);
+  --color-scrollbar-thumb-hover: oklch(72% 0.06 230);
+
+  --theme-mark: '端午';
+  --theme-pattern-color: oklch(65% 0.12 240);
+  --theme-pattern: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g fill='none' stroke='black' stroke-width='2'><path d='M-10 0a10 10 0 0 1 20 0'/><path d='M10 0a10 10 0 0 1 20 0'/><path d='M30 0a10 10 0 0 1 20 0'/><path d='M50 0a10 10 0 0 1 20 0'/><path d='M70 0a10 10 0 0 1 20 0'/><path d='M-10 20a10 10 0 0 1 20 0'/><path d='M10 20a10 10 0 0 1 20 0'/><path d='M30 20a10 10 0 0 1 20 0'/><path d='M50 20a10 10 0 0 1 20 0'/><path d='M70 20a10 10 0 0 1 20 0'/><path d='M-10 40a10 10 0 0 1 20 0'/><path d='M10 40a10 10 0 0 1 20 0'/><path d='M30 40a10 10 0 0 1 20 0'/><path d='M50 40a10 10 0 0 1 20 0'/><path d='M70 40a10 10 0 0 1 20 0'/><path d='M-10 60a10 10 0 0 1 20 0'/><path d='M10 60a10 10 0 0 1 20 0'/><path d='M30 60a10 10 0 0 1 20 0'/><path d='M50 60a10 10 0 0 1 20 0'/><path d='M70 60a10 10 0 0 1 20 0'/><path d='M-10 80a10 10 0 0 1 20 0'/><path d='M10 80a10 10 0 0 1 20 0'/><path d='M30 80a10 10 0 0 1 20 0'/><path d='M50 80a10 10 0 0 1 20 0'/><path d='M70 80a10 10 0 0 1 20 0'/></g></svg>");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='kodomo-no-hi'] {
+    --color-surface: oklch(15% 0.03 230);
+    --color-surface-muted: oklch(20% 0.035 230);
+    --color-surface-strong: oklch(26.5% 0.04 230);
+    --color-line: oklch(27% 0.04 230);
+    --color-line-strong: oklch(36% 0.045 230);
+    --color-accent: oklch(70% 0.18 250);
+    --color-accent-ink: oklch(78% 0.144 250);
+    --color-scrollbar-thumb: oklch(36% 0.045 230);
+    --color-scrollbar-thumb-hover: oklch(45% 0.05 230);
+  }
+}

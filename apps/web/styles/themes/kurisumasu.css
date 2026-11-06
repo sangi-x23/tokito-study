@@ -1,0 +1,34 @@
+/*
+ * Tema de クリスマス: Rojo y verde, con copos de nieve.
+ * Solo redefine tokens de `styles/base.css` y las variables de adorno de
+ * `decoration.css`; los componentes no se tocan.
+ */
+:root[data-theme='kurisumasu'] {
+  --color-surface: oklch(99.3% 0.006 150);
+  --color-surface-muted: oklch(97.6% 0.014 150);
+  --color-surface-strong: oklch(95% 0.025 150);
+  --color-line: oklch(91.5% 0.03 150);
+  --color-line-strong: oklch(86% 0.045 150);
+  --color-accent: oklch(62% 0.2 25);
+  --color-accent-ink: oklch(48% 0.17 25);
+  --color-scrollbar-thumb: oklch(86% 0.045 150);
+  --color-scrollbar-thumb-hover: oklch(72% 0.06 150);
+
+  --theme-mark: '聖夜';
+  --theme-pattern-color: oklch(62% 0.11 155);
+  --theme-pattern: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><g stroke='black' stroke-width='1.8' stroke-linecap='round'><path transform='translate(20 20) scale(1)' d='M0-9V9M-7.8-4.5L7.8 4.5M-7.8 4.5L7.8-4.5M-2.5-7L0-4.5L2.5-7M-2.5 7L0 4.5L2.5 7'/><path transform='translate(60 54) scale(0.8)' d='M0-9V9M-7.8-4.5L7.8 4.5M-7.8 4.5L7.8-4.5M-2.5-7L0-4.5L2.5-7M-2.5 7L0 4.5L2.5 7'/><path transform='translate(28 64) scale(0.55)' d='M0-9V9M-7.8-4.5L7.8 4.5M-7.8 4.5L7.8-4.5M-2.5-7L0-4.5L2.5-7M-2.5 7L0 4.5L2.5 7'/></g></svg>");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='kurisumasu'] {
+    --color-surface: oklch(15% 0.03 150);
+    --color-surface-muted: oklch(20% 0.035 150);
+    --color-surface-strong: oklch(26.5% 0.04 150);
+    --color-line: oklch(27% 0.04 150);
+    --color-line-strong: oklch(36% 0.045 150);
+    --color-accent: oklch(70% 0.2 25);
+    --color-accent-ink: oklch(78% 0.16 25);
+    --color-scrollbar-thumb: oklch(36% 0.045 150);
+    --color-scrollbar-thumb-hover: oklch(45% 0.05 150);
+  }
+}

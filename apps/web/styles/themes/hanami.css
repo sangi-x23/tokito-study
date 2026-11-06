@@ -1,0 +1,34 @@
+/*
+ * Tema de お花見: Rosa sakura, con pétalos de cerezo.
+ * Solo redefine tokens de `styles/base.css` y las variables de adorno de
+ * `decoration.css`; los componentes no se tocan.
+ */
+:root[data-theme='hanami'] {
+  --color-surface: oklch(99.3% 0.006 350);
+  --color-surface-muted: oklch(97.6% 0.014 350);
+  --color-surface-strong: oklch(95% 0.025 350);
+  --color-line: oklch(91.5% 0.03 350);
+  --color-line-strong: oklch(86% 0.045 350);
+  --color-accent: oklch(62% 0.15 350);
+  --color-accent-ink: oklch(48% 0.128 350);
+  --color-scrollbar-thumb: oklch(86% 0.045 350);
+  --color-scrollbar-thumb-hover: oklch(72% 0.06 350);
+
+  --theme-mark: '花見';
+  --theme-pattern-color: oklch(78% 0.11 350);
+  --theme-pattern: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><path transform='translate(16 18) rotate(20)' d='M0 8C-6 3-6-4-3-8L0-5L3-8C6-4 6 3 0 8Z'/><path transform='translate(56 12) rotate(-40)' d='M0 8C-6 3-6-4-3-8L0-5L3-8C6-4 6 3 0 8Z'/><path transform='translate(38 46) rotate(70)' d='M0 8C-6 3-6-4-3-8L0-5L3-8C6-4 6 3 0 8Z'/><path transform='translate(10 64) rotate(-10)' d='M0 8C-6 3-6-4-3-8L0-5L3-8C6-4 6 3 0 8Z'/><path transform='translate(66 60) rotate(30)' d='M0 8C-6 3-6-4-3-8L0-5L3-8C6-4 6 3 0 8Z'/></svg>");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='hanami'] {
+    --color-surface: oklch(15% 0.03 350);
+    --color-surface-muted: oklch(20% 0.035 350);
+    --color-surface-strong: oklch(26.5% 0.04 350);
+    --color-line: oklch(27% 0.04 350);
+    --color-line-strong: oklch(36% 0.045 350);
+    --color-accent: oklch(70% 0.15 350);
+    --color-accent-ink: oklch(78% 0.12 350);
+    --color-scrollbar-thumb: oklch(36% 0.045 350);
+    --color-scrollbar-thumb-hover: oklch(45% 0.05 350);
+  }
+}

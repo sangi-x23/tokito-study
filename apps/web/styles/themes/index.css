@@ -1,0 +1,17 @@
+/*
+ * Temas de los días culturales (`themed` en `modules/calendar/cultural-days.ts`).
+ * El layout raíz pone `data-theme="<slug>"` en el `<html>` y cada archivo
+ * redefine los tokens bajo ese selector. Un tema nuevo: su archivo aquí, con el
+ * slug del día, y `themed: true` en su fecha.
+ */
+@import './decoration.css';
+@import './shogatsu.css';
+@import './setsubun.css';
+@import './hinamatsuri.css';
+@import './hanami.css';
+@import './kodomo-no-hi.css';
+@import './tanabata.css';
+@import './obon.css';
+@import './shichigosan.css';
+@import './kurisumasu.css';
+@import './omisoka.css';
