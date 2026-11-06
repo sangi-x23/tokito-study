@@ -14,4 +14,6 @@ export const routes = {
   vocabularyLevel: (slug: string): string => `/vocabulario/nivel/${slug}`,
   // Route Handler que el modal de una palabra llama desde el navegador.
   vocabularyData: (id: string): string => `/datos/vocabulario/${id}`,
+  calendar: '/calendario',
+  calendarMonth: (slug: string): string => `/calendario/${slug}`,
 } as const;
