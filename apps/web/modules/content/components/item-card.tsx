@@ -14,14 +14,14 @@ export function ItemCard({ item, currentSlug }: { item: ItemSummary; currentSlug
   const elsewhere = item.primaryTopic && item.primaryTopic.slug !== currentSlug ? item.primaryTopic : null;
 
   return (
-    <li className="flex flex-col gap-2 rounded-xl border border-slate-200 p-4 dark:border-slate-800">
+    <li className="flex flex-col gap-2 rounded-xl border border-line p-4">
       <div className="flex items-start justify-between gap-3">
         <Link href={routes.item(item.id)} className="group">
           <span lang="ja" className="text-2xl font-medium group-hover:underline">
             {item.japanese}
           </span>
           {item.reading && (
-            <span lang="ja" className="ml-2 text-sm text-slate-500 dark:text-slate-400">
+            <span lang="ja" className="ml-2 text-sm text-ink-subtle">
               {item.reading}
             </span>
           )}
@@ -33,13 +33,13 @@ export function ItemCard({ item, currentSlug }: { item: ItemSummary; currentSlug
       <p>{item.meaning}</p>
 
       {item.kanji && (
-        <p lang="ja" className="text-sm text-slate-600 dark:text-slate-300">
+        <p lang="ja" className="text-sm text-ink-soft">
           {[...item.kanji.onyomi, ...item.kanji.kunyomi].join('・')}
         </p>
       )}
 
       {item.example && (
-        <p lang="ja" className="text-sm text-slate-500 dark:text-slate-400">
+        <p lang="ja" className="text-sm text-ink-subtle">
           {item.example}
         </p>
       )}
@@ -47,9 +47,9 @@ export function ItemCard({ item, currentSlug }: { item: ItemSummary; currentSlug
       <ClassList classes={item.classes} />
 
       {elsewhere && (
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          Tema principal:{' '}
-          <Link href={routes.topic(elsewhere.slug)} className="underline hover:text-slate-900 dark:hover:text-slate-100">
+        <p className="text-xs text-ink-subtle">
+          Tema principal:{''}
+          <Link href={routes.topic(elsewhere.slug)} className="underline hover:text-ink">
             {elsewhere.name}
           </Link>
         </p>

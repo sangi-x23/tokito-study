@@ -9,7 +9,7 @@ export function KanaGroupSection({ kind, children }: { kind: KanaKind; children:
     <section className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
         <h2 className="text-lg font-medium">{KANA_KIND_LABEL[kind]}</h2>
-        <p className="text-sm text-slate-600 dark:text-slate-400">{KANA_KIND_DESCRIPTION[kind]}</p>
+        <p className="text-sm text-ink-muted">{KANA_KIND_DESCRIPTION[kind]}</p>
       </div>
       {children}
     </section>
@@ -25,7 +25,7 @@ export function KanaGrid({ kana }: { kana: readonly Kana[] }): ReactNode {
           <span lang="ja" className="text-2xl font-medium sm:text-3xl">
             {entry.character}
           </span>
-          <span className="text-xs text-slate-500 dark:text-slate-400">{entry.romaji}</span>
+          <span className="text-xs text-ink-subtle">{entry.romaji}</span>
         </li>
       ))}
     </ul>

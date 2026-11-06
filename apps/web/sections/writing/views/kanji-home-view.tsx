@@ -13,12 +13,12 @@ export function KanjiHomeView(): ReactNode {
       <div className="flex flex-col gap-2">
         <Breadcrumb crumbs={[{ label: writingSection.label, href: writingSection.href }, { label: 'Kanji' }]} />
         <h1 className="text-3xl font-semibold tracking-tight">
-          Kanji{' '}
-          <span lang="ja" className="text-slate-400">
+          Kanji{''}
+          <span lang="ja" className="text-ink-faint">
             漢字
           </span>
         </h1>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-ink-muted">
           Los 2136 kanji de uso común (<span lang="ja">常用漢字</span>, jōyō), ordenados por el grado escolar en que se
           aprenden en Japón: 1026 en primaria y el resto en secundaria. Dentro de cada grado van del más al menos usado.
         </p>
@@ -28,7 +28,7 @@ export function KanjiHomeView(): ReactNode {
           <li key={entry.slug}>
             <Link
               href={routes.kanjiGrade(entry.slug)}
-              className="flex items-center justify-between gap-2 rounded-xl border border-slate-200 px-4 py-3 font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+              className="flex items-center justify-between gap-2 rounded-xl border border-line px-4 py-3 font-medium transition-colors hover:bg-surface-muted"
             >
               {entry.label}
               <LinkPendingHint />

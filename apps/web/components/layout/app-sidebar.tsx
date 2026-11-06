@@ -8,7 +8,7 @@ import { SidebarLink } from './sidebar-link';
 function Brand(): ReactNode {
   return (
     <Link href="/" className="text-lg font-semibold tracking-tight">
-      Tokito <span lang="ja" className="text-slate-400">ときと</span>
+      Tokito <span lang="ja" className="text-ink-faint">ときと</span>
     </Link>
   );
 }
@@ -21,7 +21,7 @@ export function AppSidebar(): ReactNode {
         <Brand />
       </div>
       <nav aria-label="Secciones" className="flex-1 overflow-y-auto px-3 py-2">
-        <SlidingHighlight highlightClassName="rounded-lg bg-slate-100 dark:bg-slate-800">
+        <SlidingHighlight highlightClassName="rounded-lg bg-surface-strong">
           <ul className="relative flex flex-col gap-1">
             {APP_SECTIONS.map((section) => (
               <li key={section.href}>
@@ -34,7 +34,7 @@ export function AppSidebar(): ReactNode {
           </ul>
         </SlidingHighlight>
       </nav>
-      <p className="px-5 py-4 text-xs text-slate-400">Material de estudio de japonés</p>
+      <p className="px-5 py-4 text-xs text-ink-faint">Material de estudio de japonés</p>
     </SidebarFrame>
   );
 }

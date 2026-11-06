@@ -11,7 +11,7 @@ import { diarySection } from '../section';
 function Panel({ title, children }: { title: string; children: ReactNode }): ReactNode {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="text-sm font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">{title}</h2>
+      <h2 className="text-sm font-medium uppercase tracking-wide text-ink-subtle">{title}</h2>
       {children}
     </section>
   );
@@ -19,8 +19,8 @@ function Panel({ title, children }: { title: string; children: ReactNode }): Rea
 
 function Readings({ label, readings }: { label: string; readings: readonly string[] }): ReactNode {
   return (
-    <div className="flex flex-col gap-1 rounded-lg bg-slate-50 p-3 dark:bg-slate-900">
-      <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
+    <div className="flex flex-col gap-1 rounded-lg bg-surface-muted p-3">
+      <dt className="text-xs text-ink-subtle">{label}</dt>
       <dd lang="ja" className="text-lg">
         {readings.length > 0 ? readings.join('・') : '—'}
       </dd>
@@ -45,7 +45,7 @@ export function ItemView({ item }: { item: ItemDetail }): ReactNode {
             {item.japanese}
           </h1>
           {item.reading && (
-            <span lang="ja" className="text-xl text-slate-500 dark:text-slate-400">
+            <span lang="ja" className="text-xl text-ink-subtle">
               {item.reading}
             </span>
           )}
@@ -59,19 +59,19 @@ export function ItemView({ item }: { item: ItemDetail }): ReactNode {
           <dl className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <Readings label="On'yomi" readings={item.kanji.onyomi} />
             <Readings label="Kun'yomi" readings={item.kanji.kunyomi} />
-            <div className="flex flex-col gap-1 rounded-lg bg-slate-50 p-3 dark:bg-slate-900">
-              <dt className="text-xs text-slate-500 dark:text-slate-400">Trazos</dt>
+            <div className="flex flex-col gap-1 rounded-lg bg-surface-muted p-3">
+              <dt className="text-xs text-ink-subtle">Trazos</dt>
               <dd className="text-lg">{item.kanji.strokeCount ?? '—'}</dd>
             </div>
-            <div className="flex flex-col gap-1 rounded-lg bg-slate-50 p-3 dark:bg-slate-900">
-              <dt className="text-xs text-slate-500 dark:text-slate-400">JLPT</dt>
+            <div className="flex flex-col gap-1 rounded-lg bg-surface-muted p-3">
+              <dt className="text-xs text-ink-subtle">JLPT</dt>
               <dd className="text-lg">{item.kanji.jlptLevel ? `N${item.kanji.jlptLevel}` : '—'}</dd>
             </div>
           </dl>
           {item.inKanjiCatalog && (
             <KanjiDialogButton
               character={item.japanese}
-              className="cursor-pointer self-start text-sm text-sky-700 hover:underline dark:text-sky-400"
+              className="cursor-pointer self-start text-sm text-accent-ink hover:underline"
             >
               Ver orden de trazos →
             </KanjiDialogButton>
@@ -94,17 +94,17 @@ export function ItemView({ item }: { item: ItemDetail }): ReactNode {
               <li key={word.id}>
                 <Link
                   href={routes.item(word.id)}
-                  className="flex items-baseline gap-2 rounded-lg border border-slate-200 px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+                  className="flex items-baseline gap-2 rounded-lg border border-line px-3 py-2 hover:bg-surface-muted"
                 >
                   <span lang="ja" className="text-lg">
                     {word.japanese}
                   </span>
                   {word.reading && (
-                    <span lang="ja" className="text-sm text-slate-500 dark:text-slate-400">
+                    <span lang="ja" className="text-sm text-ink-subtle">
                       {word.reading}
                     </span>
                   )}
-                  <span className="ml-auto text-sm text-slate-600 dark:text-slate-300">{word.meaning}</span>
+                  <span className="ml-auto text-sm text-ink-soft">{word.meaning}</span>
                 </Link>
               </li>
             ))}
@@ -118,10 +118,10 @@ export function ItemView({ item }: { item: ItemDetail }): ReactNode {
             <li key={topic.slug}>
               <Link
                 href={routes.topic(topic.slug)}
-                className="inline-flex rounded-full border border-slate-200 px-3 py-1 text-sm hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+                className="inline-flex rounded-full border border-line px-3 py-1 text-sm hover:bg-surface-muted"
               >
                 {topic.name}
-                {topic.isPrimary && <span className="ml-1 text-slate-400">· principal</span>}
+                {topic.isPrimary && <span className="ml-1 text-ink-faint">· principal</span>}
               </Link>
             </li>
           ))}

@@ -30,14 +30,14 @@ export function SidebarFrame({ brand, children }: { brand: ReactNode; children: 
 
   return (
     <>
-      <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur lg:hidden dark:border-slate-800 dark:bg-slate-950/90">
+      <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-line bg-surface/90 px-4 py-3 backdrop-blur lg:hidden">
         <button
           type="button"
           onClick={() => setOpenAt(pathname)}
           aria-label="Abrir menú"
           aria-expanded={open}
           aria-controls="app-sidebar"
-          className="-ml-1 rounded-md p-1 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+          className="-ml-1 rounded-md p-1 text-ink-soft hover:bg-surface-strong"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" aria-hidden className="size-6">
             <path d="M4 6h16M4 12h16M4 18h16" />
@@ -47,12 +47,12 @@ export function SidebarFrame({ brand, children }: { brand: ReactNode; children: 
       </div>
 
       {open && (
-        <div aria-hidden className="fixed inset-0 z-40 bg-slate-950/40 lg:hidden" onClick={() => setOpenAt(null)} />
+        <div aria-hidden className="fixed inset-0 z-40 bg-overlay/40 lg:hidden" onClick={() => setOpenAt(null)} />
       )}
 
       <aside
         id="app-sidebar"
-        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-slate-200 bg-white transition-transform lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:shrink-0 lg:translate-x-0 dark:border-slate-800 dark:bg-slate-950 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-line bg-surface transition-transform lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:shrink-0 lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

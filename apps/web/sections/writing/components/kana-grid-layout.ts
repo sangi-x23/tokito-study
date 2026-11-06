@@ -18,4 +18,4 @@ export const cellStyle = (kana: Kana): CSSProperties => ({
 });
 
 export const CELL_CLASS =
-  'flex w-full flex-col items-center gap-0.5 rounded-xl border border-slate-200 py-3 dark:border-slate-800';
+  'flex w-full flex-col items-center gap-0.5 rounded-xl border border-line py-3';

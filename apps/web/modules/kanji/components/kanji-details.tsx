@@ -8,7 +8,7 @@ import { KanjiReadings } from './kanji-readings';
 function Panel({ title, children }: { title: string; children: ReactNode }): ReactNode {
   return (
     <section className="flex flex-col gap-3">
-      <h3 className="text-sm font-medium tracking-wide text-slate-500 uppercase dark:text-slate-400">{title}</h3>
+      <h3 className="text-sm font-medium tracking-wide text-ink-subtle uppercase">{title}</h3>
       {children}
     </section>
   );
@@ -25,8 +25,8 @@ export function KanjiDetails({ kanji }: { kanji: KanjiDetail }): ReactNode {
   return (
     <>
       <div className="flex flex-col gap-1">
-        <p className="text-lg">{kanji.meanings.join(', ')}</p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">{facts.join(' · ')}</p>
+        <p className="text-lg">{kanji.meanings.join(',')}</p>
+        <p className="text-sm text-ink-subtle">{facts.join(' ·')}</p>
       </div>
 
       <Panel title="Lecturas">

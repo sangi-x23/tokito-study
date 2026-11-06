@@ -20,12 +20,12 @@ function KanjiCells({
             type="button"
             onClick={() => onSelect(entry.character)}
             aria-label={`${entry.character} (${entry.meaning}): ver lecturas y orden de trazos`}
-            className="flex w-full cursor-pointer flex-col items-center gap-0.5 rounded-xl border border-slate-200 px-1 py-3 transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-sky-500 dark:border-slate-800 dark:hover:bg-slate-900"
+            className="flex w-full cursor-pointer flex-col items-center gap-0.5 rounded-xl border border-line px-1 py-3 transition-colors hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-accent"
           >
             <span lang="ja" className="text-3xl font-medium">
               {entry.character}
             </span>
-            <span className="w-full truncate text-center text-xs text-slate-500 dark:text-slate-400">
+            <span className="w-full truncate text-center text-xs text-ink-subtle">
               {entry.meaning}
             </span>
           </button>
@@ -62,13 +62,13 @@ export function KanjiGrid({ kanji }: { kanji: readonly KanjiSummary[] }): ReactN
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Buscar por kanji o significado"
           autoComplete="off"
-          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm placeholder:text-slate-400 focus-visible:outline-2 focus-visible:outline-sky-500 sm:max-w-sm dark:border-slate-800 dark:bg-slate-950"
+          className="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm placeholder:text-ink-faint focus-visible:outline-2 focus-visible:outline-accent sm:max-w-sm"
         />
       </div>
 
       {searching ? (
         <section aria-live="polite" className="flex flex-col gap-3">
-          <h2 className="text-sm text-slate-500 dark:text-slate-400">
+          <h2 className="text-sm text-ink-subtle">
             {results.length === 0
               ? 'Ningún kanji del grado coincide con la búsqueda.'
               : `${results.length} ${results.length === 1 ? 'kanji coincide' : 'kanji coinciden'}`}
@@ -83,7 +83,7 @@ export function KanjiGrid({ kanji }: { kanji: readonly KanjiSummary[] }): ReactN
             key={block.start}
             className="flex flex-col gap-3 [contain-intrinsic-size:auto_40rem] [content-visibility:auto]"
           >
-            <h2 className="text-sm font-medium tracking-wide text-slate-500 uppercase tabular-nums dark:text-slate-400">
+            <h2 className="text-sm font-medium tracking-wide text-ink-subtle uppercase tabular-nums">
               {block.start}–{block.end}
             </h2>
             <KanjiCells kanji={block.kanji} onSelect={setSelected} />

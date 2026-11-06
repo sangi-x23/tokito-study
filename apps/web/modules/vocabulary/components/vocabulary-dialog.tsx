@@ -46,7 +46,7 @@ export function VocabularyDialog({ word, onClose }: { word: VocabularySummary; o
             {word.japanese}
           </span>
           {word.reading !== word.japanese && (
-            <span lang="ja" className="text-xl text-slate-500 dark:text-slate-400">
+            <span lang="ja" className="text-xl text-ink-subtle">
               {word.reading}
             </span>
           )}
@@ -54,11 +54,11 @@ export function VocabularyDialog({ word, onClose }: { word: VocabularySummary; o
       }
     >
       <div className="flex flex-col gap-1">
-        <p className="text-lg">{word.equivalents.join(', ')}</p>
+        <p className="text-lg">{word.equivalents.join(',')}</p>
         {state.status === 'ready' && <VocabularyFacts word={state.word} />}
       </div>
-      {state.status === 'loading' && <p className="text-sm text-slate-500 dark:text-slate-400">Cargando…</p>}
-      {state.status === 'error' && <p className="text-sm text-slate-500 dark:text-slate-400">{state.message}</p>}
+      {state.status === 'loading' && <p className="text-sm text-ink-subtle">Cargando…</p>}
+      {state.status === 'error' && <p className="text-sm text-ink-subtle">{state.message}</p>}
       {state.status === 'ready' && <VocabularyDetails word={state.word} />}
     </Modal>
   );

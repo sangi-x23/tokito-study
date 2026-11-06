@@ -35,8 +35,8 @@ export function SectionNavLink({
       aria-current={active ? 'page' : undefined}
       className={`flex items-center justify-between gap-2 rounded-lg px-3 py-1.5 text-sm whitespace-nowrap transition-colors lg:whitespace-normal ${
         active
-          ? 'bg-slate-100 font-medium text-slate-900 in-data-highlight:bg-transparent! dark:bg-slate-800 dark:text-slate-100'
-          : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100'
+          ? 'bg-surface-strong font-medium text-ink in-data-highlight:bg-transparent!'
+          : 'text-ink-muted hover:bg-surface-muted hover:text-ink'
       }`}
     >
       <span>{children}</span>

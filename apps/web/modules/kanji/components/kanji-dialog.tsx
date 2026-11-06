@@ -47,8 +47,8 @@ export function KanjiDialog({ character, onClose }: { character: string; onClose
         </span>
       }
     >
-      {state.status === 'loading' && <p className="text-sm text-slate-500 dark:text-slate-400">Cargando…</p>}
-      {state.status === 'error' && <p className="text-sm text-slate-500 dark:text-slate-400">{state.message}</p>}
+      {state.status === 'loading' && <p className="text-sm text-ink-subtle">Cargando…</p>}
+      {state.status === 'error' && <p className="text-sm text-ink-subtle">{state.message}</p>}
       {state.status === 'ready' && <KanjiDetails kanji={state.kanji} />}
     </Modal>
   );

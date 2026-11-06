@@ -28,12 +28,12 @@ export function BasicKanaGrid({
               type="button"
               onClick={() => setSelected(entry)}
               aria-label={`${entry.character} (${entry.romaji}): ver orden de trazos y combinaciones`}
-              className={`${CELL_CLASS} cursor-pointer transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-sky-500 dark:hover:bg-slate-900`}
+              className={`${CELL_CLASS} cursor-pointer transition-colors hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-accent`}
             >
               <span lang="ja" className="text-2xl font-medium sm:text-3xl">
                 {entry.character}
               </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400">{entry.romaji}</span>
+              <span className="text-xs text-ink-subtle">{entry.romaji}</span>
             </button>
           </li>
         ))}

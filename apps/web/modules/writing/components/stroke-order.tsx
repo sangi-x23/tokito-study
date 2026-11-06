@@ -18,7 +18,7 @@ function strokeStart(d: string): { x: number; y: number } {
 /** Cruz punteada del papel de práctica, para ubicar el trazo en el cuadro. */
 function Guides(): ReactNode {
   return (
-    <g className="text-slate-200 dark:text-slate-800" stroke="currentColor" strokeWidth={0.5} strokeDasharray="2 2">
+    <g className="text-line" stroke="currentColor" strokeWidth={0.5} strokeDasharray="2 2">
       <line x1={54.5} y1={0} x2={54.5} y2={109} />
       <line x1={0} y1={54.5} x2={109} y2={54.5} />
     </g>
@@ -73,19 +73,19 @@ export function StrokeOrder({ strokes }: { strokes: readonly string[] }): ReactN
   return (
     <div ref={root} className="flex flex-col items-center gap-4">
       <div className="flex flex-col items-center gap-2">
-        <svg viewBox={VIEWBOX} aria-hidden className="size-44 rounded-xl border border-slate-200 dark:border-slate-800">
+        <svg viewBox={VIEWBOX} aria-hidden className="size-44 rounded-xl border border-line">
           <Guides />
-          <g className="text-slate-200 dark:text-slate-800" stroke="currentColor" {...STROKE_PROPS}>
+          <g className="text-line" stroke="currentColor" {...STROKE_PROPS}>
             {strokes.map((d, index) => (
               <path key={index} d={d} />
             ))}
           </g>
-          <g className="text-slate-900 dark:text-slate-100" stroke="currentColor" {...STROKE_PROPS}>
+          <g className="text-ink" stroke="currentColor" {...STROKE_PROPS}>
             {strokes.map((d, index) => (
               <path key={index} d={d} data-animated-stroke />
             ))}
           </g>
-          <g className="fill-slate-400 dark:fill-slate-500" fontSize={7}>
+          <g className="fill-ink-faint" fontSize={7}>
             {strokes.map((d, index) => {
               const start = strokeStart(d);
               return (
@@ -100,7 +100,7 @@ export function StrokeOrder({ strokes }: { strokes: readonly string[] }): ReactN
         <button
           type="button"
           onClick={() => scope.current?.methods.replay?.()}
-          className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900 motion-reduce:hidden dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+          className="flex items-center gap-1.5 rounded-lg border border-line-strong px-3 py-1.5 text-sm font-medium text-ink-soft hover:bg-surface-strong hover:text-ink motion-reduce:hidden"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden className="size-4">
             <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
@@ -113,7 +113,7 @@ export function StrokeOrder({ strokes }: { strokes: readonly string[] }): ReactN
       <ol className="flex flex-wrap justify-center gap-2" aria-label="Paso a paso">
         {strokes.map((_, step) => (
           <li key={step} className="flex flex-col items-center gap-1">
-            <svg viewBox={VIEWBOX} aria-hidden className="size-14 rounded-lg border border-slate-200 dark:border-slate-800">
+            <svg viewBox={VIEWBOX} aria-hidden className="size-14 rounded-lg border border-line">
               <Guides />
               {strokes.slice(0, step + 1).map((d, index) => (
                 <path
@@ -122,12 +122,12 @@ export function StrokeOrder({ strokes }: { strokes: readonly string[] }): ReactN
                   stroke="currentColor"
                   {...STROKE_PROPS}
                   className={
-                    index === step ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400 dark:text-slate-500'
+                    index === step ? 'text-accent-ink' : 'text-ink-faint'
                   }
                 />
               ))}
             </svg>
-            <span className="text-xs text-slate-500 dark:text-slate-400">{step + 1}</span>
+            <span className="text-xs text-ink-subtle">{step + 1}</span>
           </li>
         ))}
       </ol>

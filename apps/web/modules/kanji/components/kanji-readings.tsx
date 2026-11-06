@@ -10,7 +10,7 @@ function KunReading({ reading }: { reading: string }): ReactNode {
   return (
     <>
       {stem}
-      {okurigana && <span className="text-slate-400 dark:text-slate-500">{okurigana}</span>}
+      {okurigana && <span className="text-ink-faint">{okurigana}</span>}
     </>
   );
 }
@@ -25,8 +25,8 @@ function ReadingList({
   kun?: boolean;
 }): ReactNode {
   return (
-    <div className="flex flex-col gap-1 rounded-lg bg-slate-50 p-3 dark:bg-slate-900">
-      <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
+    <div className="flex flex-col gap-1 rounded-lg bg-surface-muted p-3">
+      <dt className="text-xs text-ink-subtle">{label}</dt>
       <dd lang="ja" className="text-lg">
         {readings.length === 0
           ? '—'
@@ -56,7 +56,7 @@ export function KanjiReadings({
         <ReadingList label="Kun'yomi" readings={kunyomi} kun />
       </dl>
       {kunyomi.some((reading) => reading.includes('.')) && (
-        <p className="text-xs text-slate-500 dark:text-slate-400">
+        <p className="text-xs text-ink-subtle">
           En gris, el okurigana: la parte que se escribe en hiragana después del kanji.
         </p>
       )}

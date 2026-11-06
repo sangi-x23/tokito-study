@@ -24,7 +24,7 @@ export function LinkPendingHint({ className = '' }: { className?: string }): Rea
       strokeWidth={2.5}
       strokeLinecap="round"
       aria-hidden
-      className={`size-4 shrink-0 text-slate-400 ${
+      className={`size-4 shrink-0 text-ink-faint ${
         pending ? 'animate-link-pending motion-reduce:animate-link-pending-reduced' : 'invisible'
       } ${className}`}
     >
