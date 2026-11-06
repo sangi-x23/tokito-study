@@ -11,7 +11,7 @@ export function WritingHome(): ReactNode {
         los kanji de uso común con su orden de trazos. Elige uno para empezar.
       </p>
       <p className="text-sm text-ink-subtle">
-        {[...WRITING_SCRIPTS.map((script) => script.label), 'Kanji'].join(' ·')}
+        {[...WRITING_SCRIPTS.map((script) => script.label), 'Kanji'].join(' · ')}
       </p>
     </div>
   );

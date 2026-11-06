@@ -33,7 +33,7 @@ function WordCards({
               )}
             </span>
             <span className="w-full truncate text-sm text-ink-muted">
-              {word.equivalents.join(',')}
+              {word.equivalents.join(', ')}
             </span>
           </button>
         </li>

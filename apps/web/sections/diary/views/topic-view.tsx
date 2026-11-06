@@ -22,7 +22,7 @@ export function TopicView({ topic }: { topic: TopicDetail }): ReactNode {
         <Breadcrumb crumbs={crumbs} />
         <h1 className="text-3xl font-semibold tracking-tight">{topic.name}</h1>
         <p className="text-sm text-ink-subtle">
-          {CATEGORY_LABEL[topic.category]} ·{''}
+          {CATEGORY_LABEL[topic.category]} ·{' '}
           {/* Un tema raíz suele no tener ítems propios: los tienen sus subtemas. */}
           {topic.children.length > 0 && topic.itemCount === 0
             ? `${topic.children.length} subtemas`

@@ -48,7 +48,7 @@ export function ItemCard({ item, currentSlug }: { item: ItemSummary; currentSlug
 
       {elsewhere && (
         <p className="text-xs text-ink-subtle">
-          Tema principal:{''}
+          Tema principal:{' '}
           <Link href={routes.topic(elsewhere.slug)} className="underline hover:text-ink">
             {elsewhere.name}
           </Link>

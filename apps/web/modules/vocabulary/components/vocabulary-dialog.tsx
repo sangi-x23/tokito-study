@@ -54,7 +54,7 @@ export function VocabularyDialog({ word, onClose }: { word: VocabularySummary; o
       }
     >
       <div className="flex flex-col gap-1">
-        <p className="text-lg">{word.equivalents.join(',')}</p>
+        <p className="text-lg">{word.equivalents.join(', ')}</p>
         {state.status === 'ready' && <VocabularyFacts word={state.word} />}
       </div>
       {state.status === 'loading' && <p className="text-sm text-ink-subtle">Cargando…</p>}

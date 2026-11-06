@@ -13,7 +13,7 @@ export function KanjiHomeView(): ReactNode {
       <div className="flex flex-col gap-2">
         <Breadcrumb crumbs={[{ label: writingSection.label, href: writingSection.href }, { label: 'Kanji' }]} />
         <h1 className="text-3xl font-semibold tracking-tight">
-          Kanji{''}
+          Kanji{' '}
           <span lang="ja" className="text-ink-faint">
             漢字
           </span>

@@ -13,7 +13,7 @@ export function VocabularyHome(): ReactNode {
       <div className="flex flex-col gap-2">
         <Breadcrumb crumbs={[{ label: vocabularySection.label }]} />
         <h1 className="text-3xl font-semibold tracking-tight">
-          Vocabulario{''}
+          Vocabulario{' '}
           <span lang="ja" className="text-ink-faint">
             語彙
           </span>

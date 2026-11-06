@@ -21,7 +21,7 @@ export function KanaTableView({ script, table }: { script: WritingScript; table:
       <div className="flex flex-col gap-2">
         <Breadcrumb crumbs={[{ label: writingSection.label, href: writingSection.href }, { label: script.label }]} />
         <h1 className="text-3xl font-semibold tracking-tight">
-          {script.label}{''}
+          {script.label}{' '}
           <span lang="ja" className="text-ink-faint">
             {script.japanese}
           </span>

@@ -27,7 +27,7 @@ function Example({ example }: { example: VocabularyExample }): ReactNode {
         <a href={tatoebaUrl(example.tatoebaId)} target="_blank" rel="noreferrer" className={link}>
           Oración de Tatoeba
         </a>
-        {' ·'}
+        {' · '}
         {example.spanishTatoebaId ? (
           <a href={tatoebaUrl(example.spanishTatoebaId)} target="_blank" rel="noreferrer" className={link}>
             traducción de Tatoeba
@@ -47,7 +47,7 @@ export function VocabularyFacts({ word }: { word: VocabularyWord }): ReactNode {
     ...word.partsOfSpeech,
     word.usuallyKana ? 'suele escribirse solo en kana' : null,
   ].filter(Boolean);
-  return <p className="text-sm text-ink-subtle">{facts.join(' ·')}</p>;
+  return <p className="text-sm text-ink-subtle">{facts.join(' · ')}</p>;
 }
 
 /** El cuerpo del modal de una palabra: significado, ejemplos y créditos. */
