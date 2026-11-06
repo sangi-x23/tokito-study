@@ -1,0 +1,63 @@
+/*
+ * Tokens de color de toda la app. Los componentes usan solo estos nombres
+ * (`bg-surface`, `text-ink-subtle`, `border-line`…), nunca un color de la
+ * paleta de Tailwind: así un día temático cambia la interfaz entera
+ * redefiniendo las variables bajo `[data-theme="<día>"]`, sin tocar componentes.
+ *
+ * Los valores son los slate y sky de Tailwind, con su versión oscura según el
+ * sistema. Como las utilidades leen `var(--color-*)`, el modo oscuro también se
+ * resuelve aquí y los componentes no llevan `dark:` para los tokens.
+ *
+ * Excepción: las etiquetas de tipo de ítem (`modules/content/labels.ts`) son
+ * categorías, no tema, y conservan sus colores.
+ */
+@theme {
+  /* Fondos: la página, un realce suave (hover) y uno más marcado (chips). */
+  --color-surface: #fff;
+  --color-surface-muted: oklch(98.4% 0.003 247.858); /* slate-50 */
+  --color-surface-strong: oklch(96.8% 0.007 247.896); /* slate-100 */
+
+  /* Texto, de más a menos contraste. */
+  --color-ink: oklch(20.8% 0.042 265.755); /* slate-900 */
+  --color-ink-soft: oklch(44.6% 0.043 257.281); /* slate-600: texto secundario legible */
+  --color-ink-muted: oklch(44.6% 0.043 257.281); /* slate-600: enlaces de navegación */
+  --color-ink-subtle: oklch(55.4% 0.046 257.417); /* slate-500: leyendas y metadatos */
+  --color-ink-faint: oklch(70.4% 0.04 256.788); /* slate-400: placeholders y adornos */
+
+  /* Bordes. */
+  --color-line: oklch(92.9% 0.013 255.508); /* slate-200 */
+  --color-line-strong: oklch(86.9% 0.022 252.894); /* slate-300 */
+
+  /* Acento: foco y enlaces. */
+  --color-accent: oklch(68.5% 0.169 237.323); /* sky-500 */
+  --color-accent-ink: oklch(50% 0.134 242.749); /* sky-700 */
+
+  /* Fondo detrás de modales y del sidebar móvil (se usa con opacidad). */
+  --color-overlay: oklch(12.9% 0.042 264.695); /* slate-950 */
+
+  /* Barra de scroll (ver globals.css). */
+  --color-scrollbar-thumb: oklch(86.9% 0.022 252.894); /* slate-300 */
+  --color-scrollbar-thumb-hover: oklch(70.4% 0.04 256.788); /* slate-400 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-surface: oklch(12.9% 0.042 264.695); /* slate-950 */
+    --color-surface-muted: oklch(20.8% 0.042 265.755); /* slate-900 */
+    --color-surface-strong: oklch(27.9% 0.041 260.031); /* slate-800 */
+
+    --color-ink: oklch(96.8% 0.007 247.896); /* slate-100 */
+    --color-ink-soft: oklch(86.9% 0.022 252.894); /* slate-300 */
+    --color-ink-muted: oklch(70.4% 0.04 256.788); /* slate-400 */
+    --color-ink-subtle: oklch(70.4% 0.04 256.788); /* slate-400 */
+    --color-ink-faint: oklch(70.4% 0.04 256.788); /* slate-400 */
+
+    --color-line: oklch(27.9% 0.041 260.031); /* slate-800 */
+    --color-line-strong: oklch(37.2% 0.044 257.287); /* slate-700 */
+
+    --color-accent-ink: oklch(74.6% 0.16 232.661); /* sky-400 */
+
+    --color-scrollbar-thumb: oklch(37.2% 0.044 257.287); /* slate-700 */
+    --color-scrollbar-thumb-hover: oklch(44.6% 0.043 257.281); /* slate-600 */
+  }
+}

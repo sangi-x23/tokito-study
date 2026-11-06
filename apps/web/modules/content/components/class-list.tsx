@@ -13,7 +13,7 @@ export function ClassList({ classes }: { classes: readonly ClassRef[] }): ReactN
         <li
           key={`${entry.classDate ?? ''}${entry.title}`}
           lang="ja"
-          className="rounded-md bg-slate-100 px-2 py-0.5 text-xs text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+          className="rounded-md bg-surface-strong px-2 py-0.5 text-xs text-ink-soft"
         >
           {entry.title}
         </li>

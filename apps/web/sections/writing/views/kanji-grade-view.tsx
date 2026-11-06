@@ -20,7 +20,7 @@ export function KanjiGradeView({ grade, table }: { grade: KanjiGradeEntry; table
           ]}
         />
         <h1 className="text-3xl font-semibold tracking-tight">Kanji de {grade.label.toLowerCase()}</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">{table.kanji.length} kanji, del más al menos usado</p>
+        <p className="text-sm text-ink-subtle">{table.kanji.length} kanji, del más al menos usado</p>
       </div>
       <KanjiGradeNav current={grade} />
       <KanjiGrid kanji={table.kanji} />

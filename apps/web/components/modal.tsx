@@ -39,7 +39,7 @@ export function Modal({
           event.currentTarget.close();
         }
       }}
-      className="m-auto max-h-none w-[min(32rem,calc(100%-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-xl backdrop:bg-slate-950/50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
+      className="m-auto max-h-none w-[min(32rem,calc(100%-2rem))] overflow-hidden rounded-2xl border border-line bg-surface text-ink shadow-xl backdrop:bg-overlay/50"
     >
       {/* El scroll va aquí y no en el <dialog>, para que la barra quede dentro de las esquinas redondeadas. */}
       <div className="flex max-h-[calc(100dvh-2rem-2px)] flex-col gap-6 overflow-y-auto p-6">
@@ -51,7 +51,7 @@ export function Modal({
             type="button"
             onClick={() => dialog.current?.close()}
             aria-label="Cerrar"
-            className="-mr-2 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+            className="-mr-2 rounded-md p-1 text-ink-subtle hover:bg-surface-strong hover:text-ink"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} strokeLinecap="round" aria-hidden className="size-5">
               <path d="M6 6l12 12M18 6L6 18" />

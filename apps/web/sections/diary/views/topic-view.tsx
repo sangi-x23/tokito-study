@@ -21,14 +21,14 @@ export function TopicView({ topic }: { topic: TopicDetail }): ReactNode {
       <div className="flex flex-col gap-2">
         <Breadcrumb crumbs={crumbs} />
         <h1 className="text-3xl font-semibold tracking-tight">{topic.name}</h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
-          {CATEGORY_LABEL[topic.category]} ·{' '}
+        <p className="text-sm text-ink-subtle">
+          {CATEGORY_LABEL[topic.category]} ·{''}
           {/* Un tema raíz suele no tener ítems propios: los tienen sus subtemas. */}
           {topic.children.length > 0 && topic.itemCount === 0
             ? `${topic.children.length} subtemas`
             : itemCountLabel(topic.itemCount)}
         </p>
-        {topic.description && <p className="text-slate-600 dark:text-slate-400">{topic.description}</p>}
+        {topic.description && <p className="text-ink-muted">{topic.description}</p>}
       </div>
 
       {topic.children.length > 0 && (
@@ -39,16 +39,16 @@ export function TopicView({ topic }: { topic: TopicDetail }): ReactNode {
               <li key={child.slug}>
                 <Link
                   href={routes.topic(child.slug)}
-                  className="flex h-full flex-col gap-1 rounded-xl border border-slate-200 p-4 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+                  className="flex h-full flex-col gap-1 rounded-xl border border-line p-4 hover:bg-surface-muted"
                 >
                   <span className="flex items-center justify-between gap-2 font-medium">
                     {child.name}
                     <LinkPendingHint />
                   </span>
                   {child.description && (
-                    <span className="text-sm text-slate-600 dark:text-slate-400">{child.description}</span>
+                    <span className="text-sm text-ink-muted">{child.description}</span>
                   )}
-                  <span className="mt-auto pt-1 text-xs text-slate-500 dark:text-slate-400">
+                  <span className="mt-auto pt-1 text-xs text-ink-subtle">
                     {itemCountLabel(child.itemCount)}
                   </span>
                 </Link>

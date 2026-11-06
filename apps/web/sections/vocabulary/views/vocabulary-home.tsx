@@ -13,16 +13,16 @@ export function VocabularyHome(): ReactNode {
       <div className="flex flex-col gap-2">
         <Breadcrumb crumbs={[{ label: vocabularySection.label }]} />
         <h1 className="text-3xl font-semibold tracking-tight">
-          Vocabulario{' '}
-          <span lang="ja" className="text-slate-400">
+          Vocabulario{''}
+          <span lang="ja" className="text-ink-faint">
             語彙
           </span>
         </h1>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-ink-muted">
           Unas 8000 palabras ordenadas por los niveles del examen oficial de japonés (JLPT), de N5, el más fácil, a N1.
           Cada una trae su lectura, su traducción, qué significa y cómo se usa, y oraciones de ejemplo.
         </p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-ink-subtle">
           El JLPT no publica listas de vocabulario desde 2010: estas son las de Jonathan Waller, las más usadas, armadas
           a partir de exámenes anteriores. Son una guía, no la lista oficial.
         </p>
@@ -32,13 +32,13 @@ export function VocabularyHome(): ReactNode {
           <li key={entry.slug}>
             <Link
               href={routes.vocabularyLevel(entry.slug)}
-              className="flex h-full flex-col gap-1 rounded-xl border border-slate-200 px-4 py-3 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+              className="flex h-full flex-col gap-1 rounded-xl border border-line px-4 py-3 transition-colors hover:bg-surface-muted"
             >
               <span className="flex items-center justify-between gap-2 font-medium">
                 {entry.label}
                 <LinkPendingHint />
               </span>
-              <span className="text-sm text-slate-600 dark:text-slate-400">{entry.description}</span>
+              <span className="text-sm text-ink-muted">{entry.description}</span>
             </Link>
           </li>
         ))}

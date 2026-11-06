@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../styles/base.css";
 
 /*
  * El indicador de `LinkPendingHint`: espera 120 ms antes de aparecer, para no
@@ -27,22 +28,9 @@
 
 /*
  * Barra de scroll delgada y redondeada en toda la app, también dentro de los
- * modales. Los colores son los slate de Tailwind, con su versión oscura según
- * el sistema, como el resto de la app.
- */
-:root {
-  --scrollbar-thumb: #cbd5e1; /* slate-300 */
-  --scrollbar-thumb-hover: #94a3b8; /* slate-400 */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --scrollbar-thumb: #334155; /* slate-700 */
-    --scrollbar-thumb-hover: #475569; /* slate-600 */
-  }
-}
-
-/*
+ * modales. Sus colores son tokens de `styles/base.css`, así que siguen al modo
+ * oscuro y a los temas del día.
+ *
  * Chrome, Edge y Safari. Van solo con `::-webkit-scrollbar` y no con
  * `scrollbar-width`/`scrollbar-color`: con esas, Chrome pinta la barra nativa
  * con sus flechas y no hay forma estándar de quitarlas.
@@ -62,20 +50,20 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-thumb);
+  background-color: var(--color-scrollbar-thumb);
   background-clip: content-box;
   border: 3px solid transparent;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--scrollbar-thumb-hover);
+  background-color: var(--color-scrollbar-thumb-hover);
 }
 
 /* Firefox, que no conoce `::-webkit-scrollbar` y con `thin` no pinta flechas. */
 @supports not selector(::-webkit-scrollbar) {
   * {
     scrollbar-width: thin;
-    scrollbar-color: var(--scrollbar-thumb) transparent;
+    scrollbar-color: var(--color-scrollbar-thumb) transparent;
   }
 }

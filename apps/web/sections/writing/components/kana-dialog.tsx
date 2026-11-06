@@ -17,12 +17,12 @@ function RelatedList({ title, items }: { title: ReactNode; items: readonly KanaR
         {items.map((item) => (
           <li
             key={item.character}
-            className="flex min-w-14 flex-col items-center rounded-lg border border-slate-200 px-2 py-1.5 dark:border-slate-800"
+            className="flex min-w-14 flex-col items-center rounded-lg border border-line px-2 py-1.5"
           >
             <span lang="ja" className="text-xl">
               {item.character}
             </span>
-            <span className="text-xs text-slate-500 dark:text-slate-400">{item.romaji}</span>
+            <span className="text-xs text-ink-subtle">{item.romaji}</span>
           </li>
         ))}
       </ul>
@@ -48,7 +48,7 @@ export function KanaDialog({
           <span lang="ja" className="text-5xl font-medium">
             {kana.character}
           </span>
-          <span className="text-lg text-slate-500 dark:text-slate-400">{kana.romaji}</span>
+          <span className="text-lg text-ink-subtle">{kana.romaji}</span>
         </>
       }
     >
@@ -80,11 +80,11 @@ export function KanaDialog({
         </>
       )}
 
-      <p className="text-xs text-slate-500 dark:text-slate-400">
-        Trazos de{' '}
+      <p className="text-xs text-ink-subtle">
+        Trazos de{''}
         <a href="https://kanjivg.tagaini.net" target="_blank" rel="noreferrer" className="underline">
           KanjiVG
-        </a>{' '}
+        </a>{''}
         (CC BY-SA 3.0).
       </p>
     </Modal>

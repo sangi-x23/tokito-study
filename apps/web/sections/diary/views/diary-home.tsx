@@ -8,13 +8,13 @@ export function DiaryHome({ tree }: { tree: readonly TopicNode[] }): ReactNode {
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-3xl font-semibold tracking-tight">Diario de clase</h1>
-      <p className="text-slate-600 dark:text-slate-400">
+      <p className="text-ink-muted">
         El material del curso, organizado por tema y no por clase. Elige un tema para ver sus subtemas.
       </p>
       {tree.length === 0 ? (
-        <p className="text-slate-500">Todavía no hay temas.</p>
+        <p className="text-ink-subtle">Todavía no hay temas.</p>
       ) : (
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-ink-subtle">
           {tree.length} temas · {subtopicCount} subtemas
         </p>
       )}
